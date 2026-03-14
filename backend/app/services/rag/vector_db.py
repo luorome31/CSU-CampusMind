@@ -1,15 +1,17 @@
 """
-Vector Database Client - ChromaDB implementation
+Vector Database Client - ChromaDB implementation with search
 """
 from typing import List, Optional, Dict
 import chromadb
 from loguru import logger
 
 from app.schema.chunk import ChunkModel
+from app.schema.search import SearchModel
+from app.services.rag.embedding import embedding_service
 
 
 class ChromaClient:
-    """ChromaDB client for vector storage"""
+    """ChromaDB client for vector storage and retrieval"""
 
     def __init__(self, persist_path: str = "./data/chroma"):
         self.collections: Dict[str, chromadb.Collection] = {}
@@ -121,41 +123,56 @@ class ChromaClient:
     async def search(
         self,
         collection_name: str,
-        query_embedding: List[float],
+        query: str,
         top_k: int = 5
-    ) -> List[dict]:
-        """Search similar chunks"""
+    ) -> List[SearchModel]:
+        """Search similar chunks by query text"""
         collection = self._get_collection(collection_name)
         if not collection:
             logger.error(f"Collection '{collection_name}' not found")
             return []
 
         try:
+            # Get query embedding
+            query_embedding = await embedding_service.get_embedding(query)
+
             results = collection.query(
                 query_embeddings=[query_embedding],
-                n_results=min(top_k, 100),
+                n_results=min(top_k * 2, 100),  # Get more for reranking
                 include=["metadatas", "documents", "distances"]
             )
 
             if not results['ids'] or len(results['ids'][0]) == 0:
                 return []
 
-            documents = []
+            search_results = []
             for i in range(len(results['ids'][0])):
                 metadata = results['metadatas'][0][i] or {}
-                documents.append({
-                    "content": results['documents'][0][i],
-                    "chunk_id": metadata.get("chunk_id", ""),
-                    "file_id": metadata.get("file_id", ""),
-                    "file_name": metadata.get("file_name", ""),
-                    "knowledge_id": metadata.get("knowledge_id", ""),
-                    "score": 1.0 - results['distances'][0][i]
-                })
+                search_results.append(SearchModel(
+                    content=results['documents'][0][i] or "",
+                    chunk_id=metadata.get("chunk_id", ""),
+                    file_id=metadata.get("file_id", ""),
+                    file_name=metadata.get("file_name", ""),
+                    knowledge_id=metadata.get("knowledge_id", ""),
+                    update_time=metadata.get("update_time", ""),
+                    summary=metadata.get("summary", ""),
+                    score=1.0 - results['distances'][0][i]  # Convert distance to similarity
+                ))
 
-            return documents[:top_k]
+            return search_results[:top_k]
         except Exception as e:
             logger.error(f"Search failed: {e}")
             return []
+
+    async def search_summary(
+        self,
+        collection_name: str,
+        query: str,
+        top_k: int = 5
+    ) -> List[SearchModel]:
+        """Search similar chunks by summary"""
+        # Similar to search but could filter by is_summary=True
+        return await self.search(collection_name, query, top_k)
 
     async def delete_by_file_id(self, file_id: str, collection_name: str) -> bool:
         """Delete chunks by file_id"""
