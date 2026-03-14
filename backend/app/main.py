@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
-from app.api.v1 import crawl
+from app.api.v1 import crawl, index
 
 
 def create_app() -> FastAPI:
@@ -27,6 +27,7 @@ def create_app() -> FastAPI:
 
     # Include routers
     app.include_router(crawl.router, prefix="/api/v1")
+    app.include_router(index.router, prefix="/api/v1")
 
     @app.get("/health")
     async def health_check():
