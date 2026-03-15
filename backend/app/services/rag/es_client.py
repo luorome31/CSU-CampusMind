@@ -153,5 +153,18 @@ class ESClient:
             return False
 
 
-# Default instance
-es_client = ESClient()
+# Default instance - configured from settings
+from app.config import settings
+
+_es_client = None
+
+
+def get_es_client() -> ESClient:
+    """Get or create Elasticsearch client with settings from config"""
+    global _es_client
+    if _es_client is None:
+        _es_client = ESClient(hosts=settings.elasticsearch_hosts)
+    return _es_client
+
+
+es_client = get_es_client()

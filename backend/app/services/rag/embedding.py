@@ -80,5 +80,23 @@ class EmbeddingService:
         return all_embeddings
 
 
-# Default embedding service instance
-embedding_service = EmbeddingService()
+# Default embedding service instance - configured from settings
+from app.config import settings
+
+_embedding_service = None
+
+
+def get_embedding_service() -> EmbeddingService:
+    """Get or create embedding service with settings from config"""
+    global _embedding_service
+    if _embedding_service is None:
+        config = EmbeddingConfig(
+            model_name=settings.embedding_model,
+            base_url=settings.embedding_base_url,
+            api_key=settings.embedding_api_key,
+        )
+        _embedding_service = EmbeddingService(config)
+    return _embedding_service
+
+
+embedding_service = get_embedding_service()

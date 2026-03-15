@@ -189,5 +189,18 @@ class ChromaClient:
             return False
 
 
-# Default instance
-vector_db = ChromaClient()
+# Default instance - configured from settings
+from app.config import settings
+
+_vector_db = None
+
+
+def get_vector_db() -> ChromaClient:
+    """Get or create ChromaDB client with settings from config"""
+    global _vector_db
+    if _vector_db is None:
+        _vector_db = ChromaClient(persist_path=settings.chroma_persist_path)
+    return _vector_db
+
+
+vector_db = get_vector_db()
