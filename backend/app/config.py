@@ -4,7 +4,8 @@ Configuration Loader - Load settings from environment
 import os
 from pydantic import BaseModel
 from typing import Optional
-
+from dotenv import load_dotenv
+load_dotenv()
 
 class Settings(BaseModel):
     """Application settings loaded from environment"""
