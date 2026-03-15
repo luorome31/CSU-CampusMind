@@ -107,5 +107,29 @@ class StorageClient:
             client.delete_object(object_name)
 
 
-# Default instance - will be configured from settings
-storage_client = StorageClient()
+# Default instance - configured from settings
+from app.config import settings
+
+_storage_client = None
+
+
+def get_storage_client() -> StorageClient:
+    """Get or create storage client with settings from config"""
+    global _storage_client
+    if _storage_client is None:
+        config = StorageConfig(
+            mode=settings.storage_mode,
+            base_url=settings.minio_endpoint,
+            bucket_name=settings.minio_bucket,
+            minio_access_key=settings.minio_access_key or "minioadmin",
+            minio_secret_key=settings.minio_secret_key or "minioadmin",
+            minio_endpoint=settings.minio_endpoint,
+            oss_access_key_id=settings.oss_access_key_id,
+            oss_access_key_secret=settings.oss_access_key_secret,
+            oss_endpoint=settings.oss_endpoint,
+        )
+        _storage_client = StorageClient(config)
+    return _storage_client
+
+
+storage_client = get_storage_client()
