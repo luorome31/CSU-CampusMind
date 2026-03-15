@@ -4,6 +4,7 @@ Database Session Management
 from typing import AsyncGenerator
 from sqlmodel import SQLModel, create_engine, Session
 from sqlalchemy.pool import StaticPool
+from pydantic import BaseModel
 
 
 class DatabaseConfig(BaseModel):
@@ -37,5 +38,3 @@ def get_session() -> Session:
     with Session(engine) as session:
         yield session
 
-
-from pydantic import BaseModel
