@@ -41,10 +41,18 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    command: >
+      sh -c "
+        if [ ! -d plugins/analysis-ik ]; then
+          bin/elasticsearch-plugin install --batch https://get.infini.cloud/elasticsearch/analysis-ik/8.12.0;
+        fi;
+        /usr/local/bin/docker-entrypoint.sh elasticsearch
+      "
     ports:
       - "9200:9200"
     volumes:
       - campusmind_elasticsearch_data:/usr/share/elasticsearch/data
+      - campusmind_elasticsearch_plugins:/usr/share/elasticsearch/plugins
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
       interval: 10s
@@ -55,3 +63,4 @@ volumes:
   campusmind_postgres_data:
   campusmind_minio_data:
   campusmind_elasticsearch_data:
+  campusmind_elasticsearch_plugins:
