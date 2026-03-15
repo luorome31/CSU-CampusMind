@@ -49,6 +49,8 @@ class Indexer:
         try:
             # Generate file_id
             file_id = metadata.get("file_id") if metadata else str(uuid.uuid4())
+            if not file_id:
+                file_id = str(uuid.uuid4())
 
             # Chunk the content
             chunker = TextChunker(self.chunk_size, self.overlap_size)
