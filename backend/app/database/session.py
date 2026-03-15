@@ -27,6 +27,8 @@ def create_db_and_tables():
     """Create all tables"""
     from app.database.models.knowledge import KnowledgeBase
     from app.database.models.knowledge_file import KnowledgeFile
+    from app.database.models.dialog import Dialog
+    from app.database.models.chat_history import ChatHistory
     SQLModel.metadata.create_all(engine)
 
 

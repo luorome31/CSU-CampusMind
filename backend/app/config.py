@@ -28,6 +28,11 @@ class Settings(BaseModel):
     embedding_base_url: str = "https://api.openai.com/v1"
     embedding_api_key: Optional[str] = None
 
+    # LLM (OpenAI)
+    openai_api_key: Optional[str] = None
+    openai_model: str = "gpt-3.5-turbo"
+    openai_base_url: str = "https://api.openai.com/v1"
+
     # Elasticsearch
     elasticsearch_hosts: str = "http://localhost:9200"
 
@@ -56,6 +61,9 @@ class Settings(BaseModel):
             elasticsearch_hosts=os.getenv("ELASTICSEARCH_HOSTS", "http://localhost:9200"),
             chroma_persist_path=os.getenv("CHROMA_PERSIST_PATH", "./data/chroma"),
             database_url=os.getenv("DATABASE_URL", "sqlite:///./campusmind.db"),
+            openai_api_key=os.getenv("OPENAI_API_KEY"),
+            openai_model=os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"),
+            openai_base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
         )
 
 
