@@ -78,8 +78,8 @@ class HistoryService:
             .order_by(ChatHistory.created_at.asc())
             .limit(limit)
         )
-        result = await session.exec(statement)
-        return list(result.all())
+        result = await session.execute(statement)
+        return list(result.scalars().all())
 
     @staticmethod
     async def delete_dialog_history(
@@ -88,8 +88,8 @@ class HistoryService:
     ):
         """Delete all history for a dialog"""
         statement = select(ChatHistory).where(ChatHistory.dialog_id == dialog_id)
-        result = await session.exec(statement)
-        histories = result.all()
+        result = await session.execute(statement)
+        histories = result.scalars().all()
 
         for history in histories:
             await session.delete(history)

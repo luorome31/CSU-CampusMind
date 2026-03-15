@@ -1,0 +1,97 @@
+"""
+Crawl API tests
+"""
+import pytest
+from unittest.mock import patch, AsyncMock
+from fastapi.testclient import TestClient
+
+
+class TestCrawlAPI:
+    """Tests for Crawl API endpoints"""
+
+    @pytest.fixture
+    def mock_crawl_service(self):
+        """Mock crawl service"""
+        with patch("app.api.v1.crawl.crawl_service") as mock:
+            mock.crawl_and_prepare_for_storage = AsyncMock(return_value={
+                "success": True,
+                "content": "Crawled web content",
+                "storage_key": "test/key",
+                "metadata": {"title": "Example Domain"}
+            })
+            yield mock
+
+    @pytest.fixture
+    def mock_storage(self):
+        """Mock storage client"""
+        with patch("app.api.v1.crawl.storage_client") as mock:
+            mock.upload_content = lambda key, content: f"https://oss.example.com/{key}"
+            yield mock
+
+    def test_crawl_url(self, mock_crawl_service, mock_storage):
+        """Test POST /api/v1/crawl/create"""
+        from app.main import app
+        client = TestClient(app)
+
+        response = client.post(
+            "/api/v1/crawl/create",
+            json={
+                "url": "https://example.com",
+                "store_to_oss": True
+            }
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["success"] is True
+
+    def test_crawl_url_no_storage(self, mock_crawl_service):
+        """Test crawl without OSS storage"""
+        from app.main import app
+        client = TestClient(app)
+
+        response = client.post(
+            "/api/v1/crawl/create",
+            json={
+                "url": "https://example.com",
+                "store_to_oss": False
+            }
+        )
+
+        assert response.status_code == 200
+
+    def test_crawl_and_index(self, mock_crawl_service, mock_storage):
+        """Test POST /api/v1/crawl/create-and-index"""
+        from app.main import app
+        client = TestClient(app)
+
+        response = client.post(
+            "/api/v1/crawl/create-and-index",
+            json={
+                "url": "https://example.com",
+                "knowledge_id": "test_kb_1",
+                "user_id": "test_user",
+                "enable_vector": True,
+                "enable_keyword": True
+            }
+        )
+
+        assert response.status_code == 200
+
+    def test_crawl_batch(self, mock_crawl_service, mock_storage):
+        """Test POST /api/v1/crawl/batch"""
+        from app.main import app
+        client = TestClient(app)
+
+        response = client.post(
+            "/api/v1/crawl/batch",
+            json={
+                "urls": ["https://example.com", "https://example.org"],
+                "store_to_oss": True
+            }
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert isinstance(data, list)
+        assert len(data) == 2

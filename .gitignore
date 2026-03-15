@@ -75,3 +75,5 @@ htmlcov/
 # UV
 uv.lock
 skills-lock.json
+backend/task_plan_core.md
+backend/task_plan_deps.md

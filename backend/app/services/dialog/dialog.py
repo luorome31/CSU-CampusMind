@@ -50,8 +50,8 @@ class DialogService:
     async def get_dialog(session: AsyncSession, dialog_id: str) -> Optional[Dialog]:
         """Get dialog by ID"""
         statement = select(Dialog).where(Dialog.id == dialog_id)
-        result = await session.exec(statement)
-        return result.first()
+        result = await session.execute(statement)
+        return result.scalar_one_or_none()
 
     @staticmethod
     async def update_dialog_time(session: AsyncSession, dialog_id: str):
@@ -74,5 +74,5 @@ class DialogService:
             .order_by(Dialog.updated_at.desc())
             .limit(limit)
         )
-        result = await session.exec(statement)
-        return list(result.all())
+        result = await session.execute(statement)
+        return list(result.scalars().all())

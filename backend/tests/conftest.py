@@ -1,0 +1,195 @@
+"""
+Pytest configuration and fixtures for CampusMind backend tests
+"""
+import os
+import sys
+import pytest
+from typing import Generator
+from unittest.mock import AsyncMock, MagicMock
+
+# Add backend directory to path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+# Set test environment variables
+os.environ.setdefault("DATABASE_URL", "sqlite:///./test_campusmind.db")
+os.environ.setdefault("TESTING", "true")
+
+
+@pytest.fixture
+def mock_knowledge_service():
+    """Mock KnowledgeService for testing"""
+    from unittest.mock import MagicMock
+
+    mock = MagicMock()
+    mock.create_knowledge = MagicMock(return_value=MagicMock(
+        id="test_kb_1",
+        name="Test Knowledge",
+        description="Test description",
+        user_id="test_user",
+        to_dict=lambda: {
+            "id": "test_kb_1",
+            "name": "Test Knowledge",
+            "description": "Test description",
+            "user_id": "test_user",
+            "create_time": "2024-01-01T00:00:00",
+            "update_time": "2024-01-01T00:00:00"
+        }
+    ))
+    mock.get_knowledge = MagicMock(return_value=MagicMock(
+        id="test_kb_1",
+        name="Test Knowledge",
+        description="Test description",
+        user_id="test_user",
+        to_dict=lambda: {
+            "id": "test_kb_1",
+            "name": "Test Knowledge",
+            "description": "Test description",
+            "user_id": "test_user",
+            "create_time": "2024-01-01T00:00:00",
+            "update_time": "2024-01-01T00:00:00"
+        }
+    ))
+    mock.list_knowledge_by_user = MagicMock(return_value=[
+        MagicMock(
+            id="test_kb_1",
+            name="Test Knowledge",
+            description="Test description",
+            user_id="test_user",
+            to_dict=lambda: {
+                "id": "test_kb_1",
+                "name": "Test Knowledge",
+                "description": "Test description",
+                "user_id": "test_user",
+                "create_time": "2024-01-01T00:00:00",
+                "update_time": "2024-01-01T00:00:00"
+            }
+        )
+    ])
+    mock.delete_knowledge = MagicMock(return_value=True)
+    return mock
+
+
+@pytest.fixture
+def mock_rag_handler():
+    """Mock RAG handler for testing"""
+    from unittest.mock import MagicMock
+
+    mock = MagicMock()
+    mock.retrieve_with_sources = AsyncMock(return_value={
+        "context": "Test context from retrieval",
+        "sources": [
+            {"content": "Source 1", "score": 0.9},
+            {"content": "Source 2", "score": 0.8}
+        ]
+    })
+    mock.index_content = AsyncMock(return_value={
+        "success": True,
+        "chunk_count": 5
+    })
+    return mock
+
+
+@pytest.fixture
+def mock_crawl_service():
+    """Mock crawl service for testing"""
+    from unittest.mock import MagicMock
+
+    mock = MagicMock()
+    mock.crawl_url = AsyncMock(return_value={
+        "success": True,
+        "task_id": "crawl_task_123",
+        "status": "pending"
+    })
+    mock.get_crawl_result = AsyncMock(return_value={
+        "task_id": "crawl_task_123",
+        "status": "completed",
+        "content": "Crawled content"
+    })
+    return mock
+
+
+@pytest.fixture
+def sample_knowledge_request():
+    """Sample knowledge creation request data"""
+    return {
+        "name": "Test Knowledge Base",
+        "description": "A test knowledge base",
+        "user_id": "test_user"
+    }
+
+
+@pytest.fixture
+def sample_retrieve_request():
+    """Sample retrieval request data"""
+    return {
+        "query": "What is CampusMind?",
+        "knowledge_ids": ["test_kb_1"],
+        "enable_vector": True,
+        "enable_keyword": True,
+        "top_k": 5,
+        "min_score": 0.0
+    }
+
+
+@pytest.fixture
+def sample_crawl_request():
+    """Sample crawl request data"""
+    return {
+        "url": "https://example.com",
+        "knowledge_id": "test_kb_1"
+    }
+
+
+# === Core Module Fixtures ===
+
+@pytest.fixture
+def mock_langchain_model():
+    """Mock LangChain chat model for ReactAgent testing"""
+    from unittest.mock import AsyncMock, MagicMock
+
+    mock_model = MagicMock()
+
+    # Mock AIMessage with tool_calls
+    mock_response = MagicMock()
+    mock_response.tool_calls = [
+        {"name": "test_tool", "args": {"query": "test"}, "id": "call_123"}
+    ]
+    mock_response.content = "Test response"
+
+    mock_model.bind_tools = MagicMock(return_value=MagicMock(
+        ainvoke=AsyncMock(return_value=mock_response)
+    ))
+
+    return mock_model
+
+
+@pytest.fixture
+def mock_base_tool():
+    """Mock LangChain BaseTool for testing"""
+    from unittest.mock import MagicMock
+
+    tool = MagicMock()
+    tool.name = "test_tool"
+    tool.description = "A test tool"
+    tool.coroutine = True
+    tool.ainvoke = AsyncMock(return_value="Tool execution result")
+    tool.invoke = MagicMock(return_value="Tool execution result")
+
+    return tool
+
+
+@pytest.fixture
+def mock_stream_writer():
+    """Mock StreamWriter for testing"""
+    from unittest.mock import MagicMock
+
+    writer = MagicMock()
+    writer_calls = []
+
+    def capture_call(data):
+        writer_calls.append(data)
+
+    writer.side_effect = capture_call
+    writer.calls = writer_calls
+
+    return writer
