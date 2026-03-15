@@ -46,11 +46,13 @@ class RagTool(BaseTool):
     name: str = "rag_search"
     description: str = """
     Search knowledge bases to retrieve relevant context for answering user questions.
-    Use this tool when you need to find information from the user's knowledge bases.
+
+    CRITICAL: You MUST use the exact knowledge_ids provided in the conversation context.
+    DO NOT use arbitrary IDs like 'python', 'default', or any ID not in the provided list.
 
     Input should be a JSON object with:
     - query: The question to search for
-    - knowledge_ids: List of knowledge base IDs to search
+    - knowledge_ids: List of knowledge base IDs to search (MUST use provided IDs)
     - top_k: Number of results to return (default: 5)
     - min_score: Minimum relevance score (default: 0.0)
     """
@@ -139,9 +141,12 @@ class RagTool(BaseTool):
             )
 
 
-def create_rag_tool() -> RagTool:
+def create_rag_tool(knowledge_ids: List[str] = None) -> RagTool:
     """
     Factory function to create a RAG tool instance.
+
+    Args:
+        knowledge_ids: Default knowledge base IDs to search (optional)
 
     Returns:
         RagTool instance

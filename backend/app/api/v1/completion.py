@@ -119,12 +119,15 @@ def create_agent_with_rag(knowledge_ids: List[str], model_name: str = "gpt-3.5-t
     chat_model = get_llm(model_name)
 
     # Create RAG tool
-    rag_tool = create_rag_tool()
+    rag_tool = create_rag_tool(knowledge_ids=knowledge_ids)
 
-    # Create system prompt
-    system_prompt = """你是一个智能助手，可以帮助用户回答问题。
+    # Create system prompt with knowledge_ids
+    system_prompt = f"""你是一个智能助手，可以帮助用户回答问题。
+
+当前可用的知识库 ID 列表: {knowledge_ids}
 
 当用户询问需要查找知识库的问题时，你会自动使用 rag_search 工具搜索相关知识库。
+IMPORTANT: 你必须使用上面的 knowledge_ids 列表中的 ID，不要自己编造或使用其他 ID。
 请根据搜索到的上下文信息回答用户的问题。
 
 如果知识库中没有相关信息，请如实告知用户。"""

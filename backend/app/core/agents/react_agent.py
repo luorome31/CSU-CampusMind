@@ -193,11 +193,8 @@ class ReactAgent:
                     tool_result = f"Error: Tool '{tool_name}' not found."
                     raise ValueError(tool_result)
 
-                # Execute tool
-                if current_tool.coroutine:
-                    tool_result = await current_tool.ainvoke(tool_args)
-                else:
-                    tool_result = current_tool.invoke(tool_args)
+                # Execute tool - use ainvoke for both sync and async tools
+                tool_result = await current_tool.ainvoke(tool_args)
 
                 # Ensure result is string or convertible to string
                 tool_result_str = str(tool_result)
