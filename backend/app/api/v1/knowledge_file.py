@@ -5,7 +5,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Body, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from app.api.services.knowledge_file import KnowledgeFileService
+from app.services.knowledge_file import KnowledgeFileService
 
 
 router = APIRouter(tags=["Knowledge-File"])

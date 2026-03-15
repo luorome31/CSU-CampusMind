@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 from app.services.crawl.crawler import crawl_service
 from app.services.storage.client import storage_client
-from app.api.services.knowledge_file import KnowledgeFileService
+from app.services.knowledge_file import KnowledgeFileService
 
 
 router = APIRouter(tags=["Crawl"])

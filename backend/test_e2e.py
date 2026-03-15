@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from app.services.rag.indexer import indexer
 from app.services.rag.handler import rag_handler
-from app.api.services.knowledge import KnowledgeService
+from app.services.knowledge import KnowledgeService
 from app.database.session import create_db_and_tables
 
 
