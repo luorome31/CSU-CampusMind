@@ -20,7 +20,13 @@ dependencies = [
     "langchain-community>=0.4.1",
     "langgraph>=0.2.0",
     "openai>=1.0.0",
+    "httpx>=0.28.1",
 ]
 
 [tool.hatch.build.targets.wheel]
 packages = ["app"]
+
+[dependency-groups]
+dev = [
+    "sseclient-py>=1.9.0",
+]

@@ -237,7 +237,6 @@ async def generate_stream(
     finally:
         # Save assistant message to history
         duration = time.time() - start_time
-        import json
         assistant_history = ChatHistory(
             id=str(time.time() * 1000) + "_assistant",
             dialog_id=dialog_id,
