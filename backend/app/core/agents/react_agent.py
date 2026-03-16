@@ -260,14 +260,20 @@ class ReactAgent:
             ):
                 # Handle custom events
                 if typ == "custom":
-                    yield self._wrap_stream_output("event", token)
+                    # token from LangGraph custom stream is already a complete StreamOutput
+                    # directly yield without re-wrapping to avoid double nesting
+                    yield token
                 # Handle AIMessageChunk (model content streaming)
                 if typ == "messages" and isinstance(token[0], AIMessageChunk):
                     response_content += token[0].content
-                    yield self._wrap_stream_output("response_chunk", {
-                        "chunk": token[0].content,
-                        "accumulated": response_content
-                    })
+                    yield {
+                        "type": "response_chunk",
+                        "timestamp": time.time(),
+                        "data": {
+                            "chunk": token[0].content,
+                            "accumulated": response_content
+                        }
+                    }
 
         # Error handling
         except Exception as err:
@@ -276,7 +282,11 @@ class ReactAgent:
             # If empty response, send error message
             if not response_content:
                 error_chunk = "处理您的请求时发生错误，请稍后重试。"
-                yield self._wrap_stream_output("response_chunk", {
-                    "chunk": error_chunk,
-                    "accumulated": response_content + error_chunk
-                })
+                yield {
+                    "type": "response_chunk",
+                    "timestamp": time.time(),
+                    "data": {
+                        "chunk": error_chunk,
+                        "accumulated": response_content + error_chunk
+                    }
+                }
