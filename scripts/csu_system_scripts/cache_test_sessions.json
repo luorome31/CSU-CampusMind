@@ -1,0 +1,52 @@
+{
+  "8209220131": {
+    "jwc": {
+      "cookies": {
+        "route": {
+          "value": "5c06937fbe9d5336096bxxxxxxx",
+          "domain": "ca.csu.edu.cn",
+          "path": "/authserver",
+          "secure": false,
+          "expires": null
+        },
+        "CASTGC": {
+          "value": "TGT-317620-I1xqu27V3zO9R5z8aiCnh5PDTBIFzSPrvAT6PwwAABwVTo30KOJwZxxxxxxxx",
+          "domain": "ca.csu.edu.cn",
+          "path": "/authserver",
+          "secure": false,
+          "expires": null
+        },
+        "happyVoyage": {
+          "value": "n1kdMhXwun//EwM3i6puNvEpOf5Q34Eo+leZbP6rElwd+FCUjgX2QdsLMfWrcIGHLaixyM/d5WYMlHqpATAPUa9RwZCKrBj/Ps0hTN6gGD4iYAzXV9wJyKm3DNoqt8DNeo91ZUis2Ccz7M+pX/GVwT+EgLugj0H1BXbBMiHPOX4=",
+          "domain": "ca.csu.edu.cn",
+          "path": "/",
+          "secure": false,
+          "expires": null
+        },
+        "JSESSIONID": {
+          "value": "A4DDC8A1E1EF24CA8xxxxxxxx",
+          "domain": "csujwc.its.csu.edu.cn",
+          "path": "/",
+          "secure": false,
+          "expires": null
+        },
+        "SF_cookie_350": {
+          "value": "36465xxxxxxx",
+          "domain": "csujwc.its.csu.edu.cn",
+          "path": "/",
+          "secure": false,
+          "expires": null
+        },
+        "platformMultilingual": {
+          "value": "zh_CN",
+          "domain": ".edu.cn",
+          "path": "/",
+          "secure": false,
+          "expires": null
+        }
+      },
+      "saved_at": 1773668545.1801178,
+      "expires_at": 1773670345.1801188
+    }
+  }
+}
