@@ -1,12 +1,13 @@
 """
-LangChain Tools 封装
+LangChain Tools 封装 - 教务系统查询
 """
 import logging
-from typing import Type, Optional
+from typing import Optional
 
-from langchain_core.tools import BaseTool, StructuredTool
+from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field
 
+from app.core.session.factory import get_session_manager
 from app.core.session.manager import UnifiedSessionManager
 from .service import JwcService, Grade, ClassEntry, RankEntry, LevelExamEntry
 
@@ -25,7 +26,9 @@ def set_session_manager(manager: UnifiedSessionManager):
 def get_session_manager() -> UnifiedSessionManager:
     """获取全局 SessionManager"""
     if _session_manager is None:
-        raise RuntimeError("SessionManager 未设置，请先调用 set_session_manager()")
+        # 尝试从 factory 模块获取
+        from app.core.session.factory import get_session_manager as factory_get
+        return factory_get()
     return _session_manager
 
 
@@ -47,11 +50,6 @@ class RankInput(BaseModel):
 
 class LevelExamInput(BaseModel):
     user_id: str = Field(description="用户 ID (学号)")
-
-
-class SetPasswordInput(BaseModel):
-    user_id: str = Field(description="用户 ID (学号)")
-    password: str = Field(description="CAS 密码")
 
 
 # ============ Tool Functions ============
@@ -164,17 +162,6 @@ def _get_level_exams(user_id: str) -> str:
         return f"等级考试查询失败: {str(e)}"
 
 
-def _set_password(user_id: str, password: str) -> str:
-    """设置用户 CAS 密码"""
-    try:
-        manager = get_session_manager()
-        manager.set_password(user_id, password)
-        return f"密码已成功保存，用户 {user_id} 可以使用教务系统功能了"
-    except Exception as e:
-        logger.error(f"密码保存失败: {e}")
-        return f"密码保存失败: {str(e)}"
-
-
 # ============ LangChain Tools ============
 JwcGradeTool = StructuredTool.from_function(
     func=_get_grades,
@@ -204,13 +191,6 @@ JwcLevelExamTool = StructuredTool.from_function(
     args_schema=LevelExamInput,
 )
 
-JwcSetPasswordTool = StructuredTool.from_function(
-    func=_set_password,
-    name="jwc_set_password",
-    description="设置用户的 CAS 密码。首次使用教务系统功能前必须先设置密码。",
-    args_schema=SetPasswordInput,
-)
-
 
 # 工具列表
 JWC_TOOLS = [
@@ -218,5 +198,4 @@ JWC_TOOLS = [
     JwcScheduleTool,
     JwcRankTool,
     JwcLevelExamTool,
-    JwcSetPasswordTool,
 ]

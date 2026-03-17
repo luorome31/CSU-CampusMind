@@ -9,7 +9,6 @@ from app.config import settings
 from app.core.session import (
     UnifiedSessionManager,
     FileSessionPersistence,
-    PasswordManager,
     LoginRateLimiter,
 )
 
@@ -35,15 +34,9 @@ def create_session_manager() -> UnifiedSessionManager:
         storage_path=settings.session_storage_path
     )
 
-    password_manager = PasswordManager(
-        storage_path=settings.password_storage_path,
-        encryption_key=settings.password_encryption_key
-    )
-
     rate_limiter = LoginRateLimiter()
 
     manager = UnifiedSessionManager(
-        password_manager=password_manager,
         persistence=persistence,
         rate_limiter=rate_limiter,
         ttl_seconds=settings.session_ttl_seconds,

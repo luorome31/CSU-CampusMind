@@ -1,14 +1,15 @@
 """
-统一会话管理器 - 整合缓存、持久化、密码管理和 CAS 登录
+统一会话管理器 - 整合缓存、持久化和 CAS 登录
+密码从 config settings 加载 (.env)
 """
 import logging
 from typing import Optional
 
 import requests
 
+from app.config import settings
 from .cache import SubsystemSessionCache
 from .persistence import SessionPersistence
-from .password import PasswordManager
 from .rate_limiter import LoginRateLimiter
 from . import cas_login
 
@@ -30,8 +31,8 @@ SUBSYSTEM_SERVICE_URLS = {
 }
 
 
-class PasswordNotSetError(Exception):
-    """密码未设置错误"""
+class CASCredentialsNotSetError(Exception):
+    """CAS 凭证未设置错误"""
     pass
 
 
@@ -43,37 +44,26 @@ class UnifiedSessionManager:
     1. 用户+子系统粒度缓存（内存）
     2. Session 持久化（文件/Redis）
     3. 登录频率控制
-    4. CAS 密码加密存储
+    4. CAS 凭证从配置加载
     """
 
     def __init__(
         self,
-        password_manager: PasswordManager,
         persistence: SessionPersistence,
         rate_limiter: Optional[LoginRateLimiter] = None,
         ttl_seconds: int = 30 * 60,
     ):
         self._cache = SubsystemSessionCache(ttl_seconds=ttl_seconds)
         self._persistence = persistence
-        self._password_manager = password_manager
         self._rate_limiter = rate_limiter or LoginRateLimiter()
         self._ttl = ttl_seconds
-
-    def set_password(self, user_id: str, password: str) -> None:
-        """存储用户 CAS 密码"""
-        self._password_manager.save_password(user_id, password)
-
-    def get_password(self, user_id: str) -> Optional[str]:
-        """获取用户密码"""
-        return self._password_manager.get_password(user_id)
-
-    def delete_password(self, user_id: str) -> None:
-        """删除用户密码"""
-        self._password_manager.delete_password(user_id)
 
     def get_session(self, user_id: str, subsystem: str) -> requests.Session:
         """
         获取指定子系统的会话（自动加载/保存/缓存）
+
+        注意: user_id 参数保留用于多用户支持，
+        当前版本密码从配置加载，所有用户共用同一凭证
         """
         # 1. 尝试从内存缓存获取
         cached = self._cache.get(user_id, subsystem)
@@ -88,10 +78,14 @@ class UnifiedSessionManager:
             logger.info(f"Loaded from file for {user_id}:{subsystem}")
             return loaded_session
 
-        # 3. 需要登录
-        password = self._password_manager.get_password(user_id)
-        if not password:
-            raise PasswordNotSetError(f"用户 {user_id} 未设置密码，请先调用 set_password()")
+        # 3. 需要登录 - 从配置获取密码
+        username = settings.cas_username
+        password = settings.cas_password
+
+        if not username or not password:
+            raise CASCredentialsNotSetError(
+                "CAS 凭证未设置，请在 .env 文件中配置 CAS_USERNAME 和 CAS_PASSWORD"
+            )
 
         service_url = SUBSYSTEM_SERVICE_URLS.get(subsystem)
         if not service_url:
@@ -100,7 +94,7 @@ class UnifiedSessionManager:
         logger.info(f"No session found for {user_id}:{subsystem}, performing CAS login...")
 
         session = cas_login.cas_login(
-            user_id,
+            username,
             password,
             service_url,
             self._rate_limiter

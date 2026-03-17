@@ -44,9 +44,11 @@ class Settings(BaseModel):
 
     # JWC Session Storage
     session_storage_path: str = "./data/csu_sessions.json"
-    password_storage_path: str = "./data/csu_passwords.json"
-    password_encryption_key: str = "change-this-key-in-production"
     session_ttl_seconds: int = 30 * 60  # 30 minutes
+
+    # CAS Credentials (loaded from .env)
+    cas_username: Optional[str] = None
+    cas_password: Optional[str] = None
 
     @classmethod
     def from_env(cls):
@@ -71,9 +73,9 @@ class Settings(BaseModel):
             openai_model=os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"),
             openai_base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
             session_storage_path=os.getenv("SESSION_STORAGE_PATH", "./data/csu_sessions.json"),
-            password_storage_path=os.getenv("PASSWORD_STORAGE_PATH", "./data/csu_passwords.json"),
-            password_encryption_key=os.getenv("PASSWORD_ENCRYPTION_KEY", "change-this-key-in-production"),
             session_ttl_seconds=int(os.getenv("SESSION_TTL_SECONDS", "1800")),
+            cas_username=os.getenv("CAS_USERNAME"),
+            cas_password=os.getenv("CAS_PASSWORD"),
         )
 
 
