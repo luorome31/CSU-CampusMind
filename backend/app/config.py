@@ -42,6 +42,12 @@ class Settings(BaseModel):
     # Database
     database_url: str = "sqlite:///./campusmind.db"
 
+    # JWC Session Storage
+    session_storage_path: str = "./data/csu_sessions.json"
+    password_storage_path: str = "./data/csu_passwords.json"
+    password_encryption_key: str = "change-this-key-in-production"
+    session_ttl_seconds: int = 30 * 60  # 30 minutes
+
     @classmethod
     def from_env(cls):
         """Load settings from environment variables"""
@@ -64,6 +70,10 @@ class Settings(BaseModel):
             openai_api_key=os.getenv("OPENAI_API_KEY"),
             openai_model=os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"),
             openai_base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+            session_storage_path=os.getenv("SESSION_STORAGE_PATH", "./data/csu_sessions.json"),
+            password_storage_path=os.getenv("PASSWORD_STORAGE_PATH", "./data/csu_passwords.json"),
+            password_encryption_key=os.getenv("PASSWORD_ENCRYPTION_KEY", "change-this-key-in-production"),
+            session_ttl_seconds=int(os.getenv("SESSION_TTL_SECONDS", "1800")),
         )
 
 

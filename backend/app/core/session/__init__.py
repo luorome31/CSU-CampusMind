@@ -5,6 +5,7 @@ from app.core.session.persistence import SessionPersistence, FileSessionPersiste
 from app.core.session.password import PasswordManager
 from app.core.session.cas_login import CASLoginError, AccountLockedError, SUBSYSTEM_SERVICE_URLS
 from app.core.session.manager import UnifiedSessionManager, Subsystem, PasswordNotSetError
+from app.core.session.factory import get_session_manager, create_session_manager, reset_session_manager
 
 __all__ = [
     "SubsystemSessionCache",
@@ -19,4 +20,7 @@ __all__ = [
     "UnifiedSessionManager",
     "Subsystem",
     "PasswordNotSetError",
+    "get_session_manager",
+    "create_session_manager",
+    "reset_session_manager",
 ]
