@@ -17,6 +17,11 @@ from app.services.rag.handler import rag_handler
 from app.core.agents.react_agent import ReactAgent, StreamOutput
 from app.core.tools.rag_tool import create_rag_tool
 
+# Import authentication dependency
+from app.api.dependencies import get_optional_user
+from app.core.agents.factory import get_agent_factory, initialize_agent_factory
+from app.core.session.factory import get_session_manager
+
 # Import LangChain OpenAI
 from langchain_openai import ChatOpenAI
 
@@ -266,6 +271,7 @@ async def generate_stream(
 @router.post("/completion/stream")
 async def completion_stream(
     request: CompletionRequest,
+    current_user: Optional[dict] = Depends(get_optional_user),  # 改为可选认证
     db: Session = Depends(get_db_session),
 ):
     """
@@ -296,18 +302,30 @@ async def completion_stream(
         )
 
     try:
+        # current_user 可能为 None（未登录）或 {user_id: "xxx"}（已登录）
+        user_id = current_user.get("user_id") if current_user else None
+
+        # 初始化 AgentFactory（如果是首次）
+        try:
+            agent_factory = get_agent_factory()
+        except RuntimeError:
+            # 首次初始化
+            initialize_agent_factory(get_session_manager())
+            agent_factory = get_agent_factory()
+
+        # 创建 Agent（根据 user_id 自动选择工具）
+        agent = agent_factory.create_agent(
+            user_id=user_id,
+            knowledge_ids=request.knowledge_ids,
+            model_name=request.model
+        )
+
         # Get or create dialog
         dialog_id = get_or_create_dialog(
             session=db,
             dialog_id=request.dialog_id,
             user_id=request.user_id,
             agent_id=request.agent_id
-        )
-
-        # Create agent with RAG tool
-        agent = create_agent_with_rag(
-            knowledge_ids=request.knowledge_ids,
-            model_name=request.model
         )
 
         # Return streaming response
