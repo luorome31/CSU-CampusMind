@@ -33,23 +33,30 @@ def get_session_manager() -> UnifiedSessionManager:
 
 
 # ============ Tool Input Models ============
+
+def _get_default_user_id() -> str:
+    """从配置获取默认 user_id"""
+    from app.config import settings
+    return settings.cas_username or ""
+
+
 class GradeInput(BaseModel):
-    user_id: str = Field(description="用户 ID (学号)")
+    user_id: str = Field(default_factory=_get_default_user_id, description="用户 ID (学号)")
     term: str = Field(default="", description="学期，如 '2024-2025-1'，为空则查询全部")
 
 
 class ScheduleInput(BaseModel):
-    user_id: str = Field(description="用户 ID (学号)")
+    user_id: str = Field(default_factory=_get_default_user_id, description="用户 ID (学号)")
     term: str = Field(description="学期，如 '2024-2025-1'")
     week: str = Field(default="0", description="周次，'0' 为全部周")
 
 
 class RankInput(BaseModel):
-    user_id: str = Field(description="用户 ID (学号)")
+    user_id: str = Field(default_factory=_get_default_user_id, description="用户 ID (学号)")
 
 
 class LevelExamInput(BaseModel):
-    user_id: str = Field(description="用户 ID (学号)")
+    user_id: str = Field(default_factory=_get_default_user_id, description="用户 ID (学号)")
 
 
 # ============ Tool Functions ============
