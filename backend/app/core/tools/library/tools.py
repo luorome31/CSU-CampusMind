@@ -2,9 +2,10 @@
 LangChain Tools - 图书馆查询
 """
 import logging
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, Field
-from langchain_core.tools import StructuredTool
+from langchain_core.tools import StructuredTool, BaseTool
+from app.core.context import ToolContext
 from .service import LibraryService, get_library_service
 from .models import LibraryBookSearchResult, LibraryBookItemCopiesResult
 
@@ -141,3 +142,47 @@ LIBRARY_TOOLS = [
     library_search,
     library_get_book_location,
 ]
+
+
+# ============ Factory Function ============
+
+
+def create_library_tools(ctx: ToolContext) -> List[BaseTool]:
+    """
+    创建图书馆工具（不需要登录）
+
+    Library 工具是公开的，所有用户都可以使用
+    """
+
+    def _search_library(keywords: str, page: int = 1, rows: int = 10) -> str:
+        """搜索图书馆馆藏"""
+        try:
+            service = get_library_service()
+            result = service.search(keywords, page, rows)
+            return _format_search_result(result)
+        except Exception as e:
+            logger.error(f"Library search failed: {e}")
+            return f"搜索失败: {str(e)}"
+
+    def _get_book_location(record_id: int) -> str:
+        """查询图书位置"""
+        try:
+            service = get_library_service()
+            result = service.get_book_copies(record_id)
+            return _format_copies_result(result)
+        except Exception as e:
+            logger.error(f"Library get copies failed: {e}")
+            return f"查询失败: {str(e)}"
+
+    return [
+        StructuredTool.from_function(
+            func=_search_library,
+            name="library_search",
+            description="搜索中南大学图书馆馆藏。根据关键词搜索图书，返回图书列表及其 record_id。可用于查找特定主题的图书。"
+        ),
+        StructuredTool.from_function(
+            func=_get_book_location,
+            name="library_get_book_location",
+            description="查询图书的馆藏位置信息。根据搜索结果中的 record_id 查询该书的所有复本所在位置、可借状态等。"
+        ),
+    ]
