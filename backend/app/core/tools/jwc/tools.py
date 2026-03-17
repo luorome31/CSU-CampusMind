@@ -110,8 +110,12 @@ def _get_schedule(user_id: str, term: str, week: str = "0") -> str:
     """查询课表"""
     try:
         service = _get_jwc_service()
-        classes = service.get_schedule(user_id, term, week)
-        return _format_schedule(classes)
+        classes, start_week_day = service.get_schedule(user_id, term, week)
+        result = _format_schedule(classes)
+        # 如果有开始日期信息，附加到结果中
+        if start_week_day:
+            result += f"\n\n> 学期第1周开始于: {start_week_day}日"
+        return result
     except Exception as e:
         logger.error(f"课表查询失败: {e}")
         return f"课表查询失败: {str(e)}"

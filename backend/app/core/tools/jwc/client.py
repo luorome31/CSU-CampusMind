@@ -96,12 +96,12 @@ class JwcClient:
                 continue
 
             grades.append(Grade(
-                term=cells[3].get_text(strip=True),
-                course_name=cells[4].get_text(strip=True),
-                score=cells[5].get_text(strip=True),
-                credit=cells[6].get_text(strip=True),
-                attribute=cells[7].get_text(strip=True),
-                nature=cells[8].get_text(strip=True),
+                term=cells[1].get_text(strip=True),       # 初修学期
+                course_name=cells[3].get_text(strip=True),  # 课程
+                score=cells[6].get_text(strip=True),        # 成绩
+                credit=cells[7].get_text(strip=True),       # 学分
+                attribute=cells[8].get_text(strip=True),    # 课程属性
+                nature=cells[9].get_text(strip=True),       # 课程性质
             ))
 
         logger.info(f"查询到 {len(grades)} 条成绩记录")
@@ -116,35 +116,31 @@ class JwcClient:
         soup = BeautifulSoup(html, "html.parser")
         ranks = []
 
-        for option in soup.select("select[name='xqfw'] option"):
-            term = option.get_text(strip=True)
-            if not term:
-                continue
+        # 直接解析 table#dataList，不需要选择学期
+        rows = soup.select("table#dataList tr")
 
-            form = {"xqfw": term}
-            rank_resp = self._session.post(url, data=form)
-            rank_html = rank_resp.text
-
-            rank_soup = BeautifulSoup(rank_html, "html.parser")
-            rows = rank_soup.select("table#table1 tr")
-
-            for row in rows[1:]:
-                cells = row.find_all("td")
-                if len(cells) >= 4:
-                    ranks.append(RankEntry(
-                        term=term,
-                        total_score=cells[1].get_text(strip=True),
-                        class_rank=cells[2].get_text(strip=True),
-                        average_score=cells[3].get_text(strip=True),
-                    ))
+        for row in rows[1:]:  # 跳过表头
+            cells = row.find_all("td")
+            if len(cells) >= 4:
+                # 表格结构: 学期/类型, 计算学分, 专业排名, 平均分
+                ranks.append(RankEntry(
+                    term=cells[0].get_text(strip=True),        # 学期/类型
+                    total_score=cells[1].get_text(strip=True),  # 计算学分
+                    class_rank=cells[2].get_text(strip=True),  # 专业排名
+                    average_score=cells[3].get_text(strip=True), # 平均分
+                ))
 
         logger.info(f"查询到 {len(ranks)} 条排名记录")
         return ranks
 
-    def get_class_schedule(self, term: str, week: str = "0") -> List[ClassEntry]:
-        """查询课表"""
+    def get_class_schedule(self, term: str, week: str = "0") -> tuple[List[ClassEntry], str]:
+        """查询课表
+
+        Returns:
+            (课表列表, 学期开始日期)
+        """
         url = URLS["class"]
-        data = {"xnxq01id": term, "zc": week}
+        data = {"xnxq01id": term, "zc": week if week != "0" else ""}
 
         resp = self._session.post(url, data=data)
         html = resp.text
@@ -152,22 +148,82 @@ class JwcClient:
         soup = BeautifulSoup(html, "html.parser")
         classes = []
 
-        for row in soup.select("table#table1 tr"):
-            cells = row.find_all("td")
-            if len(cells) < 6:
-                continue
+        # 使用 table#kbtable 第一个表格
+        kbtable = soup.select("table#kbtable")
+        if not kbtable:
+            logger.warning("未找到课表表格 kbtable")
+            return classes, ""
 
-            classes.append(ClassEntry(
-                course_name=cells[1].get_text(strip=True),
-                teacher=cells[2].get_text(strip=True),
-                weeks=cells[3].get_text(strip=True),
-                place=cells[4].get_text(strip=True),
-                day_of_week=cells[5].get_text(strip=True),
-                time_of_day=cells[6].get_text(strip=True),
-            ))
+        main_table = kbtable[0]
+        rows = main_table.find_all("tr")
 
-        logger.info(f"查询到 {len(classes)} 条课表记录")
-        return classes
+        for row in rows:
+            # 获取节次信息（每行第一个 th）
+            th_cells = row.find_all("th")
+            time_in_day = th_cells[0].get_text(strip=True).replace("\xa0", "") if th_cells else ""
+
+            # 遍历每行的 td（每列代表一个星期）
+            td_cells = row.find_all("td")
+            for col_idx, cell in enumerate(td_cells):
+                time_in_week = str(col_idx + 1)  # 星期 1-7
+
+                # 查找课程块：优先 kbcontent，否则 kbcontent1
+                visible_blocks = cell.find_all("div", class_="kbcontent")
+                blocks = visible_blocks if visible_blocks else cell.find_all("div", class_="kbcontent1")
+
+                for block in blocks:
+                    # 获取课程名：去掉 font 和 br 标签后的文本
+                    block_copy = BeautifulSoup(str(block), "html.parser")
+                    for tag in block_copy.find_all(["font", "br"]):
+                        tag.decompose()
+                    course_name = block_copy.get_text(strip=True)
+
+                    # 通过 title 属性获取教师、周次、教室
+                    fonts = block.find_all("font")
+                    teacher = ""
+                    weeks = ""
+                    place = ""
+
+                    for font in fonts:
+                        title = font.get("title", "")
+                        if "老师" in title:
+                            teacher = font.get_text(strip=True)
+                        elif "周次" in title:
+                            weeks = font.get_text(strip=True)
+                        elif "教室" in title:
+                            place = font.get_text(strip=True)
+
+                    # 如果 title 没有匹配，尝试按顺序获取
+                    if not teacher and fonts:
+                        teacher = fonts[0].get_text(strip=True)
+                    if not weeks and len(fonts) > 1:
+                        weeks = fonts[1].get_text(strip=True)
+                    if not place and len(fonts) > 2:
+                        place = fonts[2].get_text(strip=True)
+
+                    if course_name or teacher or weeks or place:
+                        classes.append(ClassEntry(
+                            course_name=course_name,
+                            teacher=teacher,
+                            weeks=weeks,
+                            place=place,
+                            day_of_week=time_in_week,
+                            time_of_day=time_in_day,
+                        ))
+
+        # 从第二个表格获取学期开始日期
+        start_week_day = ""
+        if len(kbtable) > 1:
+            info_td = kbtable[1].find("td")
+            if info_td:
+                info_text = info_td.get_text(strip=True)
+                import re
+                match = re.search(r"第1周\xa0(.*?)日", info_text)
+                if match:
+                    start_week_day = match.group(1)
+
+        logger.info(f"查询到 {len(classes)} 条课表记录, start_week_day={start_week_day}")
+        return classes, start_week_day
 
     def get_level_exams(self) -> List[LevelExamEntry]:
         """查询等级考试成绩"""
@@ -180,18 +236,18 @@ class JwcClient:
 
         for row in soup.select("table#dataList tr"):
             cells = row.find_all("td")
-            if len(cells) < 8:
+            if len(cells) < 9:
                 continue
 
             exams.append(LevelExamEntry(
-                course=cells[0].get_text(strip=True),
-                written_score=cells[1].get_text(strip=True),
-                computer_score=cells[2].get_text(strip=True),
-                total_score=cells[3].get_text(strip=True),
-                written_level=cells[4].get_text(strip=True),
-                computer_level=cells[5].get_text(strip=True),
-                total_level=cells[6].get_text(strip=True),
-                exam_date=cells[7].get_text(strip=True),
+                course=cells[1].get_text(strip=True),
+                written_score=cells[2].get_text(strip=True),
+                computer_score=cells[3].get_text(strip=True),
+                total_score=cells[4].get_text(strip=True),
+                written_level=cells[5].get_text(strip=True),
+                computer_level=cells[6].get_text(strip=True),
+                total_level=cells[7].get_text(strip=True),
+                exam_date=cells[8].get_text(strip=True),
             ))
 
         logger.info(f"查询到 {len(exams)} 条等级考试记录")

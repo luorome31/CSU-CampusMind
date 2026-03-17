@@ -35,7 +35,7 @@ class JwcService:
         client = self._get_client(user_id)
         return client.get_grades(term)
 
-    def get_schedule(self, user_id: str, term: str, week: str = "0") -> List[ClassEntry]:
+    def get_schedule(self, user_id: str, term: str, week: str = "0") -> tuple[List[ClassEntry], str]:
         """
         查询课表
 
@@ -45,7 +45,7 @@ class JwcService:
             week: 周次，"0" 为全部周
 
         Returns:
-            课表列表
+            (课表列表, 学期开始日期)
         """
         client = self._get_client(user_id)
         return client.get_class_schedule(term, week)
