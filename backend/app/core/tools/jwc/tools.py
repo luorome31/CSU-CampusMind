@@ -210,3 +210,122 @@ JWC_TOOLS = [
     JwcRankTool,
     JwcLevelExamTool,
 ]
+
+
+# ============ Factory Function ============
+from typing import List
+from langchain_core.tools import BaseTool
+from app.core.context import ToolContext
+
+
+def create_jwc_tools(ctx: ToolContext) -> List[BaseTool]:
+    """
+    创建 JWC 工具（依赖 ToolContext，利用闭包隐藏 user_id）
+
+    Args:
+        ctx: 工具运行时上下文，包含用户身份和会话管理
+
+    Returns:
+        JWC 相关工具列表
+    """
+    # 获取 JwcService 实例（使用 ctx 的 session_manager）
+    session_manager = ctx.session_manager
+
+    def _get_jwc_service_factory() -> "JwcService":
+        """获取 JwcService 实例"""
+        from app.core.session.manager import UnifiedSessionManager
+        return JwcService(session_manager)
+
+    def _get_grades(term: str = "") -> str:
+        """查询教务处成绩"""
+        if not ctx.is_authenticated:
+            return "请先登录后再查询成绩"
+
+        session = ctx.get_subsystem_session("jwc")
+        if not session:
+            return "教务系统会话已过期，请重新登录"
+
+        try:
+            service = _get_jwc_service_factory()
+            grades = service.get_grades(ctx.user_id, term)
+            return _format_grades(grades)
+        except Exception as e:
+            logger.error(f"成绩查询失败: {e}")
+            return f"成绩查询失败: {str(e)}"
+
+    def _get_schedule(term: str, week: str = "0") -> str:
+        """查询教务处课表"""
+        if not ctx.is_authenticated:
+            return "请先登录后再查询课表"
+
+        session = ctx.get_subsystem_session("jwc")
+        if not session:
+            return "教务系统会话已过期，请重新登录"
+
+        try:
+            service = _get_jwc_service_factory()
+            classes, start_week_day = service.get_schedule(ctx.user_id, term, week)
+            result = _format_schedule(classes)
+            if start_week_day:
+                result += f"\n\n> 学期第1周开始于: {start_week_day}日"
+            return result
+        except Exception as e:
+            logger.error(f"课表查询失败: {e}")
+            return f"课表查询失败: {str(e)}"
+
+    def _get_rank() -> str:
+        """查询专业排名"""
+        if not ctx.is_authenticated:
+            return "请先登录后再查询排名"
+
+        session = ctx.get_subsystem_session("jwc")
+        if not session:
+            return "教务系统会话已过期，请重新登录"
+
+        try:
+            service = _get_jwc_service_factory()
+            ranks = service.get_rank(ctx.user_id)
+            return _format_ranks(ranks)
+        except Exception as e:
+            logger.error(f"排名查询失败: {e}")
+            return f"排名查询失败: {str(e)}"
+
+    def _get_level_exams() -> str:
+        """查询等级考试成绩"""
+        if not ctx.is_authenticated:
+            return "请先登录后再查询等级考试成绩"
+
+        session = ctx.get_subsystem_session("jwc")
+        if not session:
+            return "教务系统会话已过期，请重新登录"
+
+        try:
+            service = _get_jwc_service_factory()
+            exams = service.get_level_exams(ctx.user_id)
+            return _format_level_exams(exams)
+        except Exception as e:
+            logger.error(f"等级考试查询失败: {e}")
+            return f"等级考试查询失败: {str(e)}"
+
+    return [
+        StructuredTool.from_function(
+            func=_get_grades,
+            name="jwc_grade",
+            description="查询学生的考试成绩。参数：term（学期，如 '2024-2025-1'），不传则查询所有学期成绩。"
+        ),
+        StructuredTool.from_function(
+            func=_get_schedule,
+            name="jwc_schedule",
+            description="查询学生的课表。参数：term（学期，必填，如 '2024-2025-1'），week（周次，可选，'0' 为全部周）。"
+        ),
+        StructuredTool.from_function(
+            func=_get_rank,
+            name="jwc_rank",
+            description="查询学生的专业排名。不需要额外参数。"
+        ),
+        StructuredTool.from_function(
+            func=_get_level_exams,
+            name="jwc_level_exam",
+            description="查询学生的等级考试成绩（如英语四六级、计算机等级考试等）。不需要额外参数。"
+        ),
+    ]

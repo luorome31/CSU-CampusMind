@@ -6,6 +6,7 @@ from .tools import (
     JwcRankTool,
     JwcLevelExamTool,
     JWC_TOOLS,
+    create_jwc_tools,
     set_session_manager,
     get_session_manager,
 )
@@ -22,6 +23,7 @@ __all__ = [
     "JwcRankTool",
     "JwcLevelExamTool",
     "JWC_TOOLS",
+    "create_jwc_tools",
     "set_session_manager",
     "get_session_manager",
 ]
