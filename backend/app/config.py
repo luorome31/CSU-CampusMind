@@ -46,6 +46,11 @@ class Settings(BaseModel):
     session_storage_path: str = "./data/csu_sessions.json"
     session_ttl_seconds: int = 30 * 60  # 30 minutes
 
+    # JWT
+    jwt_secret_key: str = "your-secret-key-change-in-production"
+    jwt_algorithm: str = "HS256"
+    jwt_expire_hours: int = 24
+
     # CAS Credentials (loaded from .env)
     cas_username: Optional[str] = None
     cas_password: Optional[str] = None
@@ -74,6 +79,9 @@ class Settings(BaseModel):
             openai_base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
             session_storage_path=os.getenv("SESSION_STORAGE_PATH", "./data/csu_sessions.json"),
             session_ttl_seconds=int(os.getenv("SESSION_TTL_SECONDS", "1800")),
+            jwt_secret_key=os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production"),
+            jwt_algorithm=os.getenv("JWT_ALGORITHM", "HS256"),
+            jwt_expire_hours=int(os.getenv("JWT_EXPIRE_HOURS", "24")),
             cas_username=os.getenv("CAS_USERNAME"),
             cas_password=os.getenv("CAS_PASSWORD"),
         )
