@@ -58,13 +58,11 @@ async def login(request: LoginRequest):
     4. 生成 JWT 返回
     """
     # 1. 登录频率检查
-    try:
-        _rate_limiter.check(request.username)
-    except Exception as e:
-        logger.warning(f"Login rate limit exceeded for {request.username}: {e}")
+    if not _rate_limiter.can_login(request.username):
+        wait_time = _rate_limiter.get_wait_time(request.username)
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail=f"登录过于频繁，请稍后再试: {str(e)}"
+            detail=f"登录过于频繁，请等待 {wait_time:.0f} 秒后再试"
         )
 
     # 2. 获取 session manager
