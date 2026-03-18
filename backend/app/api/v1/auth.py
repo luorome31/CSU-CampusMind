@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 from app.config import settings
 from app.core.security import jwt_manager
-from app.core.session.manager import UnifiedSessionManager
+from app.core.session.manager import UnifiedSessionManager, NeedReLoginError
 from app.core.session.factory import get_session_manager
 from app.core.session.rate_limiter import LoginRateLimiter
 from app.api.dependencies import get_current_user
@@ -25,7 +25,6 @@ class LoginRequest(BaseModel):
     """登录请求"""
     username: str  # 学号
     password: str
-    subsystem: str = "jwc"  # 默认教务系统
 
 
 class LoginResponse(BaseModel):
@@ -38,11 +37,6 @@ class LoginResponse(BaseModel):
 class LogoutRequest(BaseModel):
     """登出请求"""
     user_id: str
-
-
-class RefreshRequest(BaseModel):
-    """刷新 token 请求"""
-    pass
 
 
 # ============ 速率限制器 ============
@@ -59,8 +53,8 @@ async def login(request: LoginRequest):
 
     流程：
     1. 检查登录频率
-    2. 调用 CAS 登录获取子系统 session
-    3. 存储 subsystem session
+    2. 调用 CAS 登录获取 CASTGC
+    3. 存储 CASTGC
     4. 生成 JWT 返回
     """
     # 1. 登录频率检查
@@ -76,45 +70,26 @@ async def login(request: LoginRequest):
     # 2. 获取 session manager
     session_manager = get_session_manager()
 
-    # 3. 调用 CAS 登录
+    # 3. CAS 登录获取 CASTGC
     try:
-        from app.core.session import cas_login
-        from app.core.session.manager import SUBSYSTEM_SERVICE_URLS
-
-        service_url = SUBSYSTEM_SERVICE_URLS.get(request.subsystem)
-        if not service_url:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"未知的子系统: {request.subsystem}"
-            )
-
-        session = cas_login.cas_login(
-            request.username,
-            request.password,
-            service_url,
-            _rate_limiter
+        session_manager.login(
+            user_id=request.username,
+            username=request.username,
+            password=request.password
         )
-    except Exception as e:
+    except AccountLockedError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"登录失败: {str(e)}"
+        )
+    except CASLoginError as e:
         logger.error(f"CAS login failed for {request.username}: {e}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"登录失败: {str(e)}"
         )
 
-    # 4. 存储 subsystem session
-    try:
-        session_manager._cache.set(request.username, request.subsystem, session)
-        session_manager._persistence.save(
-            request.username,
-            request.subsystem,
-            session,
-            settings.session_ttl_seconds
-        )
-    except Exception as e:
-        logger.error(f"Failed to save session for {request.username}: {e}")
-        # 不阻塞登录成功，只是警告
-
-    # 5. 生成 JWT
+    # 4. 生成 JWT
     token = jwt_manager.create_token({"user_id": request.username})
 
     logger.info(f"User {request.username} logged in successfully")
@@ -126,6 +101,10 @@ async def login(request: LoginRequest):
     )
 
 
+# 导入异常类供本模块使用
+from app.core.session.cas_login import AccountLockedError, CASLoginError
+
+
 @router.post("/logout")
 async def logout(
     request: LogoutRequest,
@@ -134,7 +113,7 @@ async def logout(
     """
     用户登出接口
 
-    清除用户的 subsystem session
+    清除用户的 CASTGC 和所有子系统 session
     """
     # 验证权限：只能登出自己的账号
     if current_user.get("user_id") != request.user_id:
@@ -143,7 +122,7 @@ async def logout(
             detail="无权限操作"
         )
 
-    # 清除 session
+    # 清除 session（包括 CASTGC）
     session_manager = get_session_manager()
     session_manager.invalidate_session(request.user_id)
 
@@ -156,6 +135,8 @@ async def logout(
 async def refresh_token(current_user: dict = Depends(get_current_user)):
     """
     刷新 JWT token
+
+    注意：刷新 token 不需要重新登录 CAS，CASTGC 仍然有效
     """
     if current_user is None:
         raise HTTPException(
