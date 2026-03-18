@@ -1,6 +1,9 @@
 """
 统一会话管理器 - 整合缓存、持久化和 CAS 登录
-密码从 config settings 加载 (.env)
+
+CAS 登录流程:
+1. 用户登录 CAS 获取 CASTGC cookie (跨子系统共享)
+2. 使用 CASTGC 通过 SubsystemSessionProvider 获取各子系统的 session
 """
 import logging
 from typing import Optional
@@ -12,6 +15,7 @@ from .cache import SubsystemSessionCache
 from .persistence import SessionPersistence
 from .rate_limiter import LoginRateLimiter
 from . import cas_login
+from .providers.base import SubsystemSessionProvider
 
 logger = logging.getLogger(__name__)
 
@@ -36,15 +40,20 @@ class CASCredentialsNotSetError(Exception):
     pass
 
 
+class NeedReLoginError(Exception):
+    """需要重新登录错误（CASTGC 过期或不存在）"""
+    pass
+
+
 class UnifiedSessionManager:
     """
     统一会话管理器
 
     特性：
-    1. 用户+子系统粒度缓存（内存）
-    2. Session 持久化（文件/Redis）
-    3. 登录频率控制
-    4. CAS 凭证从配置加载
+    1. CASTGC 跨子系统共享（用户级别，TTL 2小时）
+    2. 子系统 Session 独立存储（通过 SubsystemSessionProvider 获取）
+    3. Session 持久化（文件）
+    4. 登录频率控制
     """
 
     def __init__(
@@ -57,55 +66,98 @@ class UnifiedSessionManager:
         self._persistence = persistence
         self._rate_limiter = rate_limiter or LoginRateLimiter()
         self._ttl = ttl_seconds
+        # CASTGC 缓存：user_id -> {castgc, created_at, expires_at}
+        self._castgc_cache: dict[str, dict] = {}
+
+    def _get_castgc(self, user_id: str) -> Optional[str]:
+        """
+        获取缓存的 CASTGC cookie
+
+        Returns:
+            CASTGC 值，如果不存在或过期返回 None
+        """
+        if user_id not in self._castgc_cache:
+            return None
+
+        castgc_data = self._castgc_cache[user_id]
+        import time
+        if time.time() > castgc_data.get("expires_at", 0):
+            # CASTGC 过期，删除
+            del self._castgc_cache[user_id]
+            return None
+
+        return castgc_data.get("castgc")
+
+    def _save_castgc(self, user_id: str, castgc: str) -> None:
+        """保存 CASTGC cookie，TTL 2小时"""
+        import time
+        self._castgc_cache[user_id] = {
+            "castgc": castgc,
+            "created_at": time.time(),
+            "expires_at": time.time() + 2 * 3600,
+        }
+
+    def login(self, user_id: str, username: str, password: str) -> None:
+        """
+        用户登录 CAS，获取 CASTGC
+
+        Args:
+            user_id: 用户 ID (通常是 username)
+            username: CAS 用户名
+            password: CAS 密码
+
+        Raises:
+            AccountLockedError: 账号被锁定
+            CASLoginError: 登录失败
+        """
+        castgc = cas_login.cas_login_only_castgc(username, password, self._rate_limiter)
+        self._save_castgc(user_id, castgc)
+        logger.info(f"User {user_id} logged in, CASTGC saved")
 
     def get_session(self, user_id: str, subsystem: str) -> requests.Session:
         """
-        获取指定子系统的会话（自动加载/保存/缓存）
+        获取指定子系统的会话
 
-        注意: user_id 参数保留用于多用户支持，
-        当前版本密码从配置加载，所有用户共用同一凭证
+        流程：
+        1. 检查子系统 session 缓存 → 存在且有效? → 直接返回
+        2. 检查持久化缓存
+        3. 获取 CASTGC
+        4. 若无 CASTGC，抛出 NeedReLoginError
+        5. 使用 SubsystemSessionProvider 获取子系统 session
+        6. 缓存子系统 session
+
+        Raises:
+            NeedReLoginError: CASTGC 不存在或过期，需要重新登录
         """
-        # 1. 尝试从内存缓存获取
+        # 1. 检查子系统 session 缓存
         cached = self._cache.get(user_id, subsystem)
         if cached:
-            logger.info(f"Using memory cache for {user_id}:{subsystem}")
+            logger.info(f"Using cached session for {user_id}:{subsystem}")
             return cached.session
 
-        # 2. 尝试从文件加载
+        # 2. 检查持久化缓存
         loaded_session = self._persistence.load(user_id, subsystem)
         if loaded_session:
             self._cache.set(user_id, subsystem, loaded_session)
-            logger.info(f"Loaded from file for {user_id}:{subsystem}")
+            logger.info(f"Loaded session from persistence for {user_id}:{subsystem}")
             return loaded_session
 
-        # 3. 需要登录 - 从配置获取密码
-        username = settings.cas_username
-        password = settings.cas_password
-
-        if not username or not password:
-            raise CASCredentialsNotSetError(
-                "CAS 凭证未设置，请在 .env 文件中配置 CAS_USERNAME 和 CAS_PASSWORD"
+        # 3. 获取 CASTGC
+        castgc = self._get_castgc(user_id)
+        if not castgc:
+            raise NeedReLoginError(
+                f"用户 {user_id} 的 CASTGC 已过期或不存在，请重新登录"
             )
 
-        service_url = SUBSYSTEM_SERVICE_URLS.get(subsystem)
-        if not service_url:
-            raise ValueError(f"Unknown subsystem: {subsystem}")
+        # 4. 使用 Provider 获取子系统 session
+        provider = SubsystemSessionProvider.get_provider(subsystem)
+        session = provider.fetch_session(castgc)
 
-        logger.info(f"No session found for {user_id}:{subsystem}, performing CAS login...")
-
-        session = cas_login.cas_login(
-            username,
-            password,
-            service_url,
-            self._rate_limiter
-        )
-
-        # 4. 缓存到内存
+        # 5. 缓存
         self._cache.set(user_id, subsystem, session)
-
-        # 5. 持久化到文件
         self._persistence.save(user_id, subsystem, session, self._ttl)
 
+        logger.info(f"Fetched new session for {user_id}:{subsystem}")
         return session
 
     def get_jwc_session(self, user_id: str) -> requests.Session:
@@ -124,3 +176,7 @@ class UnifiedSessionManager:
         """使会话失效"""
         self._cache.invalidate(user_id, subsystem)
         self._persistence.invalidate(user_id, subsystem)
+        # 如果指定 subsystem 为 None，清除所有子系统的 session，同时也清除 CASTGC
+        if subsystem is None:
+            if user_id in self._castgc_cache:
+                del self._castgc_cache[user_id]

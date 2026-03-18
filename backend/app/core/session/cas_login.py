@@ -75,7 +75,18 @@ def cas_login(
     service_url: str,
     rate_limiter=None
 ) -> requests.Session:
-    """CAS 统一认证登录"""
+    """
+    CAS 统一认证登录
+
+    流程:
+    1. 访问 CAS 登录页面获取表单字段 (lt, execution, salt 等)
+    2. 提交登录表单，成功后获取 CASTGC cookie
+    3. 使用 CASTGC cookie 访问子系统服务 URL，获取子系统 session
+
+    返回的 session 包含:
+    - CASTGC: CAS 认证 cookie (用于后续刷新子系统 session)
+    - 子系统的 JSESSIONID: 子系统 session (如 JWC 的 JSESSIONID)
+    """
     if rate_limiter:
         if not rate_limiter.can_login(username):
             wait_time = rate_limiter.get_wait_time(username)
@@ -85,8 +96,9 @@ def cas_login(
     session = create_session()
 
     try:
+        # ========== Step 1: 获取登录表单 ==========
         login_url = f"{CAS_LOGIN_URL}?service={requests.utils.quote(service_url)}"
-        logger.info(f"Fetching login page: {login_url}")
+        logger.info(f"Step 1: Fetching login page: {login_url}")
 
         resp = session.get(login_url, allow_redirects=False)
         html = resp.text
@@ -101,6 +113,7 @@ def cas_login(
         if not salt or not execution:
             raise CASLoginError("Failed to parse login page")
 
+        # ========== Step 2: 提交登录表单，获取 CASTGC ==========
         encrypted_pwd = encrypt_password(password, salt)
 
         form_data = {
@@ -114,57 +127,129 @@ def cas_login(
             "dllt": dllt,
         }
 
-        post_url = resp.headers.get("Location", login_url)
-        if not post_url.startswith("http"):
-            post_url = urljoin(login_url, post_url)
+        logger.info(f"Step 2: Submitting login form for user: {username}")
+        resp = session.post(login_url, data=form_data, allow_redirects=False)
 
-        resp = session.post(post_url, data=form_data, allow_redirects=False)
-
-        final_url = resp.headers.get("Location", "")
-
+        # 检查是否登录成功
         if resp.status_code == 401 or "账号" in resp.text or "锁定" in resp.text:
             raise AccountLockedError("账号可能被锁定")
 
-        if not final_url:
-            raise CASLoginError("登录失败: 无重定向地址")
+        # 检查 CASTGC cookie 是否存在
+        cookies = {c.name: c.value for c in session.cookies}
+        castgc = cookies.get("CASTGC")
 
-        target_domain = service_url.split("://")[1].split("/")[0]
-        if target_domain not in final_url:
-            if "密码" in resp.text:
+        if not castgc:
+            if "密码" in resp.text or "错误" in resp.text:
                 raise CASLoginError("用户名或密码错误")
-            raise CASLoginError(f"登录失败: 重定向到未知地址 {final_url}")
+            raise CASLoginError(f"登录失败: 未获取到 CASTGC cookie, 当前 cookies: {list(cookies.keys())}")
 
-        # 访问重定向地址，获取目标系统的 Cookie
-        logger.info(f"Following redirect to: {final_url}")
+        logger.info(f"CASTGC cookie obtained: {castgc[:30]}...")
 
-        try:
-            resp = session.get(final_url, allow_redirects=False)
-            while resp.status_code in (301, 302, 303, 307, 308):
-                next_url = resp.headers.get("Location")
-                if next_url:
-                    if not next_url.startswith("http"):
-                        next_url = urljoin(resp.url, next_url)
-                    resp = session.get(next_url, allow_redirects=False)
-                else:
-                    break
-        except Exception as e:
-            logger.warning(f"Redirect handling failed: {e}, trying simple approach")
-            session.get(final_url, allow_redirects=True)
+        # ========== Step 3: 使用 CASTGC 访问子系统，获取子系统 session ==========
+        # 再次访问 CAS 登录 URL，这次会携带 CASTGC，自动重定向到子系统并设置子系统的 session
+        logger.info(f"Step 3: Accessing subsystem with CASTGC: {service_url}")
 
-        # 清理可能重复的 Cookie
-        cookies_to_keep = {}
-        for cookie in session.cookies:
-            if cookie.name == "JSESSIONID":
-                cookies_to_keep[cookie.name] = cookie
-            else:
-                cookies_to_keep[cookie.name] = cookie
+        subsystem_session_resp = session.get(login_url, allow_redirects=False)
 
-        session.cookies.clear()
-        for name, cookie in cookies_to_keep.items():
-            session.cookies.set(cookie.name, cookie.value, domain=cookie.domain, path=cookie.path)
+        # 如果有重定向，跟随重定向
+        redirect_url = subsystem_session_resp.headers.get("Location", "")
+        if redirect_url:
+            logger.info(f"Following redirect to subsystem: {redirect_url}")
+            if not redirect_url.startswith("http"):
+                redirect_url = urljoin(login_url, redirect_url)
 
-        logger.info(f"Cookies after redirect: {dict(session.cookies)}")
+            # 跟随重定向，这次允许自动重定向以获取子系统的 cookie
+            subsystem_session_resp = session.get(redirect_url, allow_redirects=True)
+            logger.info(f"Subsystem final URL: {subsystem_session_resp.url}")
+
+        # 记录日志中的 cookies
+        final_cookies = {c.name: c.value for c in session.cookies}
+        logger.info(f"Cookies after subsystem access: {list(final_cookies.keys())}")
+
+        # 验证是否获取到了子系统 session (通常是 JSESSIONID)
+        subsystem_jsessionid = final_cookies.get("JSESSIONID")
+        if subsystem_jsessionid:
+            logger.info(f"Subsystem JSESSIONID obtained: {subsystem_jsessionid[:20]}...")
+
         return session
+
+    except AccountLockedError:
+        raise
+    except requests.RequestException as e:
+        raise CASLoginError(f"网络请求失败: {e}")
+
+
+def cas_login_only_castgc(username: str, password: str, rate_limiter=None) -> str:
+    """
+    仅获取 CASTGC，不访问任何子系统
+
+    这是简化版的登录，只用于获取 CASTGC cookie。
+    后续使用 CASTGC 通过 SubsystemSessionProvider 获取各子系统的 session。
+
+    Returns:
+        CASTGC cookie 值
+
+    Raises:
+        AccountLockedError: 账号被锁定
+        CASLoginError: 登录失败
+    """
+    if rate_limiter:
+        if not rate_limiter.can_login(username):
+            wait_time = rate_limiter.get_wait_time(username)
+            raise AccountLockedError(f"登录过于频繁，请等待 {wait_time:.0f} 秒后再试")
+        rate_limiter.record_login(username)
+
+    session = create_session()
+
+    try:
+        # 任选一个 service_url，只需要能获取 CASTGC
+        service_url = SUBSYSTEM_SERVICE_URLS.get("jwc")
+        login_url = f"{CAS_LOGIN_URL}?service={requests.utils.quote(service_url)}"
+
+        # Step 1: 获取登录表单
+        resp = session.get(login_url, allow_redirects=False)
+        html = resp.text
+        soup = BeautifulSoup(html, "html.parser")
+
+        lt = soup.find("input", {"name": "lt"})["value"]
+        execution = soup.find("input", {"name": "execution"})["value"]
+        event_id = soup.find("input", {"name": "_eventId"})["value"]
+        dllt = soup.find("input", {"name": "dllt"})["value"]
+        salt = soup.find("input", {"id": "pwdEncryptSalt"})["value"]
+
+        if not salt or not execution:
+            raise CASLoginError("Failed to parse login page")
+
+        # Step 2: 提交登录表单，获取 CASTGC
+        encrypted_pwd = encrypt_password(password, salt)
+
+        form_data = {
+            "username": username,
+            "password": encrypted_pwd,
+            "passwordText": "",
+            "lt": lt,
+            "execution": execution,
+            "_eventId": event_id,
+            "cllt": "userNameLogin",
+            "dllt": dllt,
+        }
+
+        resp = session.post(login_url, data=form_data, allow_redirects=False)
+
+        # 检查是否登录成功
+        if resp.status_code == 401 or "账号" in resp.text or "锁定" in resp.text:
+            raise AccountLockedError("账号可能被锁定")
+
+        cookies = {c.name: c.value for c in session.cookies}
+        castgc = cookies.get("CASTGC")
+
+        if not castgc:
+            if "密码" in resp.text or "错误" in resp.text:
+                raise CASLoginError("用户名或密码错误")
+            raise CASLoginError(f"登录失败: 未获取到 CASTGC")
+
+        logger.info(f"CASTGC obtained: {castgc[:30]}...")
+        return castgc
 
     except AccountLockedError:
         raise
