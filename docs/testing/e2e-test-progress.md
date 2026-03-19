@@ -7,7 +7,7 @@
 | 类别 | 总数 | 已完成 | 通过率 |
 |------|------|--------|--------|
 | public_tools | 10 | 10 | 100% |
-| auth_required | 5 | 0 | - |
+| auth_required | 5 | 1 | 20% |
 | auth_tools | 6 | 0 | - |
 | multi_tool | 9 | 0 | - |
 | **总计** | **30** | **10** | **33%** |
@@ -33,7 +33,7 @@
 
 ---
 
-## auth_required ⏳ 待运行
+## auth_required 🔧 部分通过
 
 | 用例 | 状态 | 依赖 |
 |------|------|------|
@@ -41,7 +41,7 @@
 | `test_login_with_invalid_credentials_fails` | ⏳ | - |
 | `test_login_rate_limiting` | ⏳ | - |
 | `test_logout_with_valid_token_succeeds` | ⏳ | login 成功 |
-| `test_logout_without_token_fails` | ⏳ | - |
+| `test_logout_without_token_fails` | ✅ PASS | - |
 
 ---
 
@@ -98,6 +98,7 @@
 | 2026-03-19 | HTTPBearer auto_error=True 导致 401 | `HTTPBearer(auto_error=False)` | [#001](./e2e-debug-log.md#问题-001-httpbearer-导致-401-unauthorized) |
 | 2026-03-19 | gpt-3.5-turbo 模型不存在 | 使用 `settings.openai_model` | [#002](./e2e-debug-log.md#问题-002-模型名称不匹配) |
 | 2026-03-19 | loguru 日志不显示 | 配置 `sink=sys.stdout` | [#003](./e2e-debug-log.md#问题-003-loguru-日志不显示) |
+| 2026-03-19 | get_current_user 在 credentials 为 None 时返回 500 | 检查 credentials 为 None 并返回 401 | [#005](./e2e-debug-log.md#问题-005-get_current_user-在-credentials-为-none-时返回-500) |
 
 详细排查日志: [e2e-debug-log.md](./e2e-debug-log.md)
 

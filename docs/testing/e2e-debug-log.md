@@ -238,6 +238,84 @@ pytest: error: unrecognized arguments: --timeout=120
 
 ---
 
+## 问题 #005: get_current_user 在 credentials 为 None 时返回 500
+
+**发现日期**: 2026-03-19
+**测试类别**: auth_required
+**严重程度**: 🔴 高
+
+### 症状
+
+`test_logout_without_token_fails` 测试失败：
+```
+AssertionError: Expected 401 for unauthenticated logout, got 500
+```
+
+### 排查过程
+
+1. **检查后端日志**
+   - 没有详细的错误堆栈信息
+   - 只有测试发送的请求日志
+
+2. **检查 logout 端点代码**
+   ```python
+   # app/api/v1/auth.py 第 106-110 行
+   @router.post("/logout")
+   async def logout(
+       request: LogoutRequest,
+       current_user: dict = Depends(get_current_user)
+   ):
+   ```
+
+3. **检查 get_current_user 实现**
+   ```python
+   # app/api/dependencies.py 第 14-22 行
+   async def get_current_user(
+       credentials: HTTPAuthorizationCredentials = Depends(security)
+   ) -> dict:
+       token = credentials.credentials  # ← 这里是问题！
+   ```
+
+4. **定位根因**
+   - `HTTPBearer(auto_error=False)` 使得没有 Authorization 头时 `credentials` 为 `None`
+   - `get_current_user` 直接访问 `credentials.credentials`
+   - `None.credentials` 抛出 `AttributeError` → 500 Internal Server Error
+
+### 修复方案
+
+```python
+# app/api/dependencies.py
+async def get_current_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+) -> dict:
+    if credentials is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="未提供认证凭证",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    token = credentials.credentials
+    # ... 其余代码不变
+```
+
+### 验证
+
+```bash
+# 修复后测试
+curl -s -X POST http://localhost:8000/api/v1/auth/logout \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"test"}'
+
+# 返回 401 Unauthorized
+```
+
+### 相关文件
+
+- `app/api/dependencies.py`
+
+---
+
 ## 问题模板
 
 复制以下模板记录新问题：
