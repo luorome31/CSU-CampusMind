@@ -114,7 +114,7 @@ def create_career_tools(ctx: ToolContext) -> List[BaseTool]:
             return service.get_teachin(zone)
         except Exception as e:
             logger.error(f"Career teachin query failed: {e}")
-            return f"宣讲会查询失败: {str(e)}"
+            return "宣讲会查询失败"
 
     def _get_campus_recruit(keyword: str = "") -> str:
         """获取校园招聘信息"""
@@ -123,7 +123,7 @@ def create_career_tools(ctx: ToolContext) -> List[BaseTool]:
             return service.get_campus_recruit(keyword)
         except Exception as e:
             logger.error(f"Career campus recruit query failed: {e}")
-            return f"校园招聘查询失败: {str(e)}"
+            return "校园招聘查询失败"
 
     def _get_campus_intern(keyword: str = "") -> str:
         """获取实习信息"""
@@ -132,7 +132,7 @@ def create_career_tools(ctx: ToolContext) -> List[BaseTool]:
             return service.get_campus_intern(keyword)
         except Exception as e:
             logger.error(f"Career campus intern query failed: {e}")
-            return f"实习信息查询失败: {str(e)}"
+            return "实习信息查询失败"
 
     def _get_jobfair() -> str:
         """获取招聘会信息"""
@@ -141,7 +141,7 @@ def create_career_tools(ctx: ToolContext) -> List[BaseTool]:
             return service.get_jobfair()
         except Exception as e:
             logger.error(f"Career jobfair query failed: {e}")
-            return f"招聘会查询失败: {str(e)}"
+            return "招聘会查询失败"
 
     return [
         StructuredTool.from_function(
