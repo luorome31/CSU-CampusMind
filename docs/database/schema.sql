@@ -14,12 +14,12 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT,
     phone TEXT,
     is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
-CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);
+CREATE INDEX IF NOT EXISTS idx_users_create_time ON users(create_time);
 
 -- ============================================================================
 -- 2. DIALOGS TABLE
@@ -28,12 +28,12 @@ CREATE TABLE IF NOT EXISTS dialogs (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL,
     agent_id TEXT,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_dialogs_user_id ON dialogs(user_id);
-CREATE INDEX IF NOT EXISTS idx_dialogs_updated_at ON dialogs(updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_dialogs_update_time ON dialogs(update_time DESC);
 
 -- ============================================================================
 -- 3. CHAT HISTORY TABLE
@@ -46,14 +46,13 @@ CREATE TABLE IF NOT EXISTS chat_history (
     file_url TEXT,
     events TEXT,
     extra TEXT,
-    parent_id TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (dialog_id) REFERENCES dialogs(id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_chat_history_dialog_id ON chat_history(dialog_id);
-CREATE INDEX IF NOT EXISTS idx_chat_history_created_at ON chat_history(created_at);
-CREATE INDEX IF NOT EXISTS idx_chat_history_dialog_created ON chat_history(dialog_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_chat_history_create_time ON chat_history(create_time);
+CREATE INDEX IF NOT EXISTS idx_chat_history_dialog_created ON chat_history(dialog_id, create_time);
 
 -- ============================================================================
 -- 4. KNOWLEDGE BASES TABLE
@@ -63,14 +62,14 @@ CREATE TABLE IF NOT EXISTS knowledge_bases (
     name TEXT NOT NULL,
     description TEXT,
     user_id TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     UNIQUE(name, user_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_kb_user_id ON knowledge_bases(user_id);
-CREATE INDEX IF NOT EXISTS idx_kb_updated_at ON knowledge_bases(updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_kb_update_time ON knowledge_bases(update_time DESC);
 
 -- ============================================================================
 -- 5. KNOWLEDGE FILES TABLE
@@ -83,8 +82,8 @@ CREATE TABLE IF NOT EXISTS knowledge_files (
     status TEXT DEFAULT 'pending',
     oss_url TEXT NOT NULL,
     file_size BIGINT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (knowledge_id) REFERENCES knowledge_bases(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -92,7 +91,7 @@ CREATE TABLE IF NOT EXISTS knowledge_files (
 CREATE INDEX IF NOT EXISTS idx_kf_knowledge_id ON knowledge_files(knowledge_id);
 CREATE INDEX IF NOT EXISTS idx_kf_user_id ON knowledge_files(user_id);
 CREATE INDEX IF NOT EXISTS idx_kf_status ON knowledge_files(status);
-CREATE INDEX IF NOT EXISTS idx_kf_created_at ON knowledge_files(created_at);
+CREATE INDEX IF NOT EXISTS idx_kf_create_time ON knowledge_files(create_time);
 
 -- ============================================================================
 -- 6. TOOL DEFINITIONS TABLE

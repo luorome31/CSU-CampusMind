@@ -1,6 +1,7 @@
 """
 History Service - Service for chat history operations
 """
+import json
 from datetime import datetime
 from typing import Optional, Any, List
 from sqlmodel import select, desc
@@ -20,7 +21,7 @@ class HistoryService:
         dialog_id: str,
         file_url: Optional[str] = None,
         events: Optional[List[dict]] = None,
-        metadata: Optional[dict] = None
+        extra: Optional[dict] = None
     ) -> ChatHistory:
         """
         Save chat history
@@ -32,7 +33,7 @@ class HistoryService:
             dialog_id: Dialog ID
             file_url: Optional file URL
             events: Tool call events
-            metadata: Performance metadata
+            extra: Performance metadata
 
         Returns:
             ChatHistory instance
@@ -46,8 +47,8 @@ class HistoryService:
             role=role,
             content=content,
             file_url=file_url,
-            events=events,
-            metadata=metadata,
+            events=json.dumps(events) if events else None,
+            extra=json.dumps(extra) if extra else None,
             created_at=datetime.now()
         )
         session.add(history)
