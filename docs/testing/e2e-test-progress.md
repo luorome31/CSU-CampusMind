@@ -8,9 +8,9 @@
 |------|------|--------|--------|
 | public_tools | 10 | 10 | 100% |
 | auth_required | 5 | 5 | 100% |
-| auth_tools | 9 | 5 | 56% |
+| auth_tools | 9 | 9 | 100% |
 | multi_tool | 9 | 0 | - |
-| **总计** | **30** | **10** | **33%** |
+| **总计** | **30** | **24** | **80%** |
 
 ---
 
@@ -45,7 +45,7 @@
 
 ---
 
-## auth_tools ✅ 5/9 通过
+## auth_tools ✅ 9/9 全部通过
 
 | 用例 | 状态 | 备注 |
 |------|------|------|
@@ -55,10 +55,10 @@
 | `test_authenticated_user_can_query_level_exam` | ✅ PASS | |
 | `test_jwc_schedule_with_term_parameter` | ✅ PASS | |
 | `test_anonymous_user_cannot_query_grades` | ✅ PASS | |
-| `test_authenticated_user_can_query_notifications` | ⏳ SKIP | CAS 账号被锁定 |
-| `test_notification_query_with_department_filter` | ⏳ SKIP | CAS 账号被锁定 |
-| `test_notification_query_with_date_range` | ⏳ SKIP | CAS 账号被锁定 |
-| `test_jwc_session_expired_handling` | ⏳ SKIP | Token 过期 |
+| `test_authenticated_user_can_query_notifications` | ✅ PASS | |
+| `test_notification_query_with_department_filter` | ✅ PASS | |
+| `test_notification_query_with_date_range` | ✅ PASS | |
+| `test_jwc_session_expired_handling` | ✅ PASS | |
 
 ---
 
