@@ -11,6 +11,7 @@ from app.core.context import ToolContext
 from app.core.session.manager import UnifiedSessionManager
 from app.core.agents.react_agent import ReactAgent
 from app.core.tools.jwc import create_jwc_tools
+from app.core.tools.oa import create_oa_tools  # NEW
 from app.core.tools.library import create_library_tools
 from app.core.tools.career import create_career_tools
 from app.core.tools.rag_tool import create_rag_tool
@@ -69,6 +70,7 @@ class AgentFactory:
 - jwc_schedule: 查询课表
 - jwc_rank: 查询专业排名
 - jwc_level_exam: 查询等级考试成绩
+- oa_notification_list: 查询校内通知（需登录）
 
 你还可以使用以下公开工具：
 - library_search: 搜索图书馆馆藏
@@ -131,6 +133,10 @@ class AgentFactory:
         if knowledge_ids:
             for kid in knowledge_ids:
                 tools.append(create_rag_tool(knowledge_ids=[kid]))
+
+        # OA 工具（需要登录，认证检查在工具内部）
+        if ctx.is_authenticated:
+            tools.extend(create_oa_tools(ctx))  # NEW
 
         # JWC 工具（需要登录）
         if ctx.is_authenticated:
