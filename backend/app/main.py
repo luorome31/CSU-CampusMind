@@ -1,9 +1,21 @@
 """
 CampusMind Backend Application
 """
+import sys
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
+
+# Configure loguru for uvicorn - output to stdout
+logger.configure(
+    handlers=[
+        {
+            "sink": sys.stdout,
+            "level": "INFO",
+            "format": "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name} | {message}",
+        }
+    ]
+)
 
 from app.api.v1 import crawl, index, knowledge, knowledge_file, retrieve, completion, auth
 

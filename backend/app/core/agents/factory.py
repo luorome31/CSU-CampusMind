@@ -31,7 +31,9 @@ class AgentFactory:
     def __init__(self, session_manager: UnifiedSessionManager):
         self.session_manager = session_manager
 
-    def _get_llm(self, model_name: str = "gpt-3.5-turbo") -> ChatOpenAI:
+    def _get_llm(self, model_name: str = None) -> ChatOpenAI:
+        if model_name is None:
+            model_name = settings.openai_model
         """获取 LLM 实例"""
         api_key = settings.openai_api_key or settings.embedding_api_key
 
@@ -101,7 +103,7 @@ class AgentFactory:
         self,
         user_id: Optional[str] = None,
         knowledge_ids: Optional[List[str]] = None,
-        model_name: str = "gpt-3.5-turbo"
+        model_name: str = None
     ) -> ReactAgent:
         """
         创建 Agent
@@ -114,6 +116,9 @@ class AgentFactory:
         Returns:
             ReactAgent 实例
         """
+        if model_name is None:
+            model_name = settings.openai_model
+
         # 创建上下文
         ctx = ToolContext(
             user_id=user_id,

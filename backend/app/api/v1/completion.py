@@ -11,6 +11,8 @@ from pydantic import BaseModel, Field
 from sqlmodel import Session, select
 
 from app.config import settings
+
+# Use model from settings as default
 from app.database.session import engine
 from app.database.models import Dialog, ChatHistory
 from app.services.rag.handler import rag_handler
@@ -70,7 +72,7 @@ class CompletionRequest(BaseModel):
     enable_rag: bool = Field(default=True, description="Enable RAG retrieval")
     top_k: int = Field(default=5, description="Number of context chunks")
     min_score: float = Field(default=0.0, description="Minimum score threshold")
-    model: str = Field(default="gpt-3.5-turbo", description="LLM model to use")
+    model: str = Field(default=settings.openai_model, description="LLM model to use")
 
 
 class CompletionResponse(BaseModel):
@@ -83,7 +85,9 @@ class CompletionResponse(BaseModel):
     error: Optional[str] = None
 
 
-def get_llm(model_name: str = "gpt-3.5-turbo") -> ChatOpenAI:
+def get_llm(model_name: str = None) -> ChatOpenAI:
+    if model_name is None:
+        model_name = settings.openai_model
     """
     Get LLM instance based on settings.
 
@@ -109,7 +113,9 @@ def get_llm(model_name: str = "gpt-3.5-turbo") -> ChatOpenAI:
     )
 
 
-def create_agent_with_rag(knowledge_ids: List[str], model_name: str = "gpt-3.5-turbo") -> ReactAgent:
+def create_agent_with_rag(knowledge_ids: List[str], model_name: str = None) -> ReactAgent:
+    if model_name is None:
+        model_name = settings.openai_model
     """
     Create a ReactAgent with RAG tool.
 
@@ -439,7 +445,7 @@ class ChatRequest(BaseModel):
     dialog_id: Optional[str] = Field(default=None, description="Dialog ID")
     user_id: str = Field(default="system", description="User ID")
     use_rag: bool = Field(default=True, description="Use RAG")
-    model: str = Field(default="gpt-3.5-turbo", description="LLM model to use")
+    model: str = Field(default=settings.openai_model, description="LLM model to use")
 
 
 @router.post("/chat/stream")
