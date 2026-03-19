@@ -134,9 +134,8 @@ class AgentFactory:
             for kid in knowledge_ids:
                 tools.append(create_rag_tool(knowledge_ids=[kid]))
 
-        # OA 工具（需要登录，认证检查在工具内部）
-        if ctx.is_authenticated:
-            tools.extend(create_oa_tools(ctx))  # NEW
+        # OA 工具（始终可用，认证检查在工具内部进行）
+        tools.extend(create_oa_tools(ctx))  # NEW
 
         # JWC 工具（需要登录）
         if ctx.is_authenticated:
