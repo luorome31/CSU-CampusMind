@@ -436,6 +436,63 @@ uv run pytest tests/e2e/test_authenticated_tools.py::TestOaTools -v
 
 ---
 
+## 问题 #008: OA 通知查询 JSON 解析失败 (UTF-8 BOM)
+
+**发现日期**: 2026-03-19
+**测试类别**: multi_tool
+**严重程度**: 🟡 中
+
+### 症状
+
+OA 通知查询返回错误：
+```
+JSONDecodeError: Unexpected UTF-8 BOM (decode using utf-8-sig)
+```
+
+### 排查过程
+
+1. **检查响应内容**
+   - OA 系统返回的响应包含 UTF-8 BOM
+   - `resp.json()` 无法直接解析
+
+2. **添加调试日志**
+   - 将失败的响应内容保存到文件
+   - 确认是 BOM 问题
+
+### 修复方案
+
+```python
+# app/core/tools/oa/__init__.py
+def _decode_json_with_bom(response: requests.Response) -> dict:
+    """Decode JSON response, handling various encoding issues."""
+    try:
+        return response.json()
+    except json.JSONDecodeError as e:
+        logger.info(f"Standard JSON parsing failed: {e}, trying alternative encodings...")
+        encodings = ["utf-8", "utf-8-sig", "gbk", "gb2312", "latin-1"]
+        for encoding in encodings:
+            try:
+                return json.loads(response.content.decode(encoding))
+            except Exception:
+                continue
+        raise
+```
+
+### 验证
+
+```bash
+# 修复后测试
+uv run pytest tests/e2e/test_multi_tool_calls.py -v
+# test_oas_notification_with_multiple_filters PASSED
+# test_rapid_sequential_requests PASSED
+```
+
+### 相关文件
+
+- `app/core/tools/oa/__init__.py`
+
+---
+
 ## 问题模板
 
 复制以下模板记录新问题：

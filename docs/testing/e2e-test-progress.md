@@ -9,8 +9,8 @@
 | public_tools | 10 | 10 | 100% |
 | auth_required | 5 | 5 | 100% |
 | auth_tools | 9 | 9 | 100% |
-| multi_tool | 11 | 9 | 82% |
-| **总计** | **35** | **33** | **94%** |
+| multi_tool | 11 | 11 | 100% |
+| **总计** | **35** | **35** | **100%** |
 
 ---
 
@@ -62,7 +62,7 @@
 
 ---
 
-## multi_tool ✅ 9/11 通过
+## multi_tool ✅ 11/11 全部通过
 
 | 用例 | 状态 | 备注 |
 |------|------|------|
@@ -75,8 +75,8 @@
 | `test_library_search_with_pagination` | ✅ PASS | |
 | `test_career_tool_with_zone_and_keyword` | ✅ PASS | |
 | `test_query_that_triggers_no_tools` | ✅ PASS | |
-| `test_oas_notification_with_multiple_filters` | ⏳ SKIP | |
-| `test_rapid_sequential_requests` | ⏳ SKIP | |
+| `test_oas_notification_with_multiple_filters` | ✅ PASS | |
+| `test_rapid_sequential_requests` | ✅ PASS | |
 
 ---
 
