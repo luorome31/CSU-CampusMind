@@ -6,7 +6,7 @@
 """
 import base64
 import json
-from enum import Enum
+from enum import Enum, StrEnum
 
 
 # === Department Enum ===
@@ -200,36 +200,21 @@ def _get_identifier(dept_name: str) -> str:
     return result.upper()
 
 
-# String enum member class that inherits from str
-class _StrEnumMember(str):
-    """A string value that also has a .value property."""
-    __slots__ = ()
-
-    def __new__(cls, value: str):
-        return super().__new__(cls, value)
-
-    @property
-    def value(self) -> str:
-        return str(self)
-
-    def __repr__(self):
-        return f"{self.__class__.__name__}({super().__repr__()})"
-
-
+# === DepartmentEnum using standard Enum ===
 # Build enum members dict with proper identifiers
 _dept_members = {_get_identifier(d): d for d in _DEPARTMENT_VALUES}
 
-# Create DepartmentEnum class with string members
-_dept_attrs = {ident: _StrEnumMember(dept_name) for ident, dept_name in _dept_members.items()}
-_dept_attrs["__slots__"] = ()
-_dept_attrs["__doc__"] = "起草部门枚举，严格限制 LLM 可选的部门范围"
-_dept_attrs["__iter__"] = classmethod(lambda cls: iter(cls._values.keys()))
+# Create DepartmentEnum using functional API with str mixin
+# Using StrEnum would be cleaner but functional API creates it differently
+DepartmentEnum = Enum(
+    'DepartmentEnum',
+    {ident: dept_name for ident, dept_name in _dept_members.items()},
+    type=str,
+    module=__name__,
+)
 
-# Create the enum class
-DepartmentEnum = type("DepartmentEnum", (), _dept_attrs)
-
-# Add _values dict for iteration
-DepartmentEnum._values = {ident: dept_name for ident, dept_name in _dept_members.items()}
+# Add _values for backward compatibility (used by tests)
+DepartmentEnum._values = _dept_members
 
 
 # === Query Parameter Builder ===

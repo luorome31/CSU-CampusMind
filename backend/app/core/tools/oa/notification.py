@@ -3,7 +3,7 @@
 OANotificationList tool - 校内通知查询工具
 """
 import logging
-from typing import List, Optional
+from typing import Optional
 
 import requests
 from pydantic import BaseModel, Field
@@ -16,11 +16,27 @@ from .departments import DepartmentEnum, build_params
 logger = logging.getLogger(__name__)
 
 
+def _format_notification_results(result: dict) -> str:
+    """Format notification API response into readable text."""
+    count = result.get("count", 0)
+    data = result.get("data", [])
+    if count == 0:
+        return "未找到符合条件的通知"
+    lines = [f"共找到 {count} 条通知：\n"]
+    for i, item in enumerate(data, 1):
+        lines.append(
+            f"{i}. 【{item.get('QCBMMC', '未知部门')}】{item.get('WJBT', '无标题')}\n"
+            f"   文号：{item.get('FWH', '-')} | 发文字：{item.get('FWZ', '-')} | "
+            f"起草时间：{item.get('DJSJ', '-')} | "
+            f"浏览次数：{item.get('LLCS', 0)}\n"
+        )
+    return "".join(lines)
+
+
 # === Input Schema ===
 
 class OANotificationListInput(BaseModel):
     """校内通知查询输入参数"""
-    model_config = {"arbitrary_types_allowed": True}
     qssj: Optional[str] = Field(
         default=None,
         description="起始时间，格式 YYYY-MM-DD"
@@ -99,23 +115,7 @@ def _query_notifications(
         )
 
         if resp.status_code == 200:
-            result = resp.json()
-            count = result.get("count", 0)
-            data = result.get("data", [])
-
-            if count == 0:
-                return "未找到符合条件的通知"
-
-            # 格式化返回结果
-            lines = [f"共找到 {count} 条通知：\n"]
-            for i, item in enumerate(data, 1):
-                lines.append(
-                    f"{i}. 【{item.get('QCBMMC', '未知部门')}】{item.get('WJBT', '无标题')}\n"
-                    f"   文号：{item.get('FWH', '-')} | 发文字：{item.get('FWZ', '-')} | "
-                    f"起草时间：{item.get('DJSJ', '-')} | "
-                    f"浏览次数：{item.get('LLCS', 0)}\n"
-                )
-            return "".join(lines)
+            return _format_notification_results(resp.json())
 
         elif resp.status_code >= 300 and resp.status_code < 400:
             logger.warning(f"OA session expired (status {resp.status_code}), redirect: {resp.headers.get('Location')}")
@@ -129,20 +129,7 @@ def _query_notifications(
                     timeout=30,
                 )
                 if resp.status_code == 200:
-                    result = resp.json()
-                    count = result.get("count", 0)
-                    data = result.get("data", [])
-                    if count == 0:
-                        return "未找到符合条件的通知"
-                    lines = [f"共找到 {count} 条通知：\n"]
-                    for i, item in enumerate(data, 1):
-                        lines.append(
-                            f"{i}. 【{item.get('QCBMMC', '未知部门')}】{item.get('WJBT', '无标题')}\n"
-                            f"   文号：{item.get('FWH', '-')} | 发文字：{item.get('FWZ', '-')} | "
-                            f"起草时间：{item.get('DJSJ', '-')} | "
-                            f"浏览次数：{item.get('LLCS', 0)}\n"
-                        )
-                    return "".join(lines)
+                    return _format_notification_results(resp.json())
             except Exception:
                 pass
             return "校内通知查询失败，请稍后重试"
