@@ -12,6 +12,7 @@ from app.core.session.manager import UnifiedSessionManager
 from app.core.agents.react_agent import ReactAgent
 from app.core.tools.jwc import create_jwc_tools
 from app.core.tools.library import create_library_tools
+from app.core.tools.career import create_career_tools
 from app.core.tools.rag_tool import create_rag_tool
 
 logger = logging.getLogger(__name__)
@@ -22,8 +23,8 @@ class AgentFactory:
     Agent 工厂，根据用户登录状态创建不同的 Agent
 
     设计原则：
-    - 登录用户：JWC + Library + RAG tools
-    - 未登录用户：Library + RAG tools
+    - 登录用户：JWC + Library + Career + RAG tools
+    - 未登录用户：Library + Career + RAG tools
     """
 
     def __init__(self, session_manager: UnifiedSessionManager):
@@ -69,14 +70,26 @@ class AgentFactory:
 - jwc_rank: 查询专业排名
 - jwc_level_exam: 查询等级考试成绩
 
+你还可以使用以下公开工具：
+- library_search: 搜索图书馆馆藏
+- library_get_book_location: 查询图书位置
+- rag_search: 搜索知识库
+- career_teachin: 查询宣讲会信息
+- career_campus_recruit: 查询校园招聘信息
+- career_campus_intern: 查询实习岗位信息
+- career_jobfair: 查询招聘会信息
+
 重要：这些工具不需要你接收 user_id 参数，系统会自动处理用户身份。"""
         else:
             base_prompt += """
-
 当前为游客模式，你可以使用以下公开工具：
 - library_search: 搜索图书馆馆藏
 - library_get_book_location: 查询图书位置
 - rag_search: 搜索知识库
+- career_teachin: 查询宣讲会信息
+- career_campus_recruit: 查询校园招聘信息
+- career_campus_intern: 查询实习岗位信息
+- career_jobfair: 查询招聘会信息
 
 如果需要访问个人成绩、课表等信息，请提示用户先登录。"""
 
@@ -110,6 +123,9 @@ class AgentFactory:
 
         # 图书馆工具（始终可用）
         tools.extend(create_library_tools(ctx))
+
+        # Career 工具（始终可用，无需认证）
+        tools.extend(create_career_tools(ctx))
 
         # RAG 工具（始终可用）
         if knowledge_ids:
