@@ -49,15 +49,15 @@ erDiagram
         string email
         string phone
         boolean is_active
-        datetime create_time
-        datetime update_time
+        datetime created_at
+        datetime updated_at
     }
 
     DIALOG {
         string id PK
         string user_id FK
         string agent_id
-        datetime update_time
+        datetime updated_at
     }
 
     CHAT_HISTORY {
@@ -68,7 +68,7 @@ erDiagram
         string file_url
         string events
         string extra
-        datetime create_time
+        datetime created_at
     }
 
     KNOWLEDGE {
@@ -76,8 +76,8 @@ erDiagram
         string name UK
         string description
         string user_id FK
-        datetime create_time
-        datetime update_time
+        datetime created_at
+        datetime updated_at
     }
 
     KNOWLEDGE_FILE {
@@ -88,8 +88,8 @@ erDiagram
         string status
         string oss_url
         bigint file_size
-        datetime create_time
-        datetime update_time
+        datetime created_at
+        datetime updated_at
     }
 
     TOOL_DEFINITION {
@@ -98,7 +98,7 @@ erDiagram
         string description
         string category
         boolean requires_auth
-        datetime create_time
+        datetime created_at
     }
 
     TOOL_CALL_LOG {
@@ -109,7 +109,7 @@ erDiagram
         string status
         string error_message
         int duration_ms
-        datetime create_time
+        datetime created_at
     }
 ```
 
@@ -128,8 +128,8 @@ CREATE TABLE users (
     email TEXT,
     phone TEXT,
     is_active BOOLEAN DEFAULT TRUE,
-    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
@@ -149,7 +149,7 @@ CREATE TABLE dialogs (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL,
     agent_id TEXT,
-    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 ```
@@ -167,7 +167,8 @@ CREATE TABLE chat_history (
     file_url TEXT,
     events TEXT,
     extra TEXT,
-    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    parent_id TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (dialog_id) REFERENCES dialogs(id) ON DELETE CASCADE
 );
 ```
@@ -189,8 +190,8 @@ CREATE TABLE knowledge_bases (
     name TEXT NOT NULL,
     description TEXT,
     user_id TEXT NOT NULL,
-    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     UNIQUE(name, user_id)
 );
@@ -209,8 +210,8 @@ CREATE TABLE knowledge_files (
     status TEXT DEFAULT 'pending',
     oss_url TEXT NOT NULL,
     file_size BIGINT DEFAULT 0,
-    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (knowledge_id) REFERENCES knowledge_bases(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -229,7 +230,7 @@ CREATE TABLE tool_definitions (
     description TEXT,
     category TEXT,
     requires_auth BOOLEAN DEFAULT FALSE,
-    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
@@ -253,7 +254,7 @@ CREATE TABLE tool_call_logs (
     status TEXT NOT NULL,
     error_message TEXT,
     duration_ms INTEGER,
-    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
