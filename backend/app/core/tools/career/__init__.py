@@ -22,6 +22,7 @@ from .tools import (
     CareerCampusInternTool,
     CareerJobfairTool,
     CAREER_TOOLS,
+    create_career_tools,
 )
 
 __all__ = [
@@ -44,4 +45,5 @@ __all__ = [
     "CareerCampusInternTool",
     "CareerJobfairTool",
     "CAREER_TOOLS",
+    "create_career_tools",
 ]
