@@ -7,7 +7,7 @@
 | 类别 | 总数 | 已完成 | 通过率 |
 |------|------|--------|--------|
 | public_tools | 10 | 10 | 100% |
-| auth_required | 5 | 1 | 20% |
+| auth_required | 5 | 4 | 80% |
 | auth_tools | 6 | 0 | - |
 | multi_tool | 9 | 0 | - |
 | **总计** | **30** | **10** | **33%** |
@@ -37,9 +37,9 @@
 
 | 用例 | 状态 | 依赖 |
 |------|------|------|
-| `test_login_with_valid_credentials_succeeds` | ⏳ | CAS 凭据 |
-| `test_login_with_invalid_credentials_fails` | ⏳ | - |
-| `test_login_rate_limiting` | ⏳ | - |
+| `test_login_with_valid_credentials_succeeds` | 🔴 FAIL | CAS 账号被锁定 |
+| `test_login_with_invalid_credentials_fails` | ✅ PASS | - |
+| `test_login_rate_limiting` | ✅ PASS | - |
 | `test_logout_with_valid_token_succeeds` | ⏳ | login 成功 |
 | `test_logout_without_token_fails` | ✅ PASS | - |
 
@@ -106,10 +106,11 @@
 
 ## 下一步
 
-1. 运行 `auth_required` 测试（需要有效 CAS 凭据）
-2. 运行 `auth_tools` 测试
-3. 运行 `multi_tool` 测试
-4. 运行 `streaming_completion` 测试
+1. ⚠️ 等待 CAS 账号解锁（账号被锁定，错误: "账号可能被锁定"）
+2. CAS 账号解锁后重新运行 `auth_required` 测试
+3. 运行 `auth_tools` 测试
+4. 运行 `multi_tool` 测试
+5. 运行 `streaming_completion` 测试
 
 ---
 
