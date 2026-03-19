@@ -7,7 +7,7 @@
 | 类别 | 总数 | 已完成 | 通过率 |
 |------|------|--------|--------|
 | public_tools | 10 | 10 | 100% |
-| auth_required | 5 | 4 | 80% |
+| auth_required | 5 | 5 | 100% |
 | auth_tools | 6 | 0 | - |
 | multi_tool | 9 | 0 | - |
 | **总计** | **30** | **10** | **33%** |
@@ -33,28 +33,29 @@
 
 ---
 
-## auth_required 🔧 部分通过
+## auth_required ✅ 全部通过
 
 | 用例 | 状态 | 依赖 |
 |------|------|------|
-| `test_login_with_valid_credentials_succeeds` | 🔴 FAIL | CAS 账号被锁定 |
-| `test_login_with_invalid_credentials_fails` | ✅ PASS | - |
-| `test_login_rate_limiting` | ✅ PASS | - |
-| `test_logout_with_valid_token_succeeds` | ⏳ | login 成功 |
-| `test_logout_without_token_fails` | ✅ PASS | - |
+| `test_login_with_valid_credentials_succeeds` | ✅ PASS | |
+| `test_login_with_invalid_credentials_fails` | ✅ PASS | |
+| `test_login_rate_limiting` | ✅ PASS | |
+| `test_logout_with_valid_token_succeeds` | ✅ PASS | |
+| `test_logout_without_token_fails` | ✅ PASS | |
 
 ---
 
-## auth_tools ⏳ 待运行
+## auth_tools 🔧 部分通过
 
 | 用例 | 状态 | 依赖 |
 |------|------|------|
-| `test_authenticated_user_can_query_grades` | ⏳ | 有效 CAS Token |
-| `test_authenticated_user_can_query_schedule` | ⏳ | 有效 CAS Token |
-| `test_authenticated_user_can_query_rank` | ⏳ | 有效 CAS Token |
-| `test_authenticated_user_can_query_level_exam` | ⏳ | 有效 CAS Token |
-| `test_authenticated_user_can_query_notifications` | ⏳ | 有效 CAS Token |
-| `test_jwc_session_expired_handling` | ⏳ | Token 过期测试 |
+| `test_authenticated_user_can_query_grades` | ⏳ SKIP | CAS Token |
+| `test_authenticated_user_can_query_schedule` | ⏳ SKIP | CAS Token |
+| `test_authenticated_user_can_query_rank` | ⏳ SKIP | CAS Token |
+| `test_authenticated_user_can_query_level_exam` | ⏳ SKIP | CAS Token |
+| `test_authenticated_user_can_query_notifications` | ⏳ SKIP | CAS Token |
+| `test_jwc_session_expired_handling` | ⏳ SKIP | Token 过期 |
+| `test_anonymous_user_cannot_query_grades` | ✅ PASS | - |
 
 ---
 
