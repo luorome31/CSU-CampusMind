@@ -72,12 +72,16 @@ def create_oa_tools(ctx: ToolContext) -> List:
         """
         # 1. 认证检查
         if not ctx.is_authenticated:
+            logger.warning("oa_notification_list: user not authenticated")
             return "请先登录后再使用校内通知查询"
 
         # 2. 获取 OA Session
+        logger.info(f"oa_notification_list: attempting to get OA session for user {ctx.user_id}")
         session = ctx.get_subsystem_session("oa")
         if session is None:
+            logger.error(f"oa_notification_list: get_subsystem_session('oa') returned None for user {ctx.user_id}")
             return "获取校内办公网会话失败，请稍后重试"
+        logger.info(f"oa_notification_list: OA session obtained successfully")
 
         # 3. 构造查询参数
         params_str = build_params(
@@ -107,9 +111,11 @@ def create_oa_tools(ctx: ToolContext) -> List:
                 return _format_notification_results(resp.json())
 
             elif resp.status_code >= 300 and resp.status_code < 400:
-                logger.warning(f"OA session expired (status {resp.status_code}), redirect: {resp.headers.get('Location')}")
+                redirect_url = resp.headers.get('Location', 'unknown')
+                logger.warning(f"OA notification query: got redirect (status {resp.status_code}), redirect URL: {redirect_url}")
                 # Force re-fetch of session
                 try:
+                    logger.info(f"OA notification query: attempting to re-fetch OA session")
                     session = ctx.session_manager.get_session(ctx.user_id, "oa")
                     resp = session.post(
                         NOTIFICATION_API_URL,
@@ -118,16 +124,25 @@ def create_oa_tools(ctx: ToolContext) -> List:
                         timeout=30,
                     )
                     if resp.status_code == 200:
+                        logger.info(f"OA notification query: re-fetch successful, got {len(resp.json().get('data', []))} results")
                         return _format_notification_results(resp.json())
-                except Exception:
-                    pass
+                    else:
+                        logger.error(f"OA notification query: re-fetch failed with status {resp.status_code}")
+                except Exception as retry_err:
+                    logger.error(f"OA notification query: re-fetch session exception: {retry_err}", exc_info=True)
                 return "校内通知查询失败，请稍后重试"
             else:
-                logger.error(f"OA notification query failed: status={resp.status_code}")
+                logger.error(f"OA notification query failed: status={resp.status_code}, response text: {resp.text[:200] if resp.text else 'empty'}")
                 return "查询校内通知失败，请稍后重试"
 
+        except requests.exceptions.Timeout as e:
+            logger.error(f"OA notification query timeout: {e}")
+            return "查询校内通知超时，请稍后重试"
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"OA notification query connection error: {e}", exc_info=True)
+            return "无法连接到校内通知系统，请检查网络连接"
         except Exception as e:
-            logger.error(f"OA notification query exception: {e}")
+            logger.error(f"OA notification query unexpected exception: {e}", exc_info=True)
             return "查询校内通知失败，请稍后重试"
 
     return [
