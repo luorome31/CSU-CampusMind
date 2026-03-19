@@ -3,8 +3,8 @@ CareerService unit tests
 """
 import pytest
 
-from app.core.tools.jwc_career.service import CareerService
-from app.core.tools.jwc_career.client import (
+from app.core.tools.career.service import CareerService
+from app.core.tools.career.client import (
     TeachinEntry,
     CampusRecruitEntry,
     CampusInternEntry,

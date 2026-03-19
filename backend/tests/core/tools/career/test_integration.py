@@ -2,7 +2,7 @@
 就业指导中心集成测试
 
 运行方式:
-    uv run pytest tests/core/tools/jwc_career/test_integration.py -v -m integration
+    uv run pytest tests/core/tools/career/test_integration.py -v -m integration
 
 注意: 需要网络连接，会发起真实HTTP请求
 """
@@ -16,7 +16,7 @@ class TestRealAPI:
 
     def test_teachin_real(self):
         """测试真实宣讲会接口"""
-        from app.core.tools.jwc_career import CareerService
+        from app.core.tools.career import CareerService
         service = CareerService()
         result = service.get_teachin()
 
@@ -24,7 +24,7 @@ class TestRealAPI:
 
     def test_jobfair_real(self):
         """测试真实招聘会接口"""
-        from app.core.tools.jwc_career import CareerService
+        from app.core.tools.career import CareerService
         service = CareerService()
         result = service.get_jobfair()
 
@@ -32,7 +32,7 @@ class TestRealAPI:
 
     def test_campus_recruit_real(self):
         """测试真实校园招聘接口"""
-        from app.core.tools.jwc_career import CareerService
+        from app.core.tools.career import CareerService
         service = CareerService()
         result = service.get_campus_recruit()
 
@@ -40,7 +40,7 @@ class TestRealAPI:
 
     def test_campus_intern_real(self):
         """测试真实实习接口"""
-        from app.core.tools.jwc_career import CareerService
+        from app.core.tools.career import CareerService
         service = CareerService()
         result = service.get_campus_intern()
 

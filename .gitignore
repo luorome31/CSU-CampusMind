@@ -80,3 +80,11 @@ backend/task_plan_deps.md
 backend/data/csu_sessions.json
 data/chroma/chroma.sqlite3
 data/csu_sessions.json
+backend/captured_results/debug_154659.html
+backend/captured_results/subsystem_result_20260318_153726.html
+backend/captured_results/subsystem_result_20260318_153820.html
+docs/langgraph/backend-analysis.md
+docs/langgraph/rules-report.md
+scripts/csu_system_scripts/sso_analyzer.py
+scripts/csu_system_scripts/sso_to_jwc.py
+docs/development_doc/

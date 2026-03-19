@@ -1,14 +1,14 @@
 """
-JWC Career tools unit tests
+Career tools unit tests
 """
 import pytest
 
-from app.core.tools.jwc_career.tools import (
-    JWC_CAREER_TOOLS,
-    JwcTeachinTool,
-    JwcCampusRecruitTool,
-    JwcCampusInternTool,
-    JwcJobfairTool,
+from app.core.tools.career.tools import (
+    CAREER_TOOLS,
+    CareerTeachinTool,
+    CareerCampusRecruitTool,
+    CareerCampusInternTool,
+    CareerJobfairTool,
     TeachinInput,
     CampusRecruitInput,
     CampusInternInput,
@@ -17,33 +17,33 @@ from app.core.tools.jwc_career.tools import (
 
 
 class TestToolsCount:
-    """Test that JWC_CAREER_TOOLS has correct number of tools."""
+    """Test that CAREER_TOOLS has correct number of tools."""
 
     def test_has_four_tools(self):
-        assert len(JWC_CAREER_TOOLS) == 4
+        assert len(CAREER_TOOLS) == 4
 
 
 class TestToolNames:
     """Test tool names are correct."""
 
     def test_teachin_tool_name(self):
-        assert JwcTeachinTool.name == "jwc_teachin"
+        assert CareerTeachinTool.name == "career_teachin"
 
     def test_campus_recruit_tool_name(self):
-        assert JwcCampusRecruitTool.name == "jwc_campus_recruit"
+        assert CareerCampusRecruitTool.name == "career_campus_recruit"
 
     def test_campus_intern_tool_name(self):
-        assert JwcCampusInternTool.name == "jwc_campus_intern"
+        assert CareerCampusInternTool.name == "career_campus_intern"
 
     def test_jobfair_tool_name(self):
-        assert JwcJobfairTool.name == "jwc_jobfair"
+        assert CareerJobfairTool.name == "career_jobfair"
 
 
 class TestToolDescriptions:
     """Test tool descriptions contain expected keywords."""
 
     def test_teachin_description_contains_keywords(self):
-        desc = JwcTeachinTool.description
+        desc = CareerTeachinTool.description
         assert "宣讲会" in desc
         assert "中南大学" in desc
         assert "公司名称" in desc
@@ -51,7 +51,7 @@ class TestToolDescriptions:
         assert "宣讲时间" in desc
 
     def test_campus_recruit_description_contains_keywords(self):
-        desc = JwcCampusRecruitTool.description
+        desc = CareerCampusRecruitTool.description
         assert "校园招聘" in desc
         assert "中南大学" in desc
         assert "招聘公告" in desc
@@ -59,7 +59,7 @@ class TestToolDescriptions:
         assert "发布时间" in desc
 
     def test_campus_intern_description_contains_keywords(self):
-        desc = JwcCampusInternTool.description
+        desc = CareerCampusInternTool.description
         assert "实习" in desc
         assert "中南大学" in desc
         assert "实习公告" in desc
@@ -67,7 +67,7 @@ class TestToolDescriptions:
         assert "发布时间" in desc
 
     def test_jobfair_description_contains_keywords(self):
-        desc = JwcJobfairTool.description
+        desc = CareerJobfairTool.description
         assert "招聘会" in desc
         assert "中南大学" in desc
         assert "招聘会名称" in desc
@@ -97,13 +97,13 @@ class TestToolInvocation:
     """Test tool invocation works."""
 
     def test_teachin_tool_is_callable(self):
-        assert callable(JwcTeachinTool.func)
+        assert callable(CareerTeachinTool.func)
 
     def test_campus_recruit_tool_is_callable(self):
-        assert callable(JwcCampusRecruitTool.func)
+        assert callable(CareerCampusRecruitTool.func)
 
     def test_campus_intern_tool_is_callable(self):
-        assert callable(JwcCampusInternTool.func)
+        assert callable(CareerCampusInternTool.func)
 
     def test_jobfair_tool_is_callable(self):
-        assert callable(JwcJobfairTool.func)
+        assert callable(CareerJobfairTool.func)

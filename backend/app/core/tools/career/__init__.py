@@ -1,5 +1,5 @@
 """
-JWC Career module for fetching career center information from career.csu.edu.cn.
+Career center module for fetching career information from career.csu.edu.cn.
 
 No authentication required.
 """
@@ -17,11 +17,11 @@ from .tools import (
     CampusRecruitInput,
     CampusInternInput,
     JobfairInput,
-    JwcTeachinTool,
-    JwcCampusRecruitTool,
-    JwcCampusInternTool,
-    JwcJobfairTool,
-    JWC_CAREER_TOOLS,
+    CareerTeachinTool,
+    CareerCampusRecruitTool,
+    CareerCampusInternTool,
+    CareerJobfairTool,
+    CAREER_TOOLS,
 )
 
 __all__ = [
@@ -39,9 +39,9 @@ __all__ = [
     "CampusRecruitInput",
     "CampusInternInput",
     "JobfairInput",
-    "JwcTeachinTool",
-    "JwcCampusRecruitTool",
-    "JwcCampusInternTool",
-    "JwcJobfairTool",
-    "JWC_CAREER_TOOLS",
+    "CareerTeachinTool",
+    "CareerCampusRecruitTool",
+    "CareerCampusInternTool",
+    "CareerJobfairTool",
+    "CAREER_TOOLS",
 ]

@@ -5,7 +5,7 @@ import pytest
 from pathlib import Path
 from bs4 import BeautifulSoup
 
-from app.core.tools.jwc_career.client import (
+from app.core.tools.career.client import (
     CareerClient,
     TeachinEntry,
     CampusRecruitEntry,
