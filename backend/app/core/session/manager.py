@@ -25,6 +25,7 @@ class Subsystem:
     JWC = "jwc"
     LIBRARY = "library"
     ECARD = "ecard"
+    OA = "oa"
 
 
 # 子系统对应的 CAS service URL
@@ -32,6 +33,7 @@ SUBSYSTEM_SERVICE_URLS = {
     Subsystem.JWC: "http://csujwc.its.csu.edu.cn/sso.jsp",
     Subsystem.LIBRARY: "https://lib.csu.edu.cn/system/resource/code/auth/clogin.jsp",
     Subsystem.ECARD: "https://ecard.csu.edu.cn/berserker-auth/cas/login/wisedu?targetUrl=https://ecard.csu.edu.cn/plat-pc/?name=loginTransit",
+    Subsystem.OA: "https://oa.csu.edu.cn/con/",
 }
 
 
@@ -171,6 +173,10 @@ class UnifiedSessionManager:
     def get_ecard_session(self, user_id: str) -> requests.Session:
         """获取校园卡 Session"""
         return self.get_session(user_id, Subsystem.ECARD)
+
+    def get_oa_session(self, user_id: str) -> requests.Session:
+        """获取办公网 Session"""
+        return self.get_session(user_id, Subsystem.OA)
 
     def invalidate_session(self, user_id: str, subsystem: Optional[str] = None) -> None:
         """使会话失效"""
