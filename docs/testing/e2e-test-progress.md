@@ -9,8 +9,8 @@
 | public_tools | 10 | 10 | 100% |
 | auth_required | 5 | 5 | 100% |
 | auth_tools | 9 | 9 | 100% |
-| multi_tool | 9 | 0 | - |
-| **总计** | **30** | **24** | **80%** |
+| multi_tool | 11 | 9 | 82% |
+| **总计** | **35** | **33** | **94%** |
 
 ---
 
@@ -62,21 +62,21 @@
 
 ---
 
-## multi_tool ⏳ 待运行
+## multi_tool ✅ 9/11 通过
 
-| 用例 | 状态 | 依赖 |
+| 用例 | 状态 | 备注 |
 |------|------|------|
-| `test_multiple_public_tools_in_sequence` | ⏳ | - |
-| `test_multiple_authenticated_tools_in_sequence` | ⏳ | 有效 CAS Token |
-| `test_rag_combined_with_authenticated_tool` | ⏳ | 有效 CAS Token |
-| `test_multi_tool_error_recovery` | ⏳ | - |
-| `test_complex_multi_step_query` | ⏳ | 有效 CAS Token |
-| `test_tool_call_order_verification` | ⏳ | 有效 CAS Token |
-| `test_oas_notification_with_multiple_filters` | ⏳ | 有效 CAS Token |
-| `test_library_search_with_pagination` | ⏳ | - |
-| `test_career_tool_with_zone_and_keyword` | ⏳ | - |
-| `test_query_that_triggers_no_tools` | ⏳ | - |
-| `test_rapid_sequential_requests` | ⏳ | 有效 CAS Token |
+| `test_multiple_public_tools_in_sequence` | ✅ PASS | |
+| `test_multiple_authenticated_tools_in_sequence` | ✅ PASS | |
+| `test_rag_combined_with_authenticated_tool` | ✅ PASS | |
+| `test_multi_tool_error_recovery` | ✅ PASS | |
+| `test_complex_multi_step_query` | ✅ PASS | |
+| `test_tool_call_order_verification` | ✅ PASS | |
+| `test_library_search_with_pagination` | ✅ PASS | |
+| `test_career_tool_with_zone_and_keyword` | ✅ PASS | |
+| `test_query_that_triggers_no_tools` | ✅ PASS | |
+| `test_oas_notification_with_multiple_filters` | ⏳ SKIP | |
+| `test_rapid_sequential_requests` | ⏳ SKIP | |
 
 ---
 
@@ -103,6 +103,7 @@
 | 2026-03-19 | gpt-3.5-turbo 模型不存在 | 使用 `settings.openai_model` | [#002](./e2e-debug-log.md#问题-002-模型名称不匹配) |
 | 2026-03-19 | loguru 日志不显示 | 配置 `sink=sys.stdout` | [#003](./e2e-debug-log.md#问题-003-loguru-日志不显示) |
 | 2026-03-19 | get_current_user 在 credentials 为 None 时返回 500 | 检查 credentials 为 None 并返回 401 | [#005](./e2e-debug-log.md#问题-005-get_current_user-在-credentials-为-none-时返回-500) |
+| 2026-03-19 | oa_notification_list 缺少 ctx 参数 | 通过闭包捕获 ctx | [#007](./e2e-debug-log.md#问题-007-oa_notification_list-缺少-ctx-参数) |
 
 详细排查日志: [e2e-debug-log.md](./e2e-debug-log.md)
 
@@ -110,8 +111,9 @@
 
 ## 下一步
 
-1. ⚠️ 等待 CAS 账号解锁（账号被锁定，错误: "账号可能被锁定"）
-2. CAS 账号解锁后重新运行 `auth_required` 测试
+1. 运行 `streaming_completion` 测试（可选）
+2. 修复 OA 通知查询失败问题（需要更详细的日志定位）
+3. 调查 2 个跳过的 multi_tool 测试
 3. 运行 `auth_tools` 测试
 4. 运行 `multi_tool` 测试
 5. 运行 `streaming_completion` 测试
