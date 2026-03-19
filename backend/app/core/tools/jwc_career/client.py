@@ -2,11 +2,14 @@
 HTTP client for career.csu.edu.cn with BeautifulSoup HTML parsing.
 """
 
+import logging
 from dataclasses import dataclass
 from typing import Optional
 
 import requests
 from bs4 import BeautifulSoup
+
+logger = logging.getLogger(__name__)
 
 
 BASE_URL = "http://career.csu.edu.cn"
@@ -75,6 +78,7 @@ class CareerClient:
         Returns:
             List of TeachinEntry
         """
+        logger.info(f"Fetching teachin, zone={zone}")
         params = {}
         if zone:
             params["zone"] = zone
@@ -96,6 +100,7 @@ class CareerClient:
                     time=time_li.get_text(strip=True),
                 ))
 
+        logger.info(f"Fetched {len(entries)} teachin entries")
         return entries
 
     def get_campus_recruit(self, keyword: str = "") -> list[CampusRecruitEntry]:
@@ -108,6 +113,7 @@ class CareerClient:
         Returns:
             List of CampusRecruitEntry
         """
+        logger.info(f"Fetching campus recruit, keyword={keyword}")
         params = {}
         if keyword:
             params["keyword"] = keyword
@@ -127,6 +133,7 @@ class CareerClient:
                     publish_time=time_li.get_text(strip=True),
                 ))
 
+        logger.info(f"Fetched {len(entries)} campus recruit entries")
         return entries
 
     def get_campus_intern(self, keyword: str = "") -> list[CampusInternEntry]:
@@ -139,6 +146,7 @@ class CareerClient:
         Returns:
             List of CampusInternEntry
         """
+        logger.info(f"Fetching campus intern, keyword={keyword}")
         params = {}
         if keyword:
             params["keyword"] = keyword
@@ -158,6 +166,7 @@ class CareerClient:
                     publish_time=time_li.get_text(strip=True),
                 ))
 
+        logger.info(f"Fetched {len(entries)} campus intern entries")
         return entries
 
     def get_jobfair(self) -> list[JobfairEntry]:
@@ -167,6 +176,7 @@ class CareerClient:
         Returns:
             List of JobfairEntry
         """
+        logger.info("Fetching jobfair")
         soup = self._fetch("/jobfair")
         entries = []
 
@@ -186,4 +196,5 @@ class CareerClient:
                     time=time_li.get_text(strip=True),
                 ))
 
+        logger.info(f"Fetched {len(entries)} jobfair entries")
         return entries

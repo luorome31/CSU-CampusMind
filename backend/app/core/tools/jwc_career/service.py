@@ -2,7 +2,11 @@
 Business logic service for career center information with markdown formatting.
 """
 
+import logging
+
 from .client import CareerClient, TeachinEntry, CampusRecruitEntry, CampusInternEntry, JobfairEntry
+
+logger = logging.getLogger(__name__)
 
 
 class CareerService:
@@ -24,7 +28,8 @@ class CareerService:
         try:
             entries = self.client.get_teachin(zone)
             return self._format_teachin(entries)
-        except Exception:
+        except Exception as e:
+            logger.error(f"Teachin query failed: {e}")
             return "宣讲会查询失败，请稍后重试"
 
     def get_campus_recruit(self, keyword: str = "") -> str:
@@ -40,7 +45,8 @@ class CareerService:
         try:
             entries = self.client.get_campus_recruit(keyword)
             return self._format_campus_recruit(entries)
-        except Exception:
+        except Exception as e:
+            logger.error(f"Campus recruit query failed: {e}")
             return "校园招聘查询失败，请稍后重试"
 
     def get_campus_intern(self, keyword: str = "") -> str:
@@ -56,7 +62,8 @@ class CareerService:
         try:
             entries = self.client.get_campus_intern(keyword)
             return self._format_campus_intern(entries)
-        except Exception:
+        except Exception as e:
+            logger.error(f"Campus intern query failed: {e}")
             return "实习信息查询失败，请稍后重试"
 
     def get_jobfair(self) -> str:
@@ -69,7 +76,8 @@ class CareerService:
         try:
             entries = self.client.get_jobfair()
             return self._format_jobfair(entries)
-        except Exception:
+        except Exception as e:
+            logger.error(f"Jobfair query failed: {e}")
             return "招聘会查询失败，请稍后重试"
 
     def _format_teachin(self, entries: list[TeachinEntry]) -> str:
