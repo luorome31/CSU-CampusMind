@@ -1,6 +1,6 @@
 # CampusMind Backend E2E Testing Guide
 
-**Purpose:** End-to-end testing guide for authentication, streaming chat requests, and tool calling flow.
+**Purpose:** End-to-end testing guide for authentication, streaming chat requests, and all tool calling flows.
 
 **Base URL:** `http://localhost:8000/api/v1`
 
@@ -23,45 +23,38 @@
 │  │                   /completion/stream (SSE)                      │  │
 │  │  ┌─────────────────┐    ┌─────────────────┐    ┌────────────┐  │  │
 │  │  │  AgentFactory   │───▶│   ReactAgent    │───▶│ LangGraph  │  │  │
-│  │  │  (creates ctx)  │    │  (ReAct loop)   │    │  (graph)   │  │  │
+│  │  │  (creates ctx) │    │  (ReAct loop)   │    │  (graph)   │  │  │
 │  │  └─────────────────┘    └────────┬────────┘    └────────────┘  │  │
 │  │                                │                              │  │
 │  │  ┌─────────────────────────────▼──────────────────────────────┐ │  │
 │  │  │              Tools (structured by subsystem)               │ │  │
-│  │  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌───────────┐  │ │  │
-│  │  │  │ career/ │  │ library/│  │  jwc/   │  │    oa/    │  │ │  │
-│  │  │  └─────────┘  └─────────┘  └─────────┘  └───────────┘  │ │  │
+│  │  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌───────────┐     │ │  │
+│  │  │  │ career/ │ │ library/│ │  jwc/   │ │    oa/    │     │ │  │
+│  │  │  │  (4)   │ │  (2)    │ │  (4)    │ │    (1)    │     │ │  │
+│  │  │  └─────────┘ └─────────┘ └─────────┘ └───────────┘     │ │  │
+│  │  │  ┌────────────────────────────────────────────────┐    │ │  │
+│  │  │  │  rag_search (shared)                           │    │ │  │
+│  │  │  └────────────────────────────────────────────────┘    │ │  │
 │  │  └─────────────────────────────────────────────────────────┘ │  │
 │  └───────────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────────┘
-                                │
-                                │ Tool Calls
-                    ┌───────────▼───────────┐
-                    │   External APIs       │
-                    │  - CAS (ca.csu.edu.cn)│
-                    │  - JWC (csujwc)       │
-                    │  - Library (lib.csu)  │
-                    │  - OA (oa.csu.edu.cn) │
-                    └───────────────────────┘
 ```
 
 ---
 
 ## 2. Authentication Flow
 
-### 2.1 Login Endpoint
+### 2.1 Login
 
 **Endpoint:** `POST /api/v1/auth/login`
 
-**Request:**
-```json
-{
-  "username": "YOUR_STUDENT_ID",
-  "password": "YOUR_PASSWORD"
-}
+```bash
+curl -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "YOUR_STUDENT_ID", "password": "YOUR_PASSWORD"}'
 ```
 
-**Response (Success 200):**
+**Success Response (200):**
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -77,433 +70,720 @@
 | 401 | 登录失败: 账号可能被锁定 |
 | 429 | 登录过于频繁，请等待 XX 秒后再试 |
 
-### 2.2 Authentication Header
+### 2.2 Authenticated Requests
 
-All subsequent requests requiring authentication must include:
+All subsequent requests include:
 
 ```
 Authorization: Bearer <token>
 ```
 
-### 2.3 Logout Endpoint
+### 2.3 Logout
 
 **Endpoint:** `POST /api/v1/auth/logout`
 
-**Headers:** `Authorization: Bearer <token>`
-
-**Request:**
-```json
-{
-  "user_id": "2020123456"
-}
+```bash
+curl -X POST http://localhost:8000/api/v1/auth/logout \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{"user_id": "2020123456"}'
 ```
-
-**Response (200):**
-```json
-{
-  "message": "登出成功"
-}
-```
-
-### 2.4 Refresh Token
-
-**Endpoint:** `POST /api/v1/auth/refresh`
-
-**Headers:** `Authorization: Bearer <token>`
-
-**Response:** Same as login response with new token.
 
 ---
 
 ## 3. Streaming Completion API
 
-### 3.1 Main Streaming Endpoint
+### 3.1 Endpoint
 
 **Endpoint:** `POST /api/v1/completion/stream`
 
-**Headers:**
+```bash
+curl -X POST http://localhost:8000/api/v1/completion/stream \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "message": "查询通知",
+    "knowledge_ids": [],
+    "user_id": "2020123456",
+    "enable_rag": false
+  }'
 ```
-Authorization: Bearer <token>  (optional - enables more tools)
-Content-Type: application/json
-```
-
-**Request:**
-```json
-{
-  "message": "查询学校办公室最近的通知",
-  "knowledge_ids": ["kb-uuid-1"],
-  "user_id": "2020123456",
-  "dialog_id": null,
-  "enable_rag": true,
-  "top_k": 5,
-  "min_score": 0.0,
-  "model": "gpt-3.5-turbo"
-}
-```
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `message` | string | ✅ | User's message/query |
-| `knowledge_ids` | string[] | if enable_rag=true | Knowledge base UUIDs for RAG |
-| `user_id` | string | ✅ | User identifier |
-| `dialog_id` | string/null | ❌ | For conversation history |
-| `enable_rag` | boolean | ❌ | Enable RAG retrieval (default: true) |
-| `top_k` | int | ❌ | Context chunks (default: 5) |
-| `min_score` | float | ❌ | Minimum similarity score |
-| `model` | string | ❌ | LLM model name |
 
 ### 3.2 SSE Response Format
 
-The endpoint returns **Server-Sent Events (SSE)** with `Content-Type: text/event-stream`.
+**Event Types:**
 
-#### Event Types
+| Type | Description |
+|------|-------------|
+| `event` with `status: START` | Tool execution begins |
+| `event` with `status: END` | Tool execution completed |
+| `event` with `status: ERROR` | Tool execution failed |
+| `response_chunk` | LLM token stream |
 
-**1. Tool Execution Start**
+**Example SSE Stream:**
 ```
-event: tool_start
-data: {"type": "event", "timestamp": 1710816000.123, "data": {"title": "执行工具: oa_notification_list", "status": "START", "message": "参数: {...}"}}
-```
+data: {"type": "event", "timestamp": 1710816000.123, "data": {"title": "开始分析用户问题", "status": "START", "message": "正在分析需要使用的工具..."}}
 
-**2. Tool Execution End**
-```
-event: tool_end
-data: {"type": "event", "timestamp": 1710816001.456, "data": {"title": "执行工具: oa_notification_list", "status": "END", "message": "执行完成"}}
-```
+data: {"type": "event", "timestamp": 1710816000.456, "data": {"title": "开始分析用户问题", "status": "END", "message": "将调用工具: oa_notification_list"}}
 
-**3. Tool Execution Error**
-```
-event: tool_error
-data: {"type": "event", "timestamp": 1710816001.789, "data": {"title": "执行工具: oa_notification_list", "status": "ERROR", "message": "执行工具 oa_notification_list 失败: ..."}}
-```
+data: {"type": "event", "timestamp": 1710816000.789, "data": {"title": "执行工具: oa_notification_list", "status": "START", "message": "参数: {\"pageNo\": 1, \"pageSize\": 20}"}}
 
-**4. Model Response Chunk**
-```
-event: response_chunk
-data: {"type": "response_chunk", "timestamp": 1710816002.012, "data": {"chunk": "根据查询结果，", "accumulated": "根据查询结果，学校办公室最近发布了以下通知："}}
-```
+data: {"type": "event", "timestamp": 1710816001.234, "data": {"title": "执行工具: oa_notification_list", "status": "END", "message": "执行完成"}}
 
-#### Response Headers
+data: {"type": "response_chunk", "timestamp": 1710816001.456, "data": {"chunk": "根据", "accumulated": "根据"}}
 
-```
-Content-Type: text/event-stream
-X-Dialog-ID: <dialog_uuid>
+data: {"type": "response_chunk", "timestamp": 1710816001.567, "data": {"chunk": "查询结果，", "accumulated": "根据查询结果，"}}
 ```
 
 ---
 
-## 4. Tool Calling Flow
+## 4. Tool Catalog
 
-### 4.1 Available Tools by Auth State
+### 4.1 Tool Availability by Auth State
 
 | Tool | Anonymous | Authenticated |
 |------|-----------|---------------|
-| `rag_search` | ✅ | ✅ |
-| `career_teachin` | ✅ | ✅ |
-| `career_campus_recruit` | ✅ | ✅ |
-| `career_campus_intern` | ✅ | ✅ |
-| `career_jobfair` | ✅ | ✅ |
-| `library_search` | ✅ | ✅ |
-| `library_get_book_location` | ✅ | ✅ |
-| `jwc_grade` | ❌ | ✅ |
-| `jwc_schedule` | ❌ | ✅ |
-| `jwc_rank` | ❌ | ✅ |
-| `jwc_level_exam` | ❌ | ✅ |
-| `oa_notification_list` | ❌ | ✅ |
+| **rag_search** | ✅ | ✅ |
+| **career_teachin** | ✅ | ✅ |
+| **career_campus_recruit** | ✅ | ✅ |
+| **career_campus_intern** | ✅ | ✅ |
+| **career_jobfair** | ✅ | ✅ |
+| **library_search** | ✅ | ✅ |
+| **library_get_book_location** | ✅ | ✅ |
+| **jwc_grade** | ❌ | ✅ |
+| **jwc_schedule** | ❌ | ✅ |
+| **jwc_rank** | ❌ | ✅ |
+| **jwc_level_exam** | ❌ | ✅ |
+| **oa_notification_list** | ❌ | ✅ |
 
-### 4.2 Tool Execution Sequence
+**Total: 12 tools**
+- Public (no auth): 7 tools
+- Requires auth: 5 tools
 
-```
-1. User sends message
-2. LLM analyzes → decides to call tool(s)
-3. Agent sends "START" event with tool name + parameters
-4. Tool executes (may call external APIs like JWC/OA)
-5. Agent sends "END" event
-6. LLM receives tool result → generates response
-7. Response chunks stream to client via SSE
-8. If more tools needed → repeat from step 2
-9. Final response → conversation ends
-```
+---
 
-### 4.3 ToolResult Format
+### 4.2 Public Tools (No Authentication Required)
 
-Tool results are returned as strings (success) or error messages:
+#### 4.2.1 RAG Tool
 
-**Success:**
-```
-共找到 6 条通知：
-1. 【学校办公室】关于印发《中南大学校务会议议事规则》的通知
-   文号：- | 发文字：中大党字 | 起草时间：2026-01-19 | 浏览次数：970
-...
+**Name:** `rag_search`
+
+**Description:** Search knowledge bases to retrieve relevant context.
+
+**Input Schema:**
+```json
+{
+  "query": "string",        // Required - The search query
+  "knowledge_ids": ["string"], // Required - List of knowledge base IDs
+  "top_k": 5,               // Optional - Number of results (default: 5)
+  "min_score": 0.0          // Optional - Minimum relevance score
+}
 ```
 
-**Error:**
+**Example Call:**
+```json
+{
+  "query": "如何申请休学",
+  "knowledge_ids": ["kb-uuid-123"],
+  "top_k": 3
+}
+```
+
+**Expected Response Format:**
+```
+=== 相关上下文 ===
+[Retrieved context content here]
+=== 来源 ===
+1. policy.pdf (相关度: 0.92)
+2. handbook.pdf (相关度: 0.85)
+```
+
+---
+
+#### 4.2.2 Career Tools
+
+**Name:** `career_teachin`
+
+**Description:** Get campus recruitment 宣讲会 information.
+
+**Input Schema:**
+```json
+{
+  "zone": "岳麓山校区"  // Optional - Filter by campus (岳麓山校区/天心校区/杏林校区/潇湘校区), empty = all
+}
+```
+
+**Example Call:**
+```json
+{"zone": "岳麓山校区"}
+```
+
+**Example Call (no filter):**
+```json
+{}
+```
+
+---
+
+**Name:** `career_campus_recruit`
+
+**Description:** Get 校园招聘 information.
+
+**Input Schema:**
+```json
+{
+  "keyword": "软件开发"  // Optional - Search keyword, empty = all
+}
+```
+
+---
+
+**Name:** `career_campus_intern`
+
+**Description:** Get 实习岗位 information.
+
+**Input Schema:**
+```json
+{
+  "keyword": "算法"  // Optional - Search keyword, empty = all
+}
+```
+
+---
+
+**Name:** `career_jobfair`
+
+**Description:** Get 招聘会 information.
+
+**Input Schema:**
+```json
+{}  // No parameters required
+```
+
+---
+
+#### 4.2.3 Library Tools
+
+**Name:** `library_search`
+
+**Description:** Search library catalog.
+
+**Input Schema:**
+```json
+{
+  "keywords": "string",  // Required - Search keywords (建议3字以内)
+  "page": 1,            // Optional - Page number (default: 1)
+  "rows": 10             // Optional - Results per page (default: 10)
+}
+```
+
+**Example Call:**
+```json
+{"keywords": "Python", "page": 1, "rows": 5}
+```
+
+**Expected Response Format:**
+```
+共找到 42 条结果：
+
+--- 第 1 条 ---
+📚 书名: Python编程从入门到实践
+👤 作者: Eric Matthes
+🏢 出版社: 人民邮电出版社
+📅 出版年: 2019
+📖 ISBN: 9787115427028
+🔖 索书号: TP311.561/M389
+📊 馆藏: 5 册 / 在架: 3 册
+🔑 Record ID: 123456
+```
+
+---
+
+**Name:** `library_get_book_location`
+
+**Description:** Get book location/copies info.
+
+**Input Schema:**
+```json
+{
+  "record_id": 123456  // Required - Book record ID from search results
+}
+```
+
+---
+
+### 4.3 Authenticated Tools (Require Login)
+
+#### 4.3.1 JWC (教务系统) Tools
+
+**Error Response (not authenticated):**
+```
+请先登录后再查询成绩
+```
+
+---
+
+**Name:** `jwc_grade`
+
+**Description:** Query student grades.
+
+**Input Schema:**
+```json
+{
+  "term": "2024-2025-1"  // Optional - Semester, empty = all terms
+}
+```
+
+**Example Call:**
+```json
+{"term": "2024-2025-1"}
+```
+
+**Expected Response Format:**
+```
+## 成绩查询结果
+
+| 学期 | 课程名称 | 成绩 | 学分 | 课程属性 | 课程性质 |
+|------|----------|------|------|----------|----------|
+| 2024-2025-1 | 高等数学A(一) | 95 | 5.0 | 普通 | 必修 |
+```
+
+---
+
+**Name:** `jwc_schedule`
+
+**Description:** Query student class schedule.
+
+**Input Schema:**
+```json
+{
+  "term": "2024-2025-1",  // Required - Semester (e.g., "2024-2025-1")
+  "week": "0"             // Optional - Week number, "0" = all weeks (default: "0")
+}
+```
+
+**Example Call:**
+```json
+{"term": "2024-2025-1", "week": "1"}
+```
+
+**Expected Response Format:**
+```
+## 课表查询结果
+
+| 课程名称 | 教师 | 周次 | 地点 | 星期 | 节次 |
+|----------|------|------|------|------|------|
+| 高等数学A(一) | 张三 | 1-16 | 教学楼A101 | 星期一 | 1-2 |
+
+> 学期第1周开始于: 2024-09-02日
+```
+
+---
+
+**Name:** `jwc_rank`
+
+**Description:** Query student major ranking.
+
+**Input Schema:**
+```json
+{}  // No parameters required (user_id from session)
+```
+
+---
+
+**Name:** `jwc_level_exam`
+
+**Description:** Query level exam results (CET-4/6, computer tests, etc.).
+
+**Input Schema:**
+```json
+{}  // No parameters required (user_id from session)
+```
+
+---
+
+#### 4.3.2 OA (校内办公网) Tools
+
+**Error Response (not authenticated):**
 ```
 请先登录后再使用校内通知查询
 ```
 
 ---
 
+**Name:** `oa_notification_list`
+
+**Description:** Query campus notifications (行政发文、党委发文等).
+
+**Input Schema:**
+```json
+{
+  "qssj": "2024-01-01",         // Optional - Start date (YYYY-MM-DD)
+  "jssj": "2024-12-31",         // Optional - End date (YYYY-MM-DD)
+  "qcbmmc": "学校办公室",        // Optional - Drafting department (from enum)
+  "wjbt": "通知",               // Optional - Title keyword (fuzzy match)
+  "qwss": "印发",               // Optional - Full-text search keyword
+  "pageNo": 1,                  // Optional - Page number (default: 1)
+  "pageSize": 20                // Optional - Page size (default: 20)
+}
+```
+
+**Available Departments (qcbmmc):**
+```
+学校办公室 | 人事处 | 本科生院 | 研究生院 | 科学研究部 | 图书馆 |
+党委宣传部 | 党委组织部 | 学生工作部（处）| 校团委 | 纪委办公室 |
+出版社 | 继续教育学院 | 国际合作与交流处 | 档案馆（校史馆）| ...
+(共85个部门)
+```
+
+**Example Call - Query school office notifications:**
+```json
+{
+  "qcbmmc": "学校办公室",
+  "pageNo": 1,
+  "pageSize": 10
+}
+```
+
+**Example Call - Query by date range:**
+```json
+{
+  "qssj": "2024-03-01",
+  "jssj": "2024-06-30",
+  "wjbt": "放假"
+}
+```
+
+**Expected Response Format:**
+```
+共找到 6 条通知：
+
+1. 【学校办公室】关于印发《中南大学学术期刊管理办法》的通知
+   文号：- | 发文字：中大经字 | 起草时间：2026-02-10 | 浏览次数：500
+
+2. 【学校办公室】关于印发修订后的《中南大学校务会议议事规则》的通知
+   文号：- | 发文字：中大党字 | 起草时间：2026-01-19 | 浏览次数：970
+```
+
+---
+
 ## 5. E2E Test Scenarios
 
-### 5.1 Test Setup
+### 5.1 Test Environment Setup
 
 ```bash
-# Start backend server
+# Start backend
 cd backend
 uv run uvicorn app.main:app --reload --port 8000
 
-# Or with environment variables
-OPENAI_API_KEY=sk-xxx JWT_SECRET_KEY=test-secret uv run uvicorn app.main:app --reload
+# Required env vars
+export OPENAI_API_KEY=sk-xxx
+export JWT_SECRET_KEY=test-secret
 ```
 
-### 5.2 Test 1: Anonymous User Chat
+### 5.2 Test 1: Anonymous Basic Chat
 
-**Goal:** Verify anonymous users can chat without authentication.
+**Goal:** Verify anonymous users can chat with public tools.
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/completion/stream \
   -H "Content-Type: application/json" \
   -d '{
-    "message": "你好",
+    "message": "查找Python相关的图书",
     "user_id": "anonymous",
     "enable_rag": false
   }'
 ```
 
 **Expected:**
-- SSE stream returns with model response
-- No tool calls (direct response)
+- `library_search` tool called
+- Returns book list
 
-### 5.3 Test 2: Full Authenticated Flow
+### 5.3 Test 2: Anonymous Career Tools
+
+```bash
+curl -X POST http://localhost:8000/api/v1/completion/stream \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "查看最近的宣讲会信息",
+    "user_id": "anonymous",
+    "enable_rag": false
+  }'
+```
+
+**Expected:**
+- `career_teachin` tool called
+
+### 5.4 Test 3: Authenticated Full Flow
 
 **Step 1: Login**
 ```bash
-curl -X POST http://localhost:8000/api/v1/auth/login \
+TOKEN=$(curl -s -X POST http://localhost:8000/api/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username": "YOUR_ID", "password": "YOUR_PASSWORD"}'
+  -d '{"username": "YOUR_ID", "password": "YOUR_PWD"}' | jq -r '.token')
+echo "Token: $TOKEN"
 ```
 
-**Step 2: Save token from response, then:**
+**Step 2: Query Grades**
 ```bash
 curl -X POST http://localhost:8000/api/v1/completion/stream \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
+  -H "Authorization: Bearer $TOKEN" \
   -d '{
-    "message": "查询学校办公室最近的通知",
+    "message": "查询我这学期的成绩",
     "user_id": "YOUR_ID",
     "enable_rag": false
   }'
 ```
 
-**Expected SSE Sequence:**
+**Expected SSE:**
 ```
-# 1. Tool analysis start
-data: {"type": "event", "data": {"title": "开始分析用户问题", "status": "START", "message": "正在分析需要使用的工具..."}}
+# Tool analysis
+data: {"type": "event", "data": {"title": "开始分析用户问题", "status": "START"}}
+data: {"type": "event", "data": {"title": "开始分析用户问题", "status": "END", "message": "将调用工具: jwc_grade"}}
 
-# 2. Tool selected
-data: {"type": "event", "data": {"title": "开始分析用户问题", "status": "END", "message": "将调用工具: oa_notification_list"}}
+# Tool execution
+data: {"type": "event", "data": {"title": "执行工具: jwc_grade", "status": "START", "message": "参数: {\"term\": \"\"}"}}
+data: {"type": "event", "data": {"title": "执行工具: jwc_grade", "status": "END", "message": "执行完成"}}
 
-# 3. Tool execution start
-data: {"type": "event", "data": {"title": "执行工具: oa_notification_list", "status": "START", "message": "参数: {\"pageNo\": 1, \"pageSize\": 20, ...}"}}
-
-# 4. Tool execution end
-data: {"type": "event", "data": {"title": "执行工具: oa_notification_list", "status": "END", "message": "执行完成"}}
-
-# 5. Response chunks
-data: {"type": "response_chunk", "data": {"chunk": "根据", "accumulated": "根据"}}
-data: {"type": "response_chunk", "data": {"chunk": "查询结果，", "accumulated": "根据查询结果，"}}
-...
+# Response
+data: {"type": "response_chunk", "data": {"chunk": "您", "accumulated": "您"}}
+data: {"type": "response_chunk", "data": {"chunk": "的成绩", "accumulated": "您的成绩"}}
 ```
 
-### 5.4 Test 3: OA Notification Tool (Newly Integrated)
+### 5.5 Test 4: Multi-Tool Call
 
-**Login first, then:**
-```bash
-curl -X POST http://localhost:8000/api/v1/completion/stream \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "message": "查询人事处2024年的所有通知",
-    "user_id": "YOUR_ID",
-    "enable_rag": false
-  }'
-```
-
-**Expected:**
-- `oa_notification_list` tool is called
-- Tool internally calls `build_params(qssj="2024-01-01", jssj="2024-12-31", qcbmmc="人事处", ...)`
-- Results formatted and returned to LLM
-
-### 5.5 Test 4: Multiple Tool Calls
+**Goal:** LLM calls multiple tools in sequence.
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/completion/stream \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
+  -H "Authorization: Bearer $TOKEN" \
   -d '{
-    "message": "帮我查一下教务处的通知，然后看看我的成绩",
+    "message": "帮我查一下教务处的通知，然后看看我上学期的成绩",
     "user_id": "YOUR_ID",
     "enable_rag": false
   }'
 ```
 
 **Expected:**
-- First call: `oa_notification_list` with `qcbmmc="教务处"`
-- Then call: `jwc_grade`
-- LLM synthesizes both results
+1. `oa_notification_list` called (qcbmmc="教务处")
+2. `jwc_grade` called (term="2024-2025-1")
+3. LLM synthesizes both results
 
-### 5.6 Test 5: Session Expiry & Re-auth
-
-**Step 1:** Login and get token (valid 24 hours)
-
-**Step 2:** Wait for CASTGC to expire (~2 hours for CAS session)
-
-**Step 3:** Try to use OA tool
-
-**Expected:**
-- First attempt fails → session manager re-fetches
-- If CASTGC expired → returns "请先登录后再使用校内通知查询"
-
-### 5.7 Test 6: Rate Limiting
+### 5.6 Test 5: RAG + Tool Combination
 
 ```bash
-# Attempt login 6 times rapidly
-for i in {1..6}; do
-  curl -X POST http://localhost:8000/api/v1/auth/login \
-    -H "Content-Type: application/json" \
-    -d '{"username": "test", "password": "wrong"}'
-  echo ""
-done
+curl -X POST http://localhost:8000/api/v1/completion/stream \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{
+    "message": "在知识库中搜索休学申请流程，然后查一下我的课表",
+    "knowledge_ids": ["kb-uuid-xxx"],
+    "user_id": "YOUR_ID",
+    "enable_rag": true
+  }'
 ```
 
 **Expected:**
-- First 5 attempts return 401 (wrong password)
-- 6th attempt returns 429 (rate limited)
+1. `rag_search` called with knowledge_ids
+2. `jwc_schedule` called
+3. LLM uses both context
+
+### 5.7 Test 6: OA Notification with Multiple Filters
+
+```bash
+curl -X POST http://localhost:8000/api/v1/completion/stream \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{
+    "message": "查询人事处2024年所有包含"职称"的通知",
+    "user_id": "YOUR_ID",
+    "enable_rag": false
+  }'
+```
+
+**Expected:**
+- `oa_notification_list` called with:
+  - qcbmmc="人事处"
+  - qssj="2024-01-01"
+  - jssj="2024-12-31"
+  - wjbt="职称"
+
+### 5.8 Test 7: Tool Error Handling
+
+**Test when JWC session expired:**
+```bash
+# Simulate by calling tool after CASTGC expired
+curl -X POST http://localhost:8000/api/v1/completion/stream \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{
+    "message": "查询我的成绩",
+    "user_id": "YOUR_ID",
+    "enable_rag": false
+  }'
+```
+
+**Expected:**
+- Tool returns: "教务系统会话已过期，请重新登录"
+- Or automatic re-fetch succeeds
+
+### 5.9 Test 8: Library Search + Location
+
+```bash
+curl -X POST http://localhost:8000/api/v1/completion/stream \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "搜索《设计模式》这本书，然后告诉我有没有在架的",
+    "user_id": "anonymous",
+    "enable_rag": false
+  }'
+```
+
+**Expected:**
+1. `library_search` called
+2. `library_get_book_location` called with record_id
+3. LLM reports availability
 
 ---
 
-## 6. Test Environment Variables
+## 6. Tool Parameter Reference
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `OPENAI_API_KEY` | - | Required for LLM calls |
-| `JWT_SECRET_KEY` | `your-secret-key-change-in-production` | JWT signing key |
-| `JWT_EXPIRE_HOURS` | 24 | Token expiry |
-| `SESSION_TTL_SECONDS` | 1800 | Subsystem session cache TTL |
-| `CAS_USERNAME` | - | CAS credentials (for testing) |
-| `CAS_PASSWORD` | - | CAS credentials (for testing) |
+### 6.1 All Tools Summary Table
+
+| Tool Name | Required Params | Optional Params | Auth |
+|-----------|-----------------|----------------|------|
+| `rag_search` | query, knowledge_ids | top_k, min_score | No |
+| `career_teachin` | - | zone | No |
+| `career_campus_recruit` | - | keyword | No |
+| `career_campus_intern` | - | keyword | No |
+| `career_jobfair` | - | - | No |
+| `library_search` | keywords | page, rows | No |
+| `library_get_book_location` | record_id | - | No |
+| `jwc_grade` | - | term | Yes |
+| `jwc_schedule` | term | week | Yes |
+| `jwc_rank` | - | - | Yes |
+| `jwc_level_exam` | - | - | Yes |
+| `oa_notification_list` | - | qssj, jssj, qcbmmc, wjbt, qwss, pageNo, pageSize | Yes |
+
+### 6.2 Semester Format Reference
+
+JWC tools use semester format: `YYYY-YYYY-N`
+- `2024-2025-1` = 2024-2025学年 第1学期 (秋季)
+- `2024-2025-2` = 2024-2025学年 第2学期 (春季)
+- `2023-2024-1` = 2023-2024学年 第1学期
+
+### 6.3 Campus Zone Values
+
+For `career_teachin`:
+- `岳麓山校区`
+- `天心校区`
+- `杏林校区`
+- `潇湘校区`
+- `""` (empty = all campuses)
+
+### 6.4 OA Department Values (Partial)
+
+For `oa_notification_list` qcbmmc:
+```
+学校办公室 | 人事处 | 本科生院 | 研究生院 | 科学研究部
+党委宣传部 | 党委组织部 | 党委统战部 | 党委巡视办 | 纪委办公室
+学生工作部（处）| 保卫部（处）| 校工会 | 校团委
+图书馆 | 档案馆（校史馆）| 信息与网络中心 | 出版社
+国际教育学院 | 继续教育学院 | 体育教研部
+(共85个部门，参见完整列表)
+```
 
 ---
 
-## 7. Mock Testing
+## 7. Mock Testing Reference
 
-For unit/integration tests without real external APIs:
-
-### 7.1 Mock OASessionProvider
+### 7.1 Mock Tool Functions
 
 ```python
 from unittest.mock import patch, MagicMock
 
-def test_oa_notification_with_mocked_session():
+# Mock JWC Service
+def test_jwc_tool():
+    mock_service = MagicMock()
+    mock_service.get_grades.return_value = [
+        Grade(term="2024-2025-1", course_name="高数", score="95", ...)
+    ]
+
+    with patch('app.core.tools.jwc.service.JwcService') as MockJwc:
+        MockJwc.return_value = mock_service
+        # Call tool function directly
+        result = _get_grades(user_id="2020123456", term="")
+        assert "高等数学" in result
+
+# Mock OA Session Provider
+def test_oa_tool():
     mock_session = MagicMock()
     mock_session.post.return_value.json.return_value = {
-        "data": [{"JLNM": "test", "WJBT": "测试通知"}],
+        "data": [{"JLNM": "test", "WJBT": "测试通知", ...}],
         "count": 1
     }
 
-    with patch('app.core.session.manager.UnifiedSessionManager.get_session') as mock_get:
-        mock_get.return_value = mock_session
-
-        # Now call the tool
+    with patch('app.core.session.manager.UnifiedSessionManager.get_session') as mock:
+        mock.return_value = mock_session
+        # Call notification tool
         result = oa_notification_tool.invoke({
-            "qssj": "2024-01-01",
-            "jssj": "2024-12-31",
-            "pageNo": 1,
-            "pageSize": 20
+            "qcbmmc": "学校办公室"
         }, ctx)
-
         assert "测试通知" in result
 ```
 
-### 7.2 Mock ReactAgent Streaming
+### 7.2 Mock Streaming Response
 
 ```python
 import asyncio
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 
-async def test_agent_streaming():
+async def test_streaming():
     agent = ReactAgent(model=mock_llm, tools=[mock_tool])
+    messages = [HumanMessage(content="查询成绩")]
 
-    messages = [HumanMessage(content="查询通知")]
     chunks = []
-
     async for event in agent.astream(messages):
         chunks.append(event)
 
-    assert len(chunks) > 0
+    # Verify streaming
     assert any(c["type"] == "response_chunk" for c in chunks)
+    assert any("tool" in str(c) for c in chunks)
 ```
 
 ---
 
 ## 8. Troubleshooting
 
-### Issue: Streaming hangs indefinitely
+### Issue: Anonymous user gets auth-required tool
+
+**Symptom:** LLM tries to call `jwc_grade` for anonymous user
+
+**Cause:** System prompt doesn't properly filter tools
+
+**Fix:** Verify `ctx.is_authenticated` is False for anonymous, and tools are filtered in AgentFactory
+
+### Issue: Tool returns empty result
+
+**Symptom:** Tool executes but returns empty
 
 **Check:**
-- LLM API key is valid
-- Network connectivity to OpenAI API
-- Tool is not blocking on external API call
+- External API may be down (JWC/OA/Library)
+- Session expired
+- Wrong parameters
 
-### Issue: 401 after valid login
-
-**Check:**
-- Token not sent in `Authorization: Bearer <token>` format
-- Token expired (24 hours)
-- JWT secret key mismatch
-
-### Issue: Tools not available for authenticated user
+### Issue: Streaming hangs
 
 **Check:**
-- `ctx.is_authenticated` is True
-- `session_manager` is properly initialized
-- `create_xxx_tools(ctx)` is called in AgentFactory
-
-### Issue: OA tool returns "请先登录"
-
-**Check:**
-- CAS login succeeded (CASTGC obtained)
-- `OASessionProvider.fetch_session()` completed successfully
-- Subsystem.OA registered in session manager
+- LLM API key valid
+- Network to OpenAI accessible
+- Tool not blocking on external call
 
 ---
 
-## 9. Database Schema (for testing history)
-
-```sql
--- Dialogs table
-CREATE TABLE dialog (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    agent_id TEXT,
-    updated_at TIMESTAMP
-);
-
--- Chat history table
-CREATE TABLE chat_history (
-    id TEXT PRIMARY KEY,
-    dialog_id TEXT,
-    role TEXT,  -- 'user' or 'assistant'
-    content TEXT,
-    events TEXT,  -- JSON array of tool events
-    extra TEXT,   -- JSON with model, duration, etc.
-    created_at TIMESTAMP
-);
-```
-
----
-
-## 10. Related Documentation
+## 9. Related Documentation
 
 - [Design Spec](./2026-03-19-csu-oanetwork-notification-tool-design.md)
 - [Implementation Plan](./2026-03-19-csu-oanetwork-notification-tool-plan.md)
