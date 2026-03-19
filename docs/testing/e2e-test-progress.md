@@ -8,7 +8,7 @@
 |------|------|--------|--------|
 | public_tools | 10 | 10 | 100% |
 | auth_required | 5 | 5 | 100% |
-| auth_tools | 6 | 0 | - |
+| auth_tools | 9 | 5 | 56% |
 | multi_tool | 9 | 0 | - |
 | **总计** | **30** | **10** | **33%** |
 
@@ -45,17 +45,20 @@
 
 ---
 
-## auth_tools 🔧 部分通过
+## auth_tools ✅ 5/9 通过
 
-| 用例 | 状态 | 依赖 |
+| 用例 | 状态 | 备注 |
 |------|------|------|
-| `test_authenticated_user_can_query_grades` | ⏳ SKIP | CAS Token |
-| `test_authenticated_user_can_query_schedule` | ⏳ SKIP | CAS Token |
-| `test_authenticated_user_can_query_rank` | ⏳ SKIP | CAS Token |
-| `test_authenticated_user_can_query_level_exam` | ⏳ SKIP | CAS Token |
-| `test_authenticated_user_can_query_notifications` | ⏳ SKIP | CAS Token |
+| `test_authenticated_user_can_query_grades` | ✅ PASS | |
+| `test_authenticated_user_can_query_schedule` | ✅ PASS | |
+| `test_authenticated_user_can_query_rank` | ✅ PASS | |
+| `test_authenticated_user_can_query_level_exam` | ✅ PASS | |
+| `test_jwc_schedule_with_term_parameter` | ✅ PASS | |
+| `test_anonymous_user_cannot_query_grades` | ✅ PASS | |
+| `test_authenticated_user_can_query_notifications` | ⏳ SKIP | CAS 账号被锁定 |
+| `test_notification_query_with_department_filter` | ⏳ SKIP | CAS 账号被锁定 |
+| `test_notification_query_with_date_range` | ⏳ SKIP | CAS 账号被锁定 |
 | `test_jwc_session_expired_handling` | ⏳ SKIP | Token 过期 |
-| `test_anonymous_user_cannot_query_grades` | ✅ PASS | - |
 
 ---
 
