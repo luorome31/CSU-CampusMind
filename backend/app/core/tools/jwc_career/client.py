@@ -9,7 +9,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-BASE_URL = "https://career.csu.edu.cn"
+BASE_URL = "http://career.csu.edu.cn"
 
 
 @dataclass
@@ -49,11 +49,13 @@ class JobfairEntry:
 class CareerClient:
     """Client for career.csu.edu.cn career center information."""
 
-    def __init__(self, timeout: int = 30):
+    def __init__(self, timeout: int = 10):
         self.timeout = timeout
         self.session = requests.Session()
         self.session.headers.update({
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Referer": "http://career.csu.edu.cn/",
         })
 
     def _fetch(self, path: str, params: Optional[dict] = None) -> BeautifulSoup:
