@@ -87,11 +87,11 @@ class TestKnowledgeAPI:
         assert response.status_code == 404
 
     def test_list_knowledge(self, mock_service):
-        """Test GET /api/v1/knowledge/list/{user_id}"""
+        """Test GET /api/v1/users/{user_id}/knowledge"""
         from app.main import app
         client = TestClient(app)
 
-        response = client.get("/api/v1/knowledge/list/test_user")
+        response = client.get("/api/v1/users/test_user/knowledge")
 
         assert response.status_code == 200
         data = response.json()

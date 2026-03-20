@@ -49,23 +49,6 @@ class TestRetrieveAPI:
         data = response.json()
         assert "success" in data
 
-    def test_retrieve_simple(self):
-        """Test POST /api/v1/retrieve/simple"""
-        from app.main import app
-        client = TestClient(app)
-
-        response = client.post(
-            "/api/v1/retrieve/simple",
-            json={
-                "query": "What is CampusMind?",
-                "knowledge_id": "test_kb_1",
-                "top_k": 3
-            }
-        )
-
-        data = response.json()
-        assert "success" in data
-
     def test_retrieve_validation(self):
         """Test validation for retrieve request"""
         from app.main import app
@@ -80,18 +63,3 @@ class TestRetrieveAPI:
         )
 
         assert response.status_code == 422  # Validation error
-
-    def test_retrieve_simple_validation(self):
-        """Test validation for simple retrieve"""
-        from app.main import app
-        client = TestClient(app)
-
-        response = client.post(
-            "/api/v1/retrieve/simple",
-            json={
-                "query": "test"
-                # missing knowledge_id
-            }
-        )
-
-        assert response.status_code == 422

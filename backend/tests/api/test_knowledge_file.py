@@ -86,11 +86,11 @@ class TestKnowledgeFileAPI:
         assert response.status_code == 404
 
     def test_list_knowledge_files(self, mock_service):
-        """Test GET /api/v1/knowledge_file/list/{knowledge_id}"""
+        """Test GET /api/v1/knowledge/{knowledge_id}/files"""
         from app.main import app
         client = TestClient(app)
 
-        response = client.get("/api/v1/knowledge_file/list/test_kb_1")
+        response = client.get("/api/v1/knowledge/test_kb_1/files")
 
         assert response.status_code == 200
         data = response.json()
@@ -98,14 +98,13 @@ class TestKnowledgeFileAPI:
         assert len(data) == 1
 
     def test_update_file_status(self, mock_service):
-        """Test POST /api/v1/knowledge_file/status"""
+        """Test PATCH /api/v1/knowledge_file/{file_id}"""
         from app.main import app
         client = TestClient(app)
 
-        response = client.post(
-            "/api/v1/knowledge_file/status",
+        response = client.patch(
+            "/api/v1/knowledge_file/file_123",
             json={
-                "file_id": "file_123",
                 "status": "success"
             }
         )

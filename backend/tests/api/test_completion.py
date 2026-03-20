@@ -90,36 +90,3 @@ class TestCompletionAPI:
 
         assert response.status_code == 400
 
-    def test_chat_endpoint(self, mock_deps):
-        """Test POST /api/v1/chat"""
-        from app.main import app
-        client = TestClient(app)
-
-        response = client.post(
-            "/api/v1/chat",
-            json={
-                "query": "What is CampusMind?",
-                "knowledge_id": "test_kb_1",
-                "use_rag": True
-            }
-        )
-
-        assert response.status_code == 200
-        data = response.json()
-        assert "dialog_id" in data
-
-    def test_chat_without_rag(self, mock_deps):
-        """Test POST /api/v1/chat without RAG"""
-        from app.main import app
-        client = TestClient(app)
-
-        response = client.post(
-            "/api/v1/chat",
-            json={
-                "query": "Hello",
-                "knowledge_id": "test_kb_1",
-                "use_rag": False
-            }
-        )
-
-        assert response.status_code == 200
