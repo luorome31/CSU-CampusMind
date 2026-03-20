@@ -104,7 +104,7 @@ class UnifiedSessionManager:
         })
         await self._persistence._redis.setex(self._castgc_key(user_id), 4 * 3600, data)
 
-    def login(self, user_id: str, username: str, password: str) -> None:
+    async def login(self, user_id: str, username: str, password: str) -> None:
         """
         用户登录 CAS，获取 CASTGC
 
@@ -118,7 +118,7 @@ class UnifiedSessionManager:
             CASLoginError: 登录失败
         """
         castgc = cas_login.cas_login_only_castgc(username, password, self._rate_limiter)
-        asyncio.run(self._save_castgc(user_id, castgc))
+        await self._save_castgc(user_id, castgc)
         logger.info(f"User {user_id} logged in, CASTGC saved")
 
     async def get_session(self, user_id: str, subsystem: str) -> requests.Session:
