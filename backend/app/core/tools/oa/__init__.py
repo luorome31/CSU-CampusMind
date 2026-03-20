@@ -188,6 +188,7 @@ def create_oa_tools(ctx: ToolContext) -> List:
     return [
         StructuredTool.from_function(
             func=_query_notifications,
+            coroutine=_query_notifications,
             name="oa_notification_list",
             description="""查询中南大学校内通知（行政发文、党委发文等）。
 
