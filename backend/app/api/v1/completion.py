@@ -30,7 +30,7 @@ from langchain_openai import ChatOpenAI
 
 # Import DialogRepository for secure dialog access
 from app.repositories.dialog_repository import DialogRepository
-from app.services.history.history import HistoryService
+from app.services.history.cache import HistoryCacheService
 
 
 router = APIRouter(tags=["Completion"])
@@ -186,7 +186,8 @@ async def generate_stream(
 
     # Build messages
     # Fetch history and prepend to messages
-    histories = await HistoryService.get_history_by_dialog(session, dialog_id)
+    cache_service = HistoryCacheService()
+    histories = await cache_service.get_history(dialog_id)
 
     messages = []
     for h in histories:
