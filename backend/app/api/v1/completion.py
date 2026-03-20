@@ -317,6 +317,10 @@ async def completion_stream(
             agent_id=request.agent_id
         )
 
+        # Set tool context for logging
+        from app.core.tools.context import set_tool_context
+        set_tool_context(user_id=jwt_user_id, dialog_id=dialog.id)
+
         # Return streaming response
         return WatchedStreamingResponse(
             content=generate_stream(
