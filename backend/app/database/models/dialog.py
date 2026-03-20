@@ -19,7 +19,7 @@ class Dialog(SQLModel, table=True):
     __tablename__ = "dialog"
 
     id: str = Field(default=None, primary_key=True, description="Dialog ID (UUID)")
-    user_id: str = Field(index=True, description="User ID")
+    user_id: Optional[str] = Field(default=None, index=True, description="User ID (NULL for anonymous)")
     agent_id: Optional[str] = Field(default=None, index=True, description="Agent template ID")
     updated_at: datetime = Field(default_factory=datetime.now, description="Last update time")
 
