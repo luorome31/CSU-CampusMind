@@ -96,7 +96,7 @@ def create_oa_tools(ctx: ToolContext) -> List:
         OA 相关工具列表
     """
 
-    def _query_notifications(
+    async def _query_notifications(
         qssj: Optional[str] = None,
         jssj: Optional[str] = None,
         qcbmmc: Optional[str] = None,
@@ -117,7 +117,7 @@ def create_oa_tools(ctx: ToolContext) -> List:
 
         # 2. 获取 OA Session
         logger.info(f"oa_notification_list: attempting to get OA session for user {ctx.user_id}")
-        session = ctx.get_subsystem_session("oa")
+        session = await ctx.get_subsystem_session("oa")
         if session is None:
             logger.error(f"oa_notification_list: get_subsystem_session('oa') returned None for user {ctx.user_id}")
             return "获取校内办公网会话失败，请稍后重试"
