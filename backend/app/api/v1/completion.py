@@ -190,16 +190,15 @@ async def generate_stream(
     session.add(user_history)
     await session.commit()
 
-    # Append user message to cache
-    await cache_service.append_to_cache(dialog_id, user_history.to_dict())
-
     # Collect events for history
     events = []
     accumulated_content = ""
 
-    # Build messages
-    # Fetch history and prepend to messages
+    # Fetch history first (ensures DB recovery on cache miss, prevents history loss)
     histories = await cache_service.get_history(dialog_id)
+
+    # Then append user message to cache (after get_history so cache is populated)
+    await cache_service.append_to_cache(dialog_id, user_history.to_dict())
 
     messages = []
     for h in histories:
