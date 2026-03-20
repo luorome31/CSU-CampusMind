@@ -74,39 +74,35 @@ class UnifiedSessionManager:
         """Build Redis key for CASTGC storage"""
         return f"castgc:{user_id}"
 
-    def _get_castgc(self, user_id: str) -> Optional[str]:
+    async def _get_castgc(self, user_id: str) -> Optional[str]:
         """
         获取缓存的 CASTGC cookie
 
         Returns:
             CASTGC 值，如果不存在或过期返回 None
         """
-        loop = asyncio.get_event_loop()
-        data = loop.run_until_complete(self._persistence._redis.get(self._castgc_key(user_id)))
+        data = await self._persistence._redis.get(self._castgc_key(user_id))
         if not data:
             return None
         try:
             castgc_data = json.loads(data)
         except json.JSONDecodeError:
             logger.warning(f"Corrupted CASTGC data for user {user_id}, discarding")
-            loop.run_until_complete(self._persistence._redis.delete(self._castgc_key(user_id)))
+            await self._persistence._redis.delete(self._castgc_key(user_id))
             return None
         if time.time() > castgc_data.get("expires_at", 0):
-            loop.run_until_complete(self._persistence._redis.delete(self._castgc_key(user_id)))
+            await self._persistence._redis.delete(self._castgc_key(user_id))
             return None
         return castgc_data.get("castgc")
 
-    def _save_castgc(self, user_id: str, castgc: str) -> None:
+    async def _save_castgc(self, user_id: str, castgc: str) -> None:
         """保存 CASTGC cookie，TTL 4小时"""
         data = json.dumps({
             "castgc": castgc,
             "created_at": time.time(),
             "expires_at": time.time() + 4 * 3600,  # 4 hours TTL
         })
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(
-            self._persistence._redis.setex(self._castgc_key(user_id), 4 * 3600, data)
-        )
+        await self._persistence._redis.setex(self._castgc_key(user_id), 4 * 3600, data)
 
     def login(self, user_id: str, username: str, password: str) -> None:
         """
@@ -122,7 +118,7 @@ class UnifiedSessionManager:
             CASLoginError: 登录失败
         """
         castgc = cas_login.cas_login_only_castgc(username, password, self._rate_limiter)
-        self._save_castgc(user_id, castgc)
+        asyncio.run(self._save_castgc(user_id, castgc))
         logger.info(f"User {user_id} logged in, CASTGC saved")
 
     async def get_session(self, user_id: str, subsystem: str) -> requests.Session:
@@ -146,7 +142,7 @@ class UnifiedSessionManager:
             return loaded_session
 
         # 2. 获取 CASTGC
-        castgc = self._get_castgc(user_id)
+        castgc = await self._get_castgc(user_id)
         if not castgc:
             raise NeedReLoginError(
                 f"用户 {user_id} 的 CASTGC 已过期或不存在，请重新登录"
