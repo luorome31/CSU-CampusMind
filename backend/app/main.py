@@ -2,9 +2,13 @@
 CampusMind Backend Application
 """
 import sys
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
+
+from app.database.session import create_db_and_tables
+from app.config import settings
 
 # Configure loguru for uvicorn - output to stdout
 logger.configure(
@@ -20,12 +24,23 @@ logger.configure(
 from app.api.v1 import crawl, index, knowledge, knowledge_file, retrieve, completion, auth
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan: run startup and shutdown logic."""
+    logger.info("Initializing database tables...")
+    create_db_and_tables()
+    logger.info(f"Database initialized: {settings.database_url}")
+    yield
+    logger.info("Shutting down...")
+
+
 def create_app() -> FastAPI:
     """Create and configure FastAPI application"""
     app = FastAPI(
         title="CampusMind API",
         description="CampusMind - AI-powered campus assistant",
         version="0.1.0",
+        lifespan=lifespan,
     )
 
     # CORS middleware
