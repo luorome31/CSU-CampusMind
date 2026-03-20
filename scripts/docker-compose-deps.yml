@@ -59,8 +59,23 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    container_name: campusmind-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - campusmind_redis_data:/data
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   campusmind_postgres_data:
   campusmind_minio_data:
   campusmind_elasticsearch_data:
   campusmind_elasticsearch_plugins:
+  campusmind_redis_data:
