@@ -254,9 +254,6 @@ async def generate_stream(
         session.add(assistant_history)
         await session.commit()
 
-        # Invalidate cache so next read gets fresh data
-        await cache_service.invalidate(dialog_id)
-
         # Update dialog timestamp
         statement = select(Dialog).where(Dialog.id == dialog_id)
         result = await session.execute(statement)
