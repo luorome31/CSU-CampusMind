@@ -63,7 +63,8 @@ class HistoryCacheService:
             logger.info(f"[CACHE] Writing {len(histories)} histories to cache for dialog_id={dialog_id}")
             await self.update_cache(dialog_id, histories)
 
-            return histories
+            # 4. 返回 dicts（与 Redis 存储格式一致）
+            return [h.to_dict() for h in histories]
 
     async def update_cache(self, dialog_id: str, histories: List) -> None:
         """

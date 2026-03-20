@@ -202,9 +202,8 @@ async def generate_stream(
 
     messages = []
     for h in histories:
-        # Handle both dict (from cache) and ChatHistory object (from DB)
-        role = h.get("role") if isinstance(h, dict) else h.role
-        content = h.get("content") if isinstance(h, dict) else h.content
+        role = h.get("role")
+        content = h.get("content")
         if role == "user":
             messages.append(HumanMessage(content=content))
         elif role == "assistant":
