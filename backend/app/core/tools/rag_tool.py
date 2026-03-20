@@ -7,6 +7,7 @@ from langchain_core.tools import BaseTool
 from loguru import logger
 
 from app.services.rag.handler import rag_handler
+from app.core.tools.decorators import tool_logger
 
 
 # Tool input schema
@@ -58,6 +59,7 @@ class RagTool(BaseTool):
     """
     args_schema: type[BaseModel] = RagToolInput
 
+    @tool_logger
     async def _arun(
         self,
         query: str,
