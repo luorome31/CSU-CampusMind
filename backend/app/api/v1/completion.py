@@ -200,10 +200,13 @@ async def generate_stream(
 
     messages = []
     for h in histories:
-        if h.role == "user":
-            messages.append(HumanMessage(content=h.content))
-        elif h.role == "assistant":
-            messages.append(AIMessage(content=h.content))
+        # Handle both dict (from cache) and ChatHistory object (from DB)
+        role = h.get("role") if isinstance(h, dict) else h.role
+        content = h.get("content") if isinstance(h, dict) else h.content
+        if role == "user":
+            messages.append(HumanMessage(content=content))
+        elif role == "assistant":
+            messages.append(AIMessage(content=content))
 
     messages.append(HumanMessage(content=message))
 
