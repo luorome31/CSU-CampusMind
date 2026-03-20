@@ -84,6 +84,8 @@ backend/
 | knowledge_bases | `created_at`, `updated_at` |
 | knowledge_files | `created_at`, `updated_at` |
 
+** Dialog 模型说明: `user_id` 字段现为 nullable (NULL 表示匿名对话) **
+
 ---
 
 ## 3. 当前已知问题
