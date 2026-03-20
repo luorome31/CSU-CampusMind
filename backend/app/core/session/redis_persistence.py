@@ -10,7 +10,6 @@ from typing import Optional
 import requests
 from redis.asyncio import Redis
 
-from app.api.dependencies import get_redis_client
 from .persistence import SessionPersistence
 
 
@@ -21,7 +20,10 @@ class RedisSessionPersistence(SessionPersistence):
     Key 格式: session:{user_id}:{subsystem}
     """
 
-    def __init__(self, redis: Redis = Depends(get_redis_client)):
+    def __init__(self, redis: Redis = None):
+        if redis is None:
+            from app.core.session.redis_client import get_redis
+            redis = get_redis()
         self._redis = redis
 
     def _key(self, user_id: str, subsystem: str) -> str:
