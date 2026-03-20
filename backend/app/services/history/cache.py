@@ -5,6 +5,7 @@
 Write-through 策略：写入时同时更新缓存。
 """
 import json
+import logging
 from typing import List, Optional
 
 from fastapi import Depends
@@ -12,6 +13,8 @@ from redis.asyncio import Redis
 
 from app.config import settings
 from app.api.dependencies import get_redis_client
+
+logger = logging.getLogger(__name__)
 
 
 class HistoryCacheService:
@@ -41,7 +44,10 @@ class HistoryCacheService:
         # 1. 查 Redis
         cached = await self._redis.get(self._key(dialog_id))
         if cached:
+            logger.info(f"[CACHE] HIT for dialog_id={dialog_id}")
             return json.loads(cached)
+
+        logger.info(f"[CACHE] MISS for dialog_id={dialog_id}")
 
         # 2. 查 DB (延迟导入避免循环)
         from app.services.history.history import HistoryService
@@ -52,9 +58,11 @@ class HistoryCacheService:
             histories = await history_service.get_history_by_dialog(session, dialog_id)
 
             if not histories:
+                logger.info(f"[CACHE] No history found in DB for dialog_id={dialog_id}")
                 return None
 
             # 3. 写入缓存 (write-through)
+            logger.info(f"[CACHE] Writing {len(histories)} histories to cache for dialog_id={dialog_id}")
             await self.update_cache(dialog_id, histories)
 
             return histories
@@ -68,8 +76,12 @@ class HistoryCacheService:
             histories: ChatHistory 对象列表
         """
         data = json.dumps([h.to_dict() for h in histories])
-        await self._redis.setex(self._key(dialog_id), self._ttl, data)
+        key = self._key(dialog_id)
+        await self._redis.setex(key, self._ttl, data)
+        logger.info(f"[CACHE] Updated cache: key={key}, ttl={self._ttl}, count={len(histories)}")
 
     async def invalidate(self, dialog_id: str) -> None:
         """使对话历史缓存失效"""
-        await self._redis.delete(self._key(dialog_id))
+        key = self._key(dialog_id)
+        await self._redis.delete(key)
+        logger.info(f"[CACHE] Invalidated: key={key}")
