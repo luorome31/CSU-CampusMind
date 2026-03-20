@@ -46,6 +46,9 @@ class Settings(BaseModel):
     session_storage_path: str = "./data/csu_sessions.json"
     session_ttl_seconds: int = 30 * 60  # 30 minutes
 
+    # Redis
+    redis_url: str = "redis://localhost:6379/0"
+
     # JWT
     jwt_secret_key: str = "your-secret-key-change-in-production"
     jwt_algorithm: str = "HS256"
@@ -79,6 +82,7 @@ class Settings(BaseModel):
             openai_base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
             session_storage_path=os.getenv("SESSION_STORAGE_PATH", "./data/csu_sessions.json"),
             session_ttl_seconds=int(os.getenv("SESSION_TTL_SECONDS", "1800")),
+            redis_url=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
             jwt_secret_key=os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production"),
             jwt_algorithm=os.getenv("JWT_ALGORITHM", "HS256"),
             jwt_expire_hours=int(os.getenv("JWT_EXPIRE_HOURS", "24")),

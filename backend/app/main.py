@@ -9,6 +9,7 @@ from loguru import logger
 
 from app.database.session import create_db_and_tables
 from app.config import settings
+from app.core.session.redis_client import init_redis, close_redis
 
 # Configure loguru for uvicorn - output to stdout
 logger.configure(
@@ -34,8 +35,19 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"Database initialization failed: {e}")
         raise
+
+    logger.info("Initializing Redis connection pool...")
+    try:
+        await init_redis(settings.redis_url)
+        logger.info(f"Redis initialized: {settings.redis_url}")
+    except Exception as e:
+        logger.error(f"Redis initialization failed: {e}")
+        # Redis is optional for some features, don't fail startup
+
     yield
+
     logger.info("Shutting down...")
+    await close_redis()
 
 
 def create_app() -> FastAPI:

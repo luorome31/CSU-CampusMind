@@ -60,7 +60,7 @@ class LevelExamInput(BaseModel):
 
 
 # ============ Tool Functions ============
-def _get_jwc_service() -> JwcService:
+async def _get_jwc_service() -> JwcService:
     """获取 JwcService 实例"""
     return JwcService(get_session_manager())
 
@@ -80,11 +80,11 @@ def _format_grades(grades: list[Grade]) -> str:
     return "\n".join(lines)
 
 
-def _get_grades(user_id: str, term: str = "") -> str:
+async def _get_grades(user_id: str, term: str = "") -> str:
     """查询成绩"""
     try:
-        service = _get_jwc_service()
-        grades = service.get_grades(user_id, term)
+        service = await _get_jwc_service()
+        grades = await service.get_grades(user_id, term)
         return _format_grades(grades)
     except Exception as e:
         logger.error(f"成绩查询失败: {e}")
@@ -106,11 +106,11 @@ def _format_schedule(classes: list[ClassEntry]) -> str:
     return "\n".join(lines)
 
 
-def _get_schedule(user_id: str, term: str, week: str = "0") -> str:
+async def _get_schedule(user_id: str, term: str, week: str = "0") -> str:
     """查询课表"""
     try:
-        service = _get_jwc_service()
-        classes, start_week_day = service.get_schedule(user_id, term, week)
+        service = await _get_jwc_service()
+        classes, start_week_day = await service.get_schedule(user_id, term, week)
         result = _format_schedule(classes)
         # 如果有开始日期信息，附加到结果中
         if start_week_day:
@@ -136,11 +136,11 @@ def _format_ranks(ranks: list[RankEntry]) -> str:
     return "\n".join(lines)
 
 
-def _get_rank(user_id: str) -> str:
+async def _get_rank(user_id: str) -> str:
     """查询专业排名"""
     try:
-        service = _get_jwc_service()
-        ranks = service.get_rank(user_id)
+        service = await _get_jwc_service()
+        ranks = await service.get_rank(user_id)
         return _format_ranks(ranks)
     except Exception as e:
         logger.error(f"排名查询失败: {e}")
@@ -162,11 +162,11 @@ def _format_level_exams(exams: list[LevelExamEntry]) -> str:
     return "\n".join(lines)
 
 
-def _get_level_exams(user_id: str) -> str:
+async def _get_level_exams(user_id: str) -> str:
     """查询等级考试成绩"""
     try:
-        service = _get_jwc_service()
-        exams = service.get_level_exams(user_id)
+        service = await _get_jwc_service()
+        exams = await service.get_level_exams(user_id)
         return _format_level_exams(exams)
     except Exception as e:
         logger.error(f"等级考试查询失败: {e}")
@@ -231,40 +231,40 @@ def create_jwc_tools(ctx: ToolContext) -> List[BaseTool]:
     # 获取 JwcService 实例（使用 ctx 的 session_manager）
     session_manager = ctx.session_manager
 
-    def _get_jwc_service_factory() -> "JwcService":
+    async def _get_jwc_service_factory() -> "JwcService":
         """获取 JwcService 实例"""
         from app.core.session.manager import UnifiedSessionManager
         return JwcService(session_manager)
 
-    def _get_grades(term: str = "") -> str:
+    async def _get_grades(term: str = "") -> str:
         """查询教务处成绩"""
         if not ctx.is_authenticated:
             return "请先登录后再查询成绩"
 
-        session = ctx.get_subsystem_session("jwc")
+        session = await ctx.get_subsystem_session("jwc")
         if not session:
             return "教务系统会话已过期，请重新登录"
 
         try:
-            service = _get_jwc_service_factory()
-            grades = service.get_grades(ctx.user_id, term)
+            service = await _get_jwc_service_factory()
+            grades = await service.get_grades(ctx.user_id, term)
             return _format_grades(grades)
         except Exception as e:
             logger.error(f"成绩查询失败: {e}")
             return f"成绩查询失败: {str(e)}"
 
-    def _get_schedule(term: str, week: str = "0") -> str:
+    async def _get_schedule(term: str, week: str = "0") -> str:
         """查询教务处课表"""
         if not ctx.is_authenticated:
             return "请先登录后再查询课表"
 
-        session = ctx.get_subsystem_session("jwc")
+        session = await ctx.get_subsystem_session("jwc")
         if not session:
             return "教务系统会话已过期，请重新登录"
 
         try:
-            service = _get_jwc_service_factory()
-            classes, start_week_day = service.get_schedule(ctx.user_id, term, week)
+            service = await _get_jwc_service_factory()
+            classes, start_week_day = await service.get_schedule(ctx.user_id, term, week)
             result = _format_schedule(classes)
             if start_week_day:
                 result += f"\n\n> 学期第1周开始于: {start_week_day}日"
@@ -273,35 +273,35 @@ def create_jwc_tools(ctx: ToolContext) -> List[BaseTool]:
             logger.error(f"课表查询失败: {e}")
             return f"课表查询失败: {str(e)}"
 
-    def _get_rank() -> str:
+    async def _get_rank() -> str:
         """查询专业排名"""
         if not ctx.is_authenticated:
             return "请先登录后再查询排名"
 
-        session = ctx.get_subsystem_session("jwc")
+        session = await ctx.get_subsystem_session("jwc")
         if not session:
             return "教务系统会话已过期，请重新登录"
 
         try:
-            service = _get_jwc_service_factory()
-            ranks = service.get_rank(ctx.user_id)
+            service = await _get_jwc_service_factory()
+            ranks = await service.get_rank(ctx.user_id)
             return _format_ranks(ranks)
         except Exception as e:
             logger.error(f"排名查询失败: {e}")
             return f"排名查询失败: {str(e)}"
 
-    def _get_level_exams() -> str:
+    async def _get_level_exams() -> str:
         """查询等级考试成绩"""
         if not ctx.is_authenticated:
             return "请先登录后再查询等级考试成绩"
 
-        session = ctx.get_subsystem_session("jwc")
+        session = await ctx.get_subsystem_session("jwc")
         if not session:
             return "教务系统会话已过期，请重新登录"
 
         try:
-            service = _get_jwc_service_factory()
-            exams = service.get_level_exams(ctx.user_id)
+            service = await _get_jwc_service_factory()
+            exams = await service.get_level_exams(ctx.user_id)
             return _format_level_exams(exams)
         except Exception as e:
             logger.error(f"等级考试查询失败: {e}")

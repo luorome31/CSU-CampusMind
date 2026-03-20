@@ -5,6 +5,7 @@ CAS 登录流程:
 1. 用户登录 CAS 获取 CASTGC cookie (跨子系统共享)
 2. 使用 CASTGC 通过 SubsystemSessionProvider 获取各子系统的 session
 """
+import asyncio
 import json
 import logging
 import time
@@ -73,37 +74,37 @@ class UnifiedSessionManager:
         """Build Redis key for CASTGC storage"""
         return f"castgc:{user_id}"
 
-    def _get_castgc(self, user_id: str) -> Optional[str]:
+    async def _get_castgc(self, user_id: str) -> Optional[str]:
         """
         获取缓存的 CASTGC cookie
 
         Returns:
             CASTGC 值，如果不存在或过期返回 None
         """
-        data = self._persistence._redis.get(self._castgc_key(user_id))
+        data = await self._persistence._redis.get(self._castgc_key(user_id))
         if not data:
             return None
         try:
             castgc_data = json.loads(data)
         except json.JSONDecodeError:
             logger.warning(f"Corrupted CASTGC data for user {user_id}, discarding")
-            self._persistence._redis.delete(self._castgc_key(user_id))
+            await self._persistence._redis.delete(self._castgc_key(user_id))
             return None
         if time.time() > castgc_data.get("expires_at", 0):
-            self._persistence._redis.delete(self._castgc_key(user_id))
+            await self._persistence._redis.delete(self._castgc_key(user_id))
             return None
         return castgc_data.get("castgc")
 
-    def _save_castgc(self, user_id: str, castgc: str) -> None:
+    async def _save_castgc(self, user_id: str, castgc: str) -> None:
         """保存 CASTGC cookie，TTL 4小时"""
         data = json.dumps({
             "castgc": castgc,
             "created_at": time.time(),
             "expires_at": time.time() + 4 * 3600,  # 4 hours TTL
         })
-        self._persistence._redis.setex(self._castgc_key(user_id), 4 * 3600, data)
+        await self._persistence._redis.setex(self._castgc_key(user_id), 4 * 3600, data)
 
-    def login(self, user_id: str, username: str, password: str) -> None:
+    async def login(self, user_id: str, username: str, password: str) -> None:
         """
         用户登录 CAS，获取 CASTGC
 
@@ -117,10 +118,10 @@ class UnifiedSessionManager:
             CASLoginError: 登录失败
         """
         castgc = cas_login.cas_login_only_castgc(username, password, self._rate_limiter)
-        self._save_castgc(user_id, castgc)
+        await self._save_castgc(user_id, castgc)
         logger.info(f"User {user_id} logged in, CASTGC saved")
 
-    def get_session(self, user_id: str, subsystem: str) -> requests.Session:
+    async def get_session(self, user_id: str, subsystem: str) -> requests.Session:
         """
         获取指定子系统的会话
 
@@ -135,13 +136,13 @@ class UnifiedSessionManager:
             NeedReLoginError: CASTGC 不存在或过期，需要重新登录
         """
         # 1. 检查持久化缓存
-        loaded_session = self._persistence.load(user_id, subsystem)
+        loaded_session = await self._persistence.load(user_id, subsystem)
         if loaded_session:
             logger.info(f"Loaded session from persistence for {user_id}:{subsystem}")
             return loaded_session
 
         # 2. 获取 CASTGC
-        castgc = self._get_castgc(user_id)
+        castgc = await self._get_castgc(user_id)
         if not castgc:
             raise NeedReLoginError(
                 f"用户 {user_id} 的 CASTGC 已过期或不存在，请重新登录"
@@ -152,30 +153,30 @@ class UnifiedSessionManager:
         session = provider.fetch_session(castgc)
 
         # 4. 持久化保存
-        self._persistence.save(user_id, subsystem, session, self._ttl)
+        await self._persistence.save(user_id, subsystem, session, self._ttl)
 
         logger.info(f"Fetched new session for {user_id}:{subsystem}")
         return session
 
-    def get_jwc_session(self, user_id: str) -> requests.Session:
+    async def get_jwc_session(self, user_id: str) -> requests.Session:
         """获取教务系统 Session"""
-        return self.get_session(user_id, Subsystem.JWC)
+        return await self.get_session(user_id, Subsystem.JWC)
 
-    def get_library_session(self, user_id: str) -> requests.Session:
+    async def get_library_session(self, user_id: str) -> requests.Session:
         """获取图书馆 Session"""
-        return self.get_session(user_id, Subsystem.LIBRARY)
+        return await self.get_session(user_id, Subsystem.LIBRARY)
 
-    def get_ecard_session(self, user_id: str) -> requests.Session:
+    async def get_ecard_session(self, user_id: str) -> requests.Session:
         """获取校园卡 Session"""
-        return self.get_session(user_id, Subsystem.ECARD)
+        return await self.get_session(user_id, Subsystem.ECARD)
 
-    def get_oa_session(self, user_id: str) -> requests.Session:
+    async def get_oa_session(self, user_id: str) -> requests.Session:
         """获取办公网 Session"""
-        return self.get_session(user_id, Subsystem.OA)
+        return await self.get_session(user_id, Subsystem.OA)
 
-    def invalidate_session(self, user_id: str, subsystem: Optional[str] = None) -> None:
+    async def invalidate_session(self, user_id: str, subsystem: Optional[str] = None) -> None:
         """使会话失效"""
-        self._persistence.invalidate(user_id, subsystem)
+        await self._persistence.invalidate(user_id, subsystem)
         # 如果指定 subsystem 为 None，清除所有子系统的 session，同时也清除 CASTGC
         if subsystem is None:
-            self._persistence._redis.delete(self._castgc_key(user_id))
+            await self._persistence._redis.delete(self._castgc_key(user_id))

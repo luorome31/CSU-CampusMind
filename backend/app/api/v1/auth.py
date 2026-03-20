@@ -90,7 +90,7 @@ async def login(request: LoginRequest):
 
     # 3. CAS 登录获取 CASTGC
     try:
-        session_manager.login(
+        await session_manager.login(
             user_id=request.username,
             username=request.username,
             password=request.password

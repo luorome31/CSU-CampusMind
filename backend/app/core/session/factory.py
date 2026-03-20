@@ -33,7 +33,7 @@ def create_session_manager() -> UnifiedSessionManager:
     """创建 SessionManager 实例"""
     # 根据配置选择持久化实现
     if settings.redis_url:
-        persistence = RedisSessionPersistence(settings.redis_url)
+        persistence = RedisSessionPersistence()  # No redis_url needed, uses global client
     else:
         persistence = FileSessionPersistence(
             storage_path=settings.session_storage_path

@@ -6,7 +6,10 @@ from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
+from redis.asyncio import Redis
+
 from app.core.security import jwt_manager
+from app.core.session.redis_client import get_redis
 
 security = HTTPBearer(auto_error=False)
 
@@ -53,3 +56,8 @@ async def get_optional_user(
 
     token = credentials.credentials
     return jwt_manager.decode_token(token)
+
+
+async def get_redis_client() -> Redis:
+    """FastAPI dependency for Redis client."""
+    return get_redis()
