@@ -310,21 +310,25 @@ def create_jwc_tools(ctx: ToolContext) -> List[BaseTool]:
     return [
         StructuredTool.from_function(
             func=_get_grades,
+            coroutine=_get_grades,
             name="jwc_grade",
             description="查询学生的考试成绩。参数：term（学期，如 '2024-2025-1'），不传则查询所有学期成绩。"
         ),
         StructuredTool.from_function(
             func=_get_schedule,
+            coroutine=_get_schedule,
             name="jwc_schedule",
             description="查询学生的课表。参数：term（学期，必填，如 '2024-2025-1'），week（周次，可选，'0' 为全部周）。"
         ),
         StructuredTool.from_function(
             func=_get_rank,
+            coroutine=_get_rank,
             name="jwc_rank",
             description="查询学生的专业排名。不需要额外参数。"
         ),
         StructuredTool.from_function(
             func=_get_level_exams,
+            coroutine=_get_level_exams,
             name="jwc_level_exam",
             description="查询学生的等级考试成绩（如英语四六级、计算机等级考试等）。不需要额外参数。"
         ),
