@@ -5,26 +5,11 @@ Redis Session 持久化实现
 """
 import json
 import time
-from abc import ABC, abstractmethod
 from typing import Optional
 import requests
 import redis
 
-
-class SessionPersistence(ABC):
-    """Session 持久化抽象基类"""
-
-    @abstractmethod
-    def save(self, user_id: str, subsystem: str, session: requests.Session, ttl_seconds: int) -> None:
-        pass
-
-    @abstractmethod
-    def load(self, user_id: str, subsystem: str) -> Optional[requests.Session]:
-        pass
-
-    @abstractmethod
-    def invalidate(self, user_id: str, subsystem: Optional[str] = None) -> None:
-        pass
+from .persistence import SessionPersistence
 
 
 class RedisSessionPersistence(SessionPersistence):
