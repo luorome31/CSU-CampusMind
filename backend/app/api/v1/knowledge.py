@@ -53,8 +53,8 @@ async def get_knowledge(knowledge_id: str):
     return KnowledgeResponse(**knowledge.to_dict())
 
 
-@router.get("/knowledge/list/{user_id}", response_model=List[KnowledgeResponse])
-async def list_knowledge(user_id: str):
+@router.get("/users/{user_id}/knowledge", response_model=List[KnowledgeResponse])
+async def list_user_knowledge(user_id: str):
     """List all knowledge bases for a user"""
     knowledge_list = KnowledgeService.list_knowledge_by_user(user_id)
     return [KnowledgeResponse(**k.to_dict()) for k in knowledge_list]

@@ -35,7 +35,6 @@ class KnowledgeFileResponse(BaseModel):
 
 class UpdateStatusRequest(BaseModel):
     """Request model for updating file status"""
-    file_id: str = Field(..., description="File ID")
     status: str = Field(..., description="New status: success/process/fail")
 
 
@@ -66,17 +65,20 @@ async def get_knowledge_file(file_id: str):
     return KnowledgeFileResponse(**knowledge_file.to_dict())
 
 
-@router.get("/knowledge_file/list/{knowledge_id}", response_model=List[KnowledgeFileResponse])
+@router.get("/knowledge/{knowledge_id}/files", response_model=List[KnowledgeFileResponse])
 async def list_knowledge_files(knowledge_id: str):
     """List all files in a knowledge base"""
     files = KnowledgeFileService.list_knowledge_files(knowledge_id)
     return [KnowledgeFileResponse(**f.to_dict()) for f in files]
 
 
-@router.post("/knowledge_file/status")
-async def update_file_status(request: UpdateStatusRequest):
+@router.patch("/knowledge_file/{file_id}")
+async def update_knowledge_file_status(
+    file_id: str,
+    request: UpdateStatusRequest,
+):
     """Update file processing status"""
-    success = KnowledgeFileService.update_file_status(request.file_id, request.status)
+    success = KnowledgeFileService.update_file_status(file_id, request.status)
     if not success:
         raise HTTPException(status_code=404, detail="Knowledge file not found")
     return {"success": True}
