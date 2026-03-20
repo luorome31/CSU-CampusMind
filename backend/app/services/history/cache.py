@@ -42,8 +42,12 @@ class HistoryCacheService:
         # 1. 查 Redis
         cached = await self._redis.get(self._key(dialog_id))
         if cached:
-            logger.info(f"[CACHE] HIT for dialog_id={dialog_id}")
-            return json.loads(cached)
+            try:
+                logger.info(f"[CACHE] HIT for dialog_id={dialog_id}")
+                return json.loads(cached)
+            except json.JSONDecodeError:
+                logger.warning(f"[CACHE] Corrupted JSON for dialog_id={dialog_id}, treating as miss")
+                await self._redis.delete(self._key(dialog_id))
 
         logger.info(f"[CACHE] MISS for dialog_id={dialog_id}")
 
@@ -92,7 +96,11 @@ class HistoryCacheService:
         # 读取现有缓存
         cached = await self._redis.get(key)
         if cached:
-            histories = json.loads(cached)
+            try:
+                histories = json.loads(cached)
+            except json.JSONDecodeError:
+                logger.warning(f"[CACHE] Corrupted JSON for dialog_id={dialog_id} during append, resetting")
+                histories = []
         else:
             histories = []
 
