@@ -11,6 +11,7 @@ from app.core.session import (
     FileSessionPersistence,
     LoginRateLimiter,
 )
+from app.core.session.redis_persistence import RedisSessionPersistence
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +31,13 @@ def get_session_manager() -> UnifiedSessionManager:
 
 def create_session_manager() -> UnifiedSessionManager:
     """创建 SessionManager 实例"""
-    persistence = FileSessionPersistence(
-        storage_path=settings.session_storage_path
-    )
+    # 根据配置选择持久化实现
+    if settings.redis_url:
+        persistence = RedisSessionPersistence(settings.redis_url)
+    else:
+        persistence = FileSessionPersistence(
+            storage_path=settings.session_storage_path
+        )  # [DEPRECATED]
 
     rate_limiter = LoginRateLimiter()
 
