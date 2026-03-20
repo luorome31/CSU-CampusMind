@@ -30,6 +30,7 @@ from langchain_openai import ChatOpenAI
 
 # Import DialogRepository for secure dialog access
 from app.repositories.dialog_repository import DialogRepository
+from app.services.history.history import HistoryService
 
 
 router = APIRouter(tags=["Completion"])
@@ -165,7 +166,7 @@ async def generate_stream(
     """
     Generate streaming response with SSE format and save history.
     """
-    from langchain_core.messages import HumanMessage
+    from langchain_core.messages import HumanMessage, AIMessage
     from datetime import datetime
 
     # Save user message first
@@ -184,7 +185,17 @@ async def generate_stream(
     accumulated_content = ""
 
     # Build messages
-    messages = [HumanMessage(content=message)]
+    # Fetch history and prepend to messages
+    histories = await HistoryService.get_history_by_dialog(session, dialog_id)
+
+    messages = []
+    for h in histories:
+        if h.role == "user":
+            messages.append(HumanMessage(content=h.content))
+        elif h.role == "assistant":
+            messages.append(AIMessage(content=h.content))
+
+    messages.append(HumanMessage(content=message))
 
     start_time = time.time()
 
