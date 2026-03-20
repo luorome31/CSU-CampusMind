@@ -1,40 +1,73 @@
 """
 Database Session Management
+
+Database URL is driven by DATABASE_URL environment variable (default: sqlite:///./campusmind.db).
+For production, set DATABASE_URL=postgresql://user:pass@host:5432/dbname.
 """
-from typing import AsyncGenerator
+from contextlib import contextmanager
+from typing import Generator
+
 from sqlmodel import SQLModel, create_engine, Session
-from sqlalchemy.pool import StaticPool
-from pydantic import BaseModel
+from sqlalchemy.pool import StaticPool, QueuePool
+
+from app.config import settings
 
 
-class DatabaseConfig(BaseModel):
-    """Database configuration"""
-    url: str = "postgresql://postgres:postgres@localhost:5432/campusmind"
-    echo: bool = False
+def _build_engine():
+    """Create SQLAlchemy engine based on DATABASE_URL."""
+    url = settings.database_url
+    is_sqlite = url.startswith("sqlite")
+
+    if is_sqlite:
+        # SQLite: use StaticPool for in-process single connection, create DB file if not exists
+        return create_engine(
+            url,
+            echo=False,
+            connect_args={"check_same_thread": False},
+            poolclass=StaticPool,
+        )
+    else:
+        # PostgreSQL (or other DB): use QueuePool for connection pooling
+        return create_engine(
+            url,
+            echo=False,
+            poolclass=QueuePool,
+            pool_size=5,
+            max_overflow=10,
+        )
 
 
-# SQLite for demo (use PostgreSQL in production)
-DATABASE_URL = "sqlite:///./campusmind.db"
-
-engine = create_engine(
-    DATABASE_URL,
-    echo=False,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
+engine = _build_engine()
 
 
 def create_db_and_tables():
-    """Create all tables"""
-    from app.database.models.knowledge import KnowledgeBase
-    from app.database.models.knowledge_file import KnowledgeFile
-    from app.database.models.dialog import Dialog
-    from app.database.models.chat_history import ChatHistory
+    """Create all tables registered in SQLModel.metadata.
+
+    Call this once on application startup. Safe to call multiple times
+    (uses CREATE TABLE IF NOT EXISTS).
+    """
+    # Import all models to ensure they are registered with SQLModel.metadata
+    from app.database.models import (
+        Dialog,
+        ChatHistory,
+        KnowledgeBase,
+        KnowledgeFile,
+        User,
+        ToolDefinition,
+        ToolCallLog,
+    )
     SQLModel.metadata.create_all(engine)
 
 
-def get_session() -> Session:
-    """Get database session"""
+@contextmanager
+def get_session() -> Generator[Session, None, None]:
+    """Get a database session. Usage: `with get_session() as session: ...`"""
     with Session(engine) as session:
         yield session
 
+
+# Alias for FastAPI Depends compatibility
+def session_dependency() -> Generator[Session, None, None]:
+    """FastAPI dependency for database session."""
+    with Session(engine) as session:
+        yield session
