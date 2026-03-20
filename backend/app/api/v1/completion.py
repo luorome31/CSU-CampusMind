@@ -9,11 +9,12 @@ from fastapi import APIRouter, Body, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlmodel import Session, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 
 # Use model from settings as default
-from app.database.session import session_dependency
+from app.database.session import async_session_dependency
 from app.database.models import Dialog, ChatHistory
 from app.services.rag.handler import rag_handler
 from app.core.agents.react_agent import ReactAgent, StreamOutput
@@ -27,12 +28,15 @@ from app.core.session.factory import get_session_manager
 # Import LangChain OpenAI
 from langchain_openai import ChatOpenAI
 
+# Import DialogRepository for secure dialog access
+from app.repositories.dialog_repository import DialogRepository
+
 
 router = APIRouter(tags=["Completion"])
 
 
 # Re-export for backwards compatibility with existing Depends() calls
-get_db_session = session_dependency
+get_db_session = async_session_dependency
 
 
 class WatchedStreamingResponse(StreamingResponse):
@@ -64,7 +68,6 @@ class CompletionRequest(BaseModel):
     """Request model for completion with RAG"""
     message: str = Field(..., description="User message/query")
     knowledge_ids: List[str] = Field(default=[], description="Knowledge base IDs for RAG")
-    user_id: str = Field(default="system", description="User ID")
     agent_id: Optional[str] = Field(default=None, description="Agent ID")
     dialog_id: Optional[str] = Field(default=None, description="Dialog ID (for history)")
     enable_rag: bool = Field(default=True, description="Enable RAG retrieval")
@@ -151,47 +154,12 @@ IMPORTANT: 你必须使用上面的 knowledge_ids 列表中的 ID，不要自己
     return agent
 
 
-def get_or_create_dialog(session: Session, dialog_id: Optional[str], user_id: str, agent_id: Optional[str]) -> str:
-    """
-    Get existing dialog or create new one.
-
-    Returns:
-        dialog_id
-    """
-    import uuid
-
-    if dialog_id:
-        # Check if dialog exists
-        statement = select(Dialog).where(Dialog.id == dialog_id)
-        result = session.exec(statement).first()
-        if result:
-            # Update timestamp
-            from datetime import datetime
-            result.updated_at = datetime.now()
-            session.commit()
-            return dialog_id
-
-    # Create new dialog
-    new_dialog_id = dialog_id or str(uuid.uuid4())
-    from datetime import datetime
-    dialog = Dialog(
-        id=new_dialog_id,
-        user_id=user_id,
-        agent_id=agent_id,
-        updated_at=datetime.now()
-    )
-    session.add(dialog)
-    session.commit()
-    return new_dialog_id
-
-
 async def generate_stream(
     agent: ReactAgent,
     message: str,
     knowledge_ids: List[str],
-    session: Session,
+    session: AsyncSession,
     dialog_id: str,
-    user_id: str,
     model: str
 ) -> AsyncGenerator[str, None]:
     """
@@ -209,7 +177,7 @@ async def generate_stream(
         created_at=datetime.now()
     )
     session.add(user_history)
-    session.commit()
+    await session.commit()
 
     # Collect events for history
     events = []
@@ -263,20 +231,22 @@ async def generate_stream(
             created_at=datetime.now()
         )
         session.add(assistant_history)
-        session.commit()
+        await session.commit()
 
         # Update dialog timestamp
-        dialog = session.exec(select(Dialog).where(Dialog.id == dialog_id)).first()
+        statement = select(Dialog).where(Dialog.id == dialog_id)
+        result = await session.execute(statement)
+        dialog = result.scalar_one_or_none()
         if dialog:
             dialog.updated_at = datetime.now()
-            session.commit()
+            await session.commit()
 
 
 @router.post("/completion/stream")
 async def completion_stream(
     request: CompletionRequest,
     current_user: Optional[dict] = Depends(get_optional_user),  # 改为可选认证
-    db: Session = Depends(get_db_session),
+    db: AsyncSession = Depends(async_session_dependency),
 ):
     """
     Streaming completion endpoint with RAG integration
@@ -298,6 +268,8 @@ async def completion_stream(
       data.chunk: New chunk content
       data.accumulated: Full accumulated content
     """
+    import uuid
+
     # Validate knowledge_ids if RAG is enabled
     if request.enable_rag and not request.knowledge_ids:
         raise HTTPException(
@@ -307,7 +279,7 @@ async def completion_stream(
 
     try:
         # current_user 可能为 None（未登录）或 {user_id: "xxx"}（已登录）
-        user_id = current_user.get("user_id") if current_user else None
+        jwt_user_id = current_user.get("user_id") if current_user else None
 
         # 初始化 AgentFactory（如果是首次）
         try:
@@ -319,16 +291,18 @@ async def completion_stream(
 
         # 创建 Agent（根据 user_id 自动选择工具）
         agent = agent_factory.create_agent(
-            user_id=user_id,
+            user_id=jwt_user_id,
             knowledge_ids=request.knowledge_ids,
             model_name=request.model
         )
 
-        # Get or create dialog
-        dialog_id = get_or_create_dialog(
+        # Get or create dialog using DialogRepository
+        # Generate dialog_id if not provided
+        dialog_id = request.dialog_id or str(uuid.uuid4())
+        dialog, _ = await DialogRepository.get_or_create_dialog(
             session=db,
-            dialog_id=request.dialog_id,
-            user_id=request.user_id,
+            dialog_id=dialog_id,
+            jwt_user_id=jwt_user_id,
             agent_id=request.agent_id
         )
 
@@ -339,12 +313,11 @@ async def completion_stream(
                 message=request.message,
                 knowledge_ids=request.knowledge_ids,
                 session=db,
-                dialog_id=dialog_id,
-                user_id=request.user_id,
+                dialog_id=dialog.id,
                 model=request.model
             ),
             media_type="text/event-stream",
-            headers={"X-Dialog-ID": dialog_id}
+            headers={"X-Dialog-ID": dialog.id}
         )
 
     except HTTPException:
@@ -358,7 +331,8 @@ async def completion_stream(
 @router.post("/completion", response_model=CompletionResponse)
 async def completion(
     request: CompletionRequest,
-    db: Session = Depends(get_db_session),
+    current_user: Optional[dict] = Depends(get_optional_user),
+    db: AsyncSession = Depends(async_session_dependency),
 ):
     """
     Completion endpoint with RAG integration (non-streaming)
@@ -370,12 +344,20 @@ async def completion(
     4. Save history to database
     5. Return message + context + sources
     """
+    import uuid
+    from datetime import datetime
+
     try:
-        # Get or create dialog
-        dialog_id = get_or_create_dialog(
+        # Get jwt_user_id from current_user
+        jwt_user_id = current_user.get("user_id") if current_user else None
+
+        # Get or create dialog using DialogRepository
+        # Generate dialog_id if not provided
+        dialog_id = request.dialog_id or str(uuid.uuid4())
+        dialog, _ = await DialogRepository.get_or_create_dialog(
             session=db,
-            dialog_id=request.dialog_id,
-            user_id=request.user_id,
+            dialog_id=dialog_id,
+            jwt_user_id=jwt_user_id,
             agent_id=request.agent_id
         )
 
@@ -383,10 +365,9 @@ async def completion(
         sources = []
 
         # Save user message
-        from datetime import datetime
         user_history = ChatHistory(
             id=str(time.time() * 1000) + "_user",
-            dialog_id=dialog_id,
+            dialog_id=dialog.id,
             role="user",
             content=request.message,
             created_at=datetime.now()
@@ -407,7 +388,7 @@ async def completion(
         # Save assistant message
         assistant_history = ChatHistory(
             id=str(time.time() * 1000) + "_assistant",
-            dialog_id=dialog_id,
+            dialog_id=dialog.id,
             role="assistant",
             content=context,
             extra=json.dumps({
@@ -418,14 +399,14 @@ async def completion(
             created_at=datetime.now()
         )
         db.add(assistant_history)
-        db.commit()
+        await db.commit()
 
         return CompletionResponse(
             success=True,
             message=request.message,
             context=context,
             sources=sources,
-            dialog_id=dialog_id
+            dialog_id=dialog.id
         )
 
     except Exception as e:
@@ -441,7 +422,6 @@ class ChatRequest(BaseModel):
     query: str = Field(..., description="User query")
     knowledge_id: str = Field(..., description="Single knowledge base ID")
     dialog_id: Optional[str] = Field(default=None, description="Dialog ID")
-    user_id: str = Field(default="system", description="User ID")
     use_rag: bool = Field(default=True, description="Use RAG")
     model: str = Field(default=settings.openai_model, description="LLM model to use")
 
@@ -449,17 +429,24 @@ class ChatRequest(BaseModel):
 @router.post("/chat/stream")
 async def chat_stream(
     request: ChatRequest,
-    db: Session = Depends(get_db_session),
+    current_user: Optional[dict] = Depends(get_optional_user),
+    db: AsyncSession = Depends(async_session_dependency),
 ):
     """
     Streaming chat endpoint with RAG
     """
+    import uuid
+
     try:
-        # Get or create dialog
-        dialog_id = get_or_create_dialog(
+        # Get jwt_user_id from current_user
+        jwt_user_id = current_user.get("user_id") if current_user else None
+
+        # Get or create dialog using DialogRepository
+        dialog_id = request.dialog_id or str(uuid.uuid4())
+        dialog, _ = await DialogRepository.get_or_create_dialog(
             session=db,
-            dialog_id=request.dialog_id,
-            user_id=request.user_id,
+            dialog_id=dialog_id,
+            jwt_user_id=jwt_user_id,
             agent_id=None
         )
 
@@ -474,12 +461,11 @@ async def chat_stream(
                 message=request.query,
                 knowledge_ids=[request.knowledge_id],
                 session=db,
-                dialog_id=dialog_id,
-                user_id=request.user_id,
+                dialog_id=dialog.id,
                 model=request.model
             ),
             media_type="text/event-stream",
-            headers={"X-Dialog-ID": dialog_id}
+            headers={"X-Dialog-ID": dialog.id}
         )
 
     except Exception as e:
@@ -491,17 +477,25 @@ async def chat_stream(
 @router.post("/chat", response_model=CompletionResponse)
 async def chat(
     request: ChatRequest,
-    db: Session = Depends(get_db_session),
+    current_user: Optional[dict] = Depends(get_optional_user),
+    db: AsyncSession = Depends(async_session_dependency),
 ):
     """
     Simple chat endpoint with RAG (non-streaming)
     """
+    import uuid
+    from datetime import datetime
+
     try:
-        # Get or create dialog
-        dialog_id = get_or_create_dialog(
+        # Get jwt_user_id from current_user
+        jwt_user_id = current_user.get("user_id") if current_user else None
+
+        # Get or create dialog using DialogRepository
+        dialog_id = request.dialog_id or str(uuid.uuid4())
+        dialog, _ = await DialogRepository.get_or_create_dialog(
             session=db,
-            dialog_id=request.dialog_id,
-            user_id=request.user_id,
+            dialog_id=dialog_id,
+            jwt_user_id=jwt_user_id,
             agent_id=None
         )
 
@@ -509,10 +503,9 @@ async def chat(
         sources = []
 
         # Save user message
-        from datetime import datetime
         user_history = ChatHistory(
             id=str(time.time() * 1000) + "_user",
-            dialog_id=dialog_id,
+            dialog_id=dialog.id,
             role="user",
             content=request.query,
             created_at=datetime.now()
@@ -531,7 +524,7 @@ async def chat(
         # Save assistant message
         assistant_history = ChatHistory(
             id=str(time.time() * 1000) + "_assistant",
-            dialog_id=dialog_id,
+            dialog_id=dialog.id,
             role="assistant",
             content=context,
             extra=json.dumps({
@@ -541,14 +534,14 @@ async def chat(
             created_at=datetime.now()
         )
         db.add(assistant_history)
-        db.commit()
+        await db.commit()
 
         return CompletionResponse(
             success=True,
             message=request.query,
             context=context,
             sources=sources,
-            dialog_id=dialog_id
+            dialog_id=dialog.id
         )
 
     except Exception as e:

@@ -5,19 +5,33 @@ import pytest
 from unittest.mock import patch, MagicMock, AsyncMock
 from fastapi.testclient import TestClient
 
+from app.api.v1.completion import async_session_dependency
+
 
 class TestCompletionAPI:
     """Tests for Completion API endpoints"""
 
     @pytest.fixture
-    def mock_deps(self):
-        """Mock dependencies for completion API"""
-        with patch("app.api.v1.completion.get_db_session") as mock_session, \
-             patch("app.api.v1.completion.rag_handler") as mock_rag:
+    def mock_db_session(self):
+        """Create a mock async database session"""
+        mock_db = MagicMock()
+        mock_db.commit = AsyncMock()
+        mock_db.add = MagicMock()
+        mock_db.execute = AsyncMock()
+        return mock_db
 
-            # Mock database session
-            mock_db = MagicMock()
-            mock_session.return_value = iter([mock_db])
+    @pytest.fixture
+    def mock_deps(self, mock_db_session):
+        """Mock dependencies for completion API"""
+        # Create mock dialog object
+        mock_dialog = MagicMock()
+        mock_dialog.id = "test-dialog-id"
+
+        async def mock_get_or_create_dialog(session, dialog_id, jwt_user_id, agent_id=None):
+            return (mock_dialog, True)
+
+        with patch("app.api.v1.completion.DialogRepository.get_or_create_dialog", mock_get_or_create_dialog), \
+             patch("app.api.v1.completion.rag_handler") as mock_rag:
 
             # Mock RAG handler
             mock_rag.retrieve_with_sources = AsyncMock(return_value={
@@ -27,10 +41,20 @@ class TestCompletionAPI:
                 ]
             })
 
+            # Override the async_session_dependency
+            async def override_async_session_dependency():
+                yield mock_db_session
+
+            from app.main import app
+            app.dependency_overrides[async_session_dependency] = override_async_session_dependency
+
             yield {
-                "session": mock_db,
+                "dialog": mock_dialog,
                 "rag_handler": mock_rag
             }
+
+            # Clean up override
+            app.dependency_overrides.clear()
 
     def test_completion_without_rag(self, mock_deps):
         """Test POST /api/v1/completion without RAG"""
@@ -42,7 +66,6 @@ class TestCompletionAPI:
             json={
                 "message": "Hello, how are you?",
                 "knowledge_ids": [],
-                "user_id": "test_user",
                 "enable_rag": False
             }
         )
@@ -77,7 +100,6 @@ class TestCompletionAPI:
             json={
                 "query": "What is CampusMind?",
                 "knowledge_id": "test_kb_1",
-                "user_id": "test_user",
                 "use_rag": True
             }
         )
@@ -96,7 +118,6 @@ class TestCompletionAPI:
             json={
                 "query": "Hello",
                 "knowledge_id": "test_kb_1",
-                "user_id": "test_user",
                 "use_rag": False
             }
         )
