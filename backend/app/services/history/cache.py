@@ -78,6 +78,31 @@ class HistoryCacheService:
         await self._redis.setex(key, self._ttl, data)
         logger.info(f"[CACHE] Updated cache: key={key}, ttl={self._ttl}, count={len(histories)}")
 
+    async def append_to_cache(self, dialog_id: str, history_entry: dict) -> None:
+        """
+        Append a new history entry to existing cache (高效写入)
+
+        Args:
+            dialog_id: 对话 ID
+            history_entry: 新的历史记录 dict (包含 role, content 等)
+        """
+        key = self._key(dialog_id)
+
+        # 读取现有缓存
+        cached = await self._redis.get(key)
+        if cached:
+            histories = json.loads(cached)
+        else:
+            histories = []
+
+        # Append 新消息
+        histories.append(history_entry)
+
+        # 写回缓存
+        data = json.dumps(histories)
+        await self._redis.setex(key, self._ttl, data)
+        logger.info(f"[CACHE] Appended to cache: key={key}, new_count={len(histories)}")
+
     async def invalidate(self, dialog_id: str) -> None:
         """使对话历史缓存失效"""
         key = self._key(dialog_id)

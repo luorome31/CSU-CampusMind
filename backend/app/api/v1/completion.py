@@ -190,6 +190,9 @@ async def generate_stream(
     session.add(user_history)
     await session.commit()
 
+    # Append user message to cache
+    await cache_service.append_to_cache(dialog_id, user_history.to_dict())
+
     # Collect events for history
     events = []
     accumulated_content = ""
@@ -256,6 +259,9 @@ async def generate_stream(
         )
         session.add(assistant_history)
         await session.commit()
+
+        # Append assistant message to cache
+        await cache_service.append_to_cache(dialog_id, assistant_history.to_dict())
 
         # Update dialog timestamp
         statement = select(Dialog).where(Dialog.id == dialog_id)
