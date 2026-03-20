@@ -60,7 +60,7 @@ class LevelExamInput(BaseModel):
 
 
 # ============ Tool Functions ============
-def _get_jwc_service() -> JwcService:
+async def _get_jwc_service() -> JwcService:
     """获取 JwcService 实例"""
     return JwcService(get_session_manager())
 
@@ -80,11 +80,11 @@ def _format_grades(grades: list[Grade]) -> str:
     return "\n".join(lines)
 
 
-def _get_grades(user_id: str, term: str = "") -> str:
+async def _get_grades(user_id: str, term: str = "") -> str:
     """查询成绩"""
     try:
         service = _get_jwc_service()
-        grades = service.get_grades(user_id, term)
+        grades = await service.get_grades(user_id, term)
         return _format_grades(grades)
     except Exception as e:
         logger.error(f"成绩查询失败: {e}")
@@ -106,11 +106,11 @@ def _format_schedule(classes: list[ClassEntry]) -> str:
     return "\n".join(lines)
 
 
-def _get_schedule(user_id: str, term: str, week: str = "0") -> str:
+async def _get_schedule(user_id: str, term: str, week: str = "0") -> str:
     """查询课表"""
     try:
         service = _get_jwc_service()
-        classes, start_week_day = service.get_schedule(user_id, term, week)
+        classes, start_week_day = await service.get_schedule(user_id, term, week)
         result = _format_schedule(classes)
         # 如果有开始日期信息，附加到结果中
         if start_week_day:
@@ -136,11 +136,11 @@ def _format_ranks(ranks: list[RankEntry]) -> str:
     return "\n".join(lines)
 
 
-def _get_rank(user_id: str) -> str:
+async def _get_rank(user_id: str) -> str:
     """查询专业排名"""
     try:
         service = _get_jwc_service()
-        ranks = service.get_rank(user_id)
+        ranks = await service.get_rank(user_id)
         return _format_ranks(ranks)
     except Exception as e:
         logger.error(f"排名查询失败: {e}")
@@ -162,11 +162,11 @@ def _format_level_exams(exams: list[LevelExamEntry]) -> str:
     return "\n".join(lines)
 
 
-def _get_level_exams(user_id: str) -> str:
+async def _get_level_exams(user_id: str) -> str:
     """查询等级考试成绩"""
     try:
         service = _get_jwc_service()
-        exams = service.get_level_exams(user_id)
+        exams = await service.get_level_exams(user_id)
         return _format_level_exams(exams)
     except Exception as e:
         logger.error(f"等级考试查询失败: {e}")
