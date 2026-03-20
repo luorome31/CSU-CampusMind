@@ -33,7 +33,7 @@ class ToolContext:
         """用户是否已登录"""
         return self.user_id is not None and self.session_manager is not None
 
-    def get_subsystem_session(self, subsystem: str) -> Optional[Dict[str, Any]]:
+    async def get_subsystem_session(self, subsystem: str) -> Optional[Dict[str, Any]]:
         """
         获取子系统 session，必要时自动登录
 
@@ -45,7 +45,7 @@ class ToolContext:
 
         try:
             # 从 session_manager 获取 session
-            session = self.session_manager.get_session(self.user_id, subsystem)
+            session = await self.session_manager.get_session(self.user_id, subsystem)
             return session
         except Exception as e:
             logger.error(f"Failed to get subsystem session for {subsystem}: {e}")
