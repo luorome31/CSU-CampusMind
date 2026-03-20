@@ -13,7 +13,7 @@ from sqlmodel import Session, select
 from app.config import settings
 
 # Use model from settings as default
-from app.database.session import engine
+from app.database.session import session_dependency
 from app.database.models import Dialog, ChatHistory
 from app.services.rag.handler import rag_handler
 from app.core.agents.react_agent import ReactAgent, StreamOutput
@@ -31,10 +31,8 @@ from langchain_openai import ChatOpenAI
 router = APIRouter(tags=["Completion"])
 
 
-def get_db_session():
-    """Get database session"""
-    with Session(engine) as session:
-        yield session
+# Re-export for backwards compatibility with existing Depends() calls
+get_db_session = session_dependency
 
 
 class WatchedStreamingResponse(StreamingResponse):
