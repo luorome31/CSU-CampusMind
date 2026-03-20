@@ -175,11 +175,21 @@ async def generate_stream(
 ) -> AsyncGenerator[str, None]:
     """
     Generate streaming response with SSE format and save history.
+
+    Consistency strategy:
+    1. Read history first (triggers DB backfill on cache miss while message not yet committed)
+    2. In-memory merge to build full context for immediate agent response
+    3. Async dual-write: concurrent DB commit + cache append via asyncio.gather
     """
+    import asyncio
     from langchain_core.messages import HumanMessage, AIMessage
     from datetime import datetime
 
-    # Save user message first
+    # Collect events for history
+    events = []
+    accumulated_content = ""
+
+    # Prepare user history object (not yet committed)
     user_history = ChatHistory(
         id=str(time.time() * 1000) + "_user",
         dialog_id=dialog_id,
@@ -187,21 +197,17 @@ async def generate_stream(
         content=message,
         created_at=datetime.now()
     )
-    session.add(user_history)
-    await session.commit()
+    user_history_dict = user_history.to_dict()
 
-    # Collect events for history
-    events = []
-    accumulated_content = ""
-
-    # Fetch history first (ensures DB recovery on cache miss, prevents history loss)
+    # Step 1: Read history FIRST (on cache miss, backfills from DB which doesn't have this message yet)
     histories = await cache_service.get_history(dialog_id)
 
-    # Then append user message to cache (after get_history so cache is populated)
-    await cache_service.append_to_cache(dialog_id, user_history.to_dict())
+    # Step 2: In-memory merge - full context includes current user message
+    # This ensures agent can start immediately without waiting for I/O
+    full_histories = histories + [user_history_dict]
 
     messages = []
-    for h in histories:
+    for h in full_histories:
         role = h.get("role")
         content = h.get("content")
         if role == "user":
@@ -209,8 +215,12 @@ async def generate_stream(
         elif role == "assistant":
             messages.append(AIMessage(content=content))
 
-    # Note: current user message already included in histories from cache
-    # so no need to append again
+    # Step 3: Async dual-write - concurrent DB commit and cache append
+    session.add(user_history)
+    await asyncio.gather(
+        session.commit(),
+        cache_service.append_to_cache(dialog_id, user_history_dict)
+    )
 
     start_time = time.time()
 
@@ -241,7 +251,7 @@ async def generate_stream(
         events.append(error_event)
 
     finally:
-        # Save assistant message to history
+        # Save assistant message to history (async dual-write for consistency)
         duration = time.time() - start_time
         assistant_history = ChatHistory(
             id=str(time.time() * 1000) + "_assistant",
@@ -257,10 +267,6 @@ async def generate_stream(
             created_at=datetime.now()
         )
         session.add(assistant_history)
-        await session.commit()
-
-        # Append assistant message to cache
-        await cache_service.append_to_cache(dialog_id, assistant_history.to_dict())
 
         # Update dialog timestamp
         statement = select(Dialog).where(Dialog.id == dialog_id)
@@ -268,7 +274,12 @@ async def generate_stream(
         dialog = result.scalar_one_or_none()
         if dialog:
             dialog.updated_at = datetime.now()
-            await session.commit()
+
+        # Async triple-write: concurrent DB commit, cache append, and dialog update
+        await asyncio.gather(
+            session.commit(),
+            cache_service.append_to_cache(dialog_id, assistant_history.to_dict())
+        )
 
 
 @router.post("/completion/stream")
