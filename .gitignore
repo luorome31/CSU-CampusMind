@@ -90,3 +90,4 @@ scripts/csu_system_scripts/sso_analyzer.py
 scripts/csu_system_scripts/sso_to_jwc.py
 docs/development_doc/
 docs/superpowers/plans/2026-03-19-career-tools-integration-plan.md
+.pytest_cache/

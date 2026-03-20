@@ -60,13 +60,10 @@ def _build_async_engine():
             poolclass=StaticPool,
         )
     else:
-        # PostgreSQL (or other DB): use QueuePool for connection pooling
+        # PostgreSQL (or other DB): async engine handles pooling internally via asyncpg
         return create_async_engine(
             async_url,
             echo=False,
-            poolclass=QueuePool,
-            pool_size=5,
-            max_overflow=10,
         )
 
 
