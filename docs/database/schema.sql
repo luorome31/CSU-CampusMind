@@ -26,10 +26,10 @@ CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS dialogs (
     id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
+    user_id TEXT,
     agent_id TEXT,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_dialogs_user_id ON dialogs(user_id);
