@@ -4,11 +4,9 @@ Global Redis Client Singleton
 Manages Redis connection pool lifecycle via FastAPI lifespan.
 Uses redis.asyncio for full async support.
 """
-import logging
 from typing import Optional
 from redis.asyncio import Redis, ConnectionPool
-
-logger = logging.getLogger(__name__)
+from loguru import logger
 
 _redis_pool: Optional[ConnectionPool] = None
 _redis_client: Optional[Redis] = None

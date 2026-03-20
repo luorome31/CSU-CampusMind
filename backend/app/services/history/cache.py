@@ -5,16 +5,14 @@
 Write-through 策略：写入时同时更新缓存。
 """
 import json
-import logging
 from typing import List, Optional
 
 from fastapi import Depends
 from redis.asyncio import Redis
+from loguru import logger
 
 from app.config import settings
 from app.api.dependencies import get_redis_client
-
-logger = logging.getLogger(__name__)
 
 
 class HistoryCacheService:
