@@ -158,21 +158,21 @@ class UnifiedSessionManager:
         logger.info(f"Fetched new session for {user_id}:{subsystem}")
         return session
 
-    def get_jwc_session(self, user_id: str) -> requests.Session:
+    async def get_jwc_session(self, user_id: str) -> requests.Session:
         """获取教务系统 Session"""
-        return self.get_session(user_id, Subsystem.JWC)
+        return await self.get_session(user_id, Subsystem.JWC)
 
-    def get_library_session(self, user_id: str) -> requests.Session:
+    async def get_library_session(self, user_id: str) -> requests.Session:
         """获取图书馆 Session"""
-        return self.get_session(user_id, Subsystem.LIBRARY)
+        return await self.get_session(user_id, Subsystem.LIBRARY)
 
-    def get_ecard_session(self, user_id: str) -> requests.Session:
+    async def get_ecard_session(self, user_id: str) -> requests.Session:
         """获取校园卡 Session"""
-        return self.get_session(user_id, Subsystem.ECARD)
+        return await self.get_session(user_id, Subsystem.ECARD)
 
-    def get_oa_session(self, user_id: str) -> requests.Session:
+    async def get_oa_session(self, user_id: str) -> requests.Session:
         """获取办公网 Session"""
-        return self.get_session(user_id, Subsystem.OA)
+        return await self.get_session(user_id, Subsystem.OA)
 
     async def invalidate_session(self, user_id: str, subsystem: Optional[str] = None) -> None:
         """使会话失效"""
