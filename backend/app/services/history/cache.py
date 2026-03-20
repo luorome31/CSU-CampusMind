@@ -5,7 +5,7 @@
 Write-through 策略：写入时同时更新缓存。
 """
 import json
-from typing import List, Optional
+from typing import List
 
 from fastapi import Depends
 from redis.asyncio import Redis
@@ -30,7 +30,7 @@ class HistoryCacheService:
     def _key(self, dialog_id: str) -> str:
         return f"history:{dialog_id}"
 
-    async def get_history(self, dialog_id: str) -> Optional[List[dict]]:
+    async def get_history(self, dialog_id: str) -> List[dict]:
         """
         获取对话历史
 
@@ -57,7 +57,7 @@ class HistoryCacheService:
 
             if not histories:
                 logger.info(f"[CACHE] No history found in DB for dialog_id={dialog_id}")
-                return None
+                return []
 
             # 3. 写入缓存 (write-through)
             logger.info(f"[CACHE] Writing {len(histories)} histories to cache for dialog_id={dialog_id}")
