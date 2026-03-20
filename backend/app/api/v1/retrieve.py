@@ -63,38 +63,4 @@ async def retrieve(
         )
 
 
-class RetrieveSimpleRequest(BaseModel):
-    """Simple request for retrieval (single knowledge base)"""
-    query: str = Field(..., description="User query")
-    knowledge_id: str = Field(..., description="Single knowledge base ID")
-    top_k: int = Field(default=5, description="Number of results")
-
-
-@router.post("/retrieve/simple", response_model=RetrieveResponse)
-async def retrieve_simple(
-    request: RetrieveSimpleRequest,
-):
-    """
-    Simplified retrieval endpoint for single knowledge base
-    """
-    try:
-        result = await rag_handler.retrieve_with_sources(
-            query=request.query,
-            knowledge_ids=[request.knowledge_id],
-            top_k=request.top_k
-        )
-
-        return RetrieveResponse(
-            success=True,
-            context=result["context"],
-            sources=result["sources"]
-        )
-
-    except Exception as e:
-        return RetrieveResponse(
-            success=False,
-            error=str(e)
-        )
-
-
 from loguru import logger
