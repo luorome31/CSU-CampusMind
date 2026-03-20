@@ -15,7 +15,7 @@ class DialogService:
     @staticmethod
     async def create_dialog(
         session: AsyncSession,
-        user_id: str,
+        user_id: Optional[str],
         agent_id: Optional[str] = None,
         dialog_id: Optional[str] = None
     ) -> Dialog:
@@ -67,7 +67,11 @@ class DialogService:
         user_id: str,
         limit: int = 50
     ) -> list[Dialog]:
-        """List user's dialogs"""
+        """List user's dialogs
+
+        Note: This only works for logged-in users. Anonymous dialogs have no
+        user_id to filter by, so they cannot be retrieved via this method.
+        """
         statement = (
             select(Dialog)
             .where(Dialog.user_id == user_id)
