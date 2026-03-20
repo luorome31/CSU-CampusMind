@@ -141,7 +141,7 @@ def save_html(content: str, name: str, output_dir: Path):
     return filepath
 
 
-def test_url(session: requests.Session, name: str, url_info: dict, output_dir: Path) -> bool:
+def check_url(session: requests.Session, name: str, url_info: dict, output_dir: Path) -> bool:
     """测试单个 URL"""
     url = url_info["url"]
     method = url_info.get("method", "GET")
@@ -208,7 +208,7 @@ def main():
         print(f"\n{Colors.CYAN}{'=' * 60}{Colors.RESET}")
         print(f"{Colors.CYAN}# {i}/{len(JWC_URLS)}: {name}{Colors.RESET}")
 
-        success = test_url(session, name, url_info, output_dir)
+        success = check_url(session, name, url_info, output_dir)
         results[name] = success
 
         # 请求间隔

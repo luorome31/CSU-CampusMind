@@ -83,7 +83,7 @@ def _format_grades(grades: list[Grade]) -> str:
 async def _get_grades(user_id: str, term: str = "") -> str:
     """查询成绩"""
     try:
-        service = _get_jwc_service()
+        service = await _get_jwc_service()
         grades = await service.get_grades(user_id, term)
         return _format_grades(grades)
     except Exception as e:
@@ -109,7 +109,7 @@ def _format_schedule(classes: list[ClassEntry]) -> str:
 async def _get_schedule(user_id: str, term: str, week: str = "0") -> str:
     """查询课表"""
     try:
-        service = _get_jwc_service()
+        service = await _get_jwc_service()
         classes, start_week_day = await service.get_schedule(user_id, term, week)
         result = _format_schedule(classes)
         # 如果有开始日期信息，附加到结果中
@@ -139,7 +139,7 @@ def _format_ranks(ranks: list[RankEntry]) -> str:
 async def _get_rank(user_id: str) -> str:
     """查询专业排名"""
     try:
-        service = _get_jwc_service()
+        service = await _get_jwc_service()
         ranks = await service.get_rank(user_id)
         return _format_ranks(ranks)
     except Exception as e:
@@ -165,7 +165,7 @@ def _format_level_exams(exams: list[LevelExamEntry]) -> str:
 async def _get_level_exams(user_id: str) -> str:
     """查询等级考试成绩"""
     try:
-        service = _get_jwc_service()
+        service = await _get_jwc_service()
         exams = await service.get_level_exams(user_id)
         return _format_level_exams(exams)
     except Exception as e:
