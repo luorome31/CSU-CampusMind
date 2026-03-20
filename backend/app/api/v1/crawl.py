@@ -5,6 +5,15 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
+from crawl4ai import (
+    AsyncWebCrawler,
+    BrowserConfig,
+    CrawlerRunConfig,
+    DefaultMarkdownGenerator,
+    PruningContentFilter,
+    SemaphoreDispatcher,
+)
+
 from app.services.crawl.crawler import crawl_service
 from app.services.storage.client import storage_client
 from app.services.knowledge_file import KnowledgeFileService
@@ -161,35 +170,52 @@ async def crawl_and_index(
 async def crawl_batch(
     request: CrawlBatchRequest,
 ):
-    """Crawl multiple URLs and optionally store to OSS"""
+    """
+    Crawl multiple URLs concurrently using SemaphoreDispatcher
+
+    Returns per-URL status with partial success handling.
+    """
     try:
-        results = []
+        browser_config = BrowserConfig(headless=True, verbose=False)
+        run_config = CrawlerRunConfig(
+            markdown_generator=DefaultMarkdownGenerator(
+                content_filter=PruningContentFilter()
+            ),
+        )
 
-        for url in request.urls:
-            result = await crawl_service.crawl_and_prepare_for_storage(url)
+        async with AsyncWebCrawler(config=browser_config) as crawler:
+            dispatcher = SemaphoreDispatcher(semaphore_count=5)
+            results = await crawler.arun_many(
+                urls=request.urls,
+                config=run_config,
+                dispatcher=dispatcher,
+            )
 
-            if not result["success"]:
-                results.append(CrawlResponse(
+        responses = []
+        for i, result in enumerate(results):
+            url = request.urls[i]
+            if result.success:
+                # Store to OSS if requested
+                oss_url = None
+                if request.store_to_oss:
+                    storage_key = crawl_service.generate_storage_key(url)
+                    content = result.markdown.raw_markdown.encode("utf-8")
+                    oss_url = storage_client.upload_content(storage_key, content)
+
+                responses.append(CrawlResponse(
+                    success=True,
+                    url=url,
+                    oss_url=oss_url,
+                    title=result.metadata.get("title", "") if result.metadata else "",
+                ))
+            else:
+                responses.append(CrawlResponse(
                     success=False,
                     url=url,
-                    error=result.get("error", "Unknown error"),
+                    error=result.error_message or "Unknown error",
                 ))
-                continue
 
-            oss_url = None
-            if request.store_to_oss:
-                content = result["content"].encode("utf-8")
-                storage_key = result["storage_key"]
-                oss_url = storage_client.upload_content(storage_key, content)
-
-            results.append(CrawlResponse(
-                success=True,
-                url=url,
-                oss_url=oss_url,
-                title=result["metadata"].get("title", ""),
-            ))
-
-        return results
+        return responses
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -203,65 +229,88 @@ async def crawl_batch_with_knowledge(
     Crawl multiple URLs and create knowledge_file records for each
 
     End-to-end flow for multiple URLs: crawl -> OSS -> knowledge_file -> index
+    Uses parallel crawling with SemaphoreDispatcher for performance.
     """
     from app.services.rag.indexer import indexer
 
-    results = []
-    for url in request.urls:
-        try:
-            # Step 1: Crawl
-            crawl_result = await crawl_service.crawl_and_prepare_for_storage(url)
+    try:
+        browser_config = BrowserConfig(headless=True, verbose=False)
+        run_config = CrawlerRunConfig(
+            markdown_generator=DefaultMarkdownGenerator(
+                content_filter=PruningContentFilter()
+            ),
+        )
 
-            if not crawl_result["success"]:
-                results.append(CrawlResponse(
+        async with AsyncWebCrawler(config=browser_config) as crawler:
+            dispatcher = SemaphoreDispatcher(semaphore_count=5)
+            results = await crawler.arun_many(
+                urls=request.urls,
+                config=run_config,
+                dispatcher=dispatcher,
+            )
+
+        responses = []
+        for i, result in enumerate(results):
+            url = request.urls[i]
+
+            if not result.success:
+                responses.append(CrawlResponse(
                     success=False,
                     url=url,
-                    error=crawl_result.get("error", "Unknown error"),
+                    error=result.error_message or "Unknown error",
                 ))
                 continue
 
-            # Step 2: Store to OSS
-            content = crawl_result["content"].encode("utf-8")
-            storage_key = crawl_result["storage_key"]
-            oss_url = storage_client.upload_content(storage_key, content)
+            try:
+                # Store to OSS
+                storage_key = crawl_service.generate_storage_key(url)
+                content = result.markdown.raw_markdown.encode("utf-8")
+                oss_url = storage_client.upload_content(storage_key, content)
 
-            # Step 3: Create knowledge_file
-            file_name = storage_key.split("/")[-1]
-            knowledge_file = KnowledgeFileService.create_knowledge_file(
-                file_name=file_name,
-                knowledge_id=request.knowledge_id,
-                user_id=request.user_id,
-                oss_url=oss_url,
-                file_size=len(content),
-            )
+                # Create knowledge_file
+                file_name = storage_key.split("/")[-1]
+                knowledge_file = KnowledgeFileService.create_knowledge_file(
+                    file_name=file_name,
+                    knowledge_id=request.knowledge_id,
+                    user_id=request.user_id,
+                    oss_url=oss_url,
+                    file_size=len(content),
+                )
 
-            # Step 4: Index
-            index_result = await indexer.index_content(
-                content=crawl_result["content"],
-                knowledge_id=request.knowledge_id,
-                source_name=file_name,
-                metadata={"file_id": knowledge_file.id}
-            )
+                # Index to vector/keyword DB
+                index_result = await indexer.index_content(
+                    content=result.markdown.raw_markdown,
+                    knowledge_id=request.knowledge_id,
+                    source_name=file_name,
+                    metadata={
+                        "file_id": knowledge_file.id,
+                        "enable_vector": request.enable_vector,
+                        "enable_keyword": request.enable_keyword,
+                    }
+                )
 
-            # Update status
-            if index_result.get("success"):
-                KnowledgeFileService.update_file_status(knowledge_file.id, "success")
-            else:
-                KnowledgeFileService.update_file_status(knowledge_file.id, "fail")
+                # Update file status
+                if index_result.get("success"):
+                    KnowledgeFileService.update_file_status(knowledge_file.id, "success")
+                else:
+                    KnowledgeFileService.update_file_status(knowledge_file.id, "fail")
 
-            results.append(CrawlResponse(
-                success=True,
-                url=url,
-                oss_url=oss_url,
-                title=crawl_result["metadata"].get("title", ""),
-                file_id=knowledge_file.id,
-            ))
+                responses.append(CrawlResponse(
+                    success=True,
+                    url=url,
+                    oss_url=oss_url,
+                    title=result.metadata.get("title", "") if result.metadata else "",
+                    file_id=knowledge_file.id,
+                ))
 
-        except Exception as e:
-            results.append(CrawlResponse(
-                success=False,
-                url=url,
-                error=str(e),
-            ))
+            except Exception as e:
+                responses.append(CrawlResponse(
+                    success=False,
+                    url=url,
+                    error=str(e),
+                ))
 
-    return results
+        return responses
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
