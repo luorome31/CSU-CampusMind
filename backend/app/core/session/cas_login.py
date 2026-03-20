@@ -202,9 +202,7 @@ def cas_login_only_castgc(username: str, password: str, rate_limiter=None) -> st
     session = create_session()
 
     try:
-        # 任选一个 service_url，只需要能获取 CASTGC
-        service_url = SUBSYSTEM_SERVICE_URLS.get("jwc")
-        login_url = f"{CAS_LOGIN_URL}?service={requests.utils.quote(service_url)}"
+        login_url = CAS_LOGIN_URL  # no service param — CAS server sets CASTGC on bare authserver/login
 
         # Step 1: 获取登录表单
         resp = session.get(login_url, allow_redirects=False)
