@@ -28,6 +28,7 @@ dependencies = [
     "langchain-openai>=1.1.11",
     "pyjwt>=2.12.1",
     "psycopg2-binary>=2.9.11",
+    "redis[hiredis]>=5.0.0",
 ]
 
 [tool.hatch.build.targets.wheel]

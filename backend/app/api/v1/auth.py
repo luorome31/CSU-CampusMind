@@ -13,10 +13,30 @@ from app.core.session.manager import UnifiedSessionManager, NeedReLoginError
 from app.core.session.factory import get_session_manager
 from app.core.session.rate_limiter import LoginRateLimiter
 from app.api.dependencies import get_current_user
+from app.database.session import async_session_dependency
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["认证"])
+
+
+# ============ Helper Functions ============
+
+async def _ensure_user_exists(user_id: str) -> None:
+    """
+    如果用户不存在则创建
+
+    Args:
+        user_id: 用户 ID (CAS username)
+    """
+    from app.database.models import User
+
+    session = async_session_dependency()
+    existing = await session.get(User, user_id)
+    if not existing:
+        user = User(id=user_id, username=user_id)
+        session.add(user)
+        await session.commit()
 
 
 # ============ Request/Response Models ============
@@ -86,6 +106,9 @@ async def login(request: LoginRequest):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"登录失败: {str(e)}"
         )
+
+    # 登录成功后确保用户存在
+    await _ensure_user_exists(request.username)
 
     # 4. 生成 JWT
     token = jwt_manager.create_token({"user_id": request.username})

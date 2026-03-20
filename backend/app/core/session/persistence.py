@@ -24,7 +24,12 @@ class SessionPersistence(ABC):
 
 
 class FileSessionPersistence(SessionPersistence):
-    """文件存储 Session 持久化"""
+    """
+    [DEPRECATED] 文件存储 Session 持久化
+
+    请使用 RedisSessionPersistence 替代。
+    计划移除时间: 2026-06-01
+    """
 
     def __init__(self, storage_path: str = "./data/csu_sessions.json"):
         self._storage_path = storage_path
