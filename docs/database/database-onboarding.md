@@ -108,11 +108,11 @@ backend/
 
 ### 3.2 中优先级
 
-**问题 3: `create_db_and_tables()` 不完整**
+**问题 3: `create_db_and_tables()` 不完整** ✅ 已修复
 
-- **现状:** 主应用启动时从未调用建表函数，只在测试中调用
-- **位置:** `app/database/session.py`
-- **修复方向:** 在 `app/main.py` 启动时调用
+- **修复:** 在 `app/main.py` 的 lifespan 中调用 `create_db_and_tables()`，
+  所有模型 (User, ToolDefinition, ToolCallLog) 均已导入
+- **位置:** `app/main.py`, `app/database/session.py`
 
 **问题 4: 缺少模型导入**
 
