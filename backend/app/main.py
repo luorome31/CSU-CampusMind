@@ -28,8 +28,12 @@ from app.api.v1 import crawl, index, knowledge, knowledge_file, retrieve, comple
 async def lifespan(app: FastAPI):
     """Application lifespan: run startup and shutdown logic."""
     logger.info("Initializing database tables...")
-    create_db_and_tables()
-    logger.info(f"Database initialized: {settings.database_url}")
+    try:
+        create_db_and_tables()
+        logger.info(f"Database initialized: {settings.database_url}")
+    except Exception as e:
+        logger.error(f"Database initialization failed: {e}")
+        raise
     yield
     logger.info("Shutting down...")
 
@@ -43,6 +47,8 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
+    # NOTE: CORS misconfiguration - allow_origins=["*"] with allow_credentials=True is rejected by browsers
+    # This is a pre-existing issue to be addressed separately
     # CORS middleware
     app.add_middleware(
         CORSMiddleware,
