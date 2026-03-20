@@ -16,12 +16,12 @@ class JwcService:
     def __init__(self, session_manager: UnifiedSessionManager):
         self._session_manager = session_manager
 
-    def _get_client(self, user_id: str) -> JwcClient:
+    async def _get_client(self, user_id: str) -> JwcClient:
         """获取 JwcClient 实例"""
-        session = self._session_manager.get_jwc_session(user_id)
+        session = await self._session_manager.get_jwc_session(user_id)
         return JwcClient(session)
 
-    def get_grades(self, user_id: str, term: str = "") -> List[Grade]:
+    async def get_grades(self, user_id: str, term: str = "") -> List[Grade]:
         """
         查询成绩
 
@@ -32,10 +32,10 @@ class JwcService:
         Returns:
             成绩列表
         """
-        client = self._get_client(user_id)
+        client = await self._get_client(user_id)
         return client.get_grades(term)
 
-    def get_schedule(self, user_id: str, term: str, week: str = "0") -> tuple[List[ClassEntry], str]:
+    async def get_schedule(self, user_id: str, term: str, week: str = "0") -> tuple[List[ClassEntry], str]:
         """
         查询课表
 
@@ -47,15 +47,15 @@ class JwcService:
         Returns:
             (课表列表, 学期开始日期)
         """
-        client = self._get_client(user_id)
+        client = await self._get_client(user_id)
         return client.get_class_schedule(term, week)
 
-    def get_rank(self, user_id: str) -> List[RankEntry]:
+    async def get_rank(self, user_id: str) -> List[RankEntry]:
         """查询专业排名"""
-        client = self._get_client(user_id)
+        client = await self._get_client(user_id)
         return client.get_rank()
 
-    def get_level_exams(self, user_id: str) -> List[LevelExamEntry]:
+    async def get_level_exams(self, user_id: str) -> List[LevelExamEntry]:
         """查询等级考试成绩"""
-        client = self._get_client(user_id)
+        client = await self._get_client(user_id)
         return client.get_level_exams()
