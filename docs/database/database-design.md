@@ -147,7 +147,7 @@ CREATE TABLE users (
 ```sql
 CREATE TABLE dialogs (
     id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
+    user_id TEXT,
     agent_id TEXT,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
