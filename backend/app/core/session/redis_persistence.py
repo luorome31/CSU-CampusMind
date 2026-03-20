@@ -2,13 +2,15 @@
 Redis Session 持久化实现
 
 使用 Redis 替代 FileSessionPersistence 提供会话存储。
+使用全局 Redis 连接池单例。
 """
 import json
 import time
 from typing import Optional
 import requests
-import redis
+from redis.asyncio import Redis
 
+from app.api.dependencies import get_redis_client
 from .persistence import SessionPersistence
 
 
@@ -19,13 +21,13 @@ class RedisSessionPersistence(SessionPersistence):
     Key 格式: session:{user_id}:{subsystem}
     """
 
-    def __init__(self, redis_url: str = "redis://localhost:6379/0"):
-        self._redis = redis.from_url(redis_url, decode_responses=True)
+    def __init__(self, redis: Redis = Depends(get_redis_client)):
+        self._redis = redis
 
     def _key(self, user_id: str, subsystem: str) -> str:
         return f"session:{user_id}:{subsystem}"
 
-    def save(self, user_id: str, subsystem: str, session: requests.Session, ttl_seconds: int) -> None:
+    async def save(self, user_id: str, subsystem: str, session: requests.Session, ttl_seconds: int) -> None:
         cookies_dict = {}
         for cookie in session.cookies:
             cookies_dict[cookie.name] = {
@@ -39,10 +41,10 @@ class RedisSessionPersistence(SessionPersistence):
             "cookies": cookies_dict,
             "saved_at": time.time()
         })
-        self._redis.setex(self._key(user_id, subsystem), ttl_seconds, data)
+        await self._redis.setex(self._key(user_id, subsystem), ttl_seconds, data)
 
-    def load(self, user_id: str, subsystem: str) -> Optional[requests.Session]:
-        data = self._redis.get(self._key(user_id, subsystem))
+    async def load(self, user_id: str, subsystem: str) -> Optional[requests.Session]:
+        data = await self._redis.get(self._key(user_id, subsystem))
         if not data:
             return None
 
@@ -60,11 +62,13 @@ class RedisSessionPersistence(SessionPersistence):
 
         return session
 
-    def invalidate(self, user_id: str, subsystem: Optional[str] = None) -> None:
+    async def invalidate(self, user_id: str, subsystem: Optional[str] = None) -> None:
         if subsystem:
-            self._redis.delete(self._key(user_id, subsystem))
+            await self._redis.delete(self._key(user_id, subsystem))
         else:
             # 删除用户所有 session
-            keys = self._redis.keys(f"session:{user_id}:*")
+            keys = []
+            async for key in self._redis.scan_iter(f"session:{user_id}:*"):
+                keys.append(key)
             if keys:
-                self._redis.delete(*keys)
+                await self._redis.delete(*keys)
