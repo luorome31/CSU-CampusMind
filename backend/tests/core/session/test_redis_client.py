@@ -38,35 +38,41 @@ class TestRedisClient:
         """Test init_redis and close_redis flow"""
         # Create mocks
         mock_pool = MagicMock()
-        mock_client = MagicMock(spec=Redis)
-        mock_client.ping = AsyncMock()
-        mock_client.aclose = AsyncMock()
         mock_pool.disconnect = AsyncMock()
 
+        # Create a mock Redis client with async methods
+        mock_client = MagicMock()
+        mock_client.ping = AsyncMock()
+        mock_client.aclose = AsyncMock()
+
         with patch.object(redis_client, 'ConnectionPool') as MockPool:
-            MockPool.from_url.return_value = mock_pool
-            MockPool.from_url.return_value = mock_pool
+            with patch.object(redis_client, 'Redis') as MockRedis:
+                MockPool.from_url.return_value = mock_pool
+                MockRedis.return_value = mock_client
 
-            # Call init_redis
-            result = await redis_client.init_redis("redis://localhost:6379/0")
+                # Call init_redis
+                await redis_client.init_redis("redis://localhost:6379/0")
 
-            # Verify ConnectionPool.from_url was called
-            MockPool.from_url.assert_called_once_with("redis://localhost:6379/0", decode_responses=True)
+                # Verify ConnectionPool.from_url was called
+                MockPool.from_url.assert_called_once_with("redis://localhost:6379/0", decode_responses=True)
 
-            # Verify ping was called
-            mock_client.ping.assert_called_once()
+                # Verify Redis was instantiated with the pool
+                MockRedis.assert_called_once_with(connection_pool=mock_pool)
 
-            # Verify globals are set
-            assert redis_client._redis_client is not None
-            assert redis_client._redis_pool is not None
+                # Verify ping was called
+                mock_client.ping.assert_called_once()
 
-            # Call close_redis
-            await redis_client.close_redis()
+                # Verify globals are set
+                assert redis_client._redis_client is mock_client
+                assert redis_client._redis_pool is mock_pool
 
-            # Verify cleanup methods were called
-            mock_client.aclose.assert_called_once()
-            mock_pool.disconnect.assert_called_once()
+                # Call close_redis
+                await redis_client.close_redis()
 
-            # Verify globals are cleared
-            assert redis_client._redis_client is None
-            assert redis_client._redis_pool is None
+                # Verify cleanup methods were called
+                mock_client.aclose.assert_called_once()
+                mock_pool.disconnect.assert_called_once()
+
+                # Verify globals are cleared
+                assert redis_client._redis_client is None
+                assert redis_client._redis_pool is None
