@@ -211,7 +211,8 @@ async def generate_stream(
         elif role == "assistant":
             messages.append(AIMessage(content=content))
 
-    messages.append(HumanMessage(content=message))
+    # Note: current user message already included in histories from cache
+    # so no need to append again
 
     start_time = time.time()
 
