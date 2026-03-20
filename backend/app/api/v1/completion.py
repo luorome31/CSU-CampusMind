@@ -21,7 +21,7 @@ from app.core.agents.react_agent import ReactAgent, StreamOutput
 from app.core.tools.rag_tool import create_rag_tool
 
 # Import authentication dependency
-from app.api.dependencies import get_optional_user
+from app.api.dependencies import get_optional_user, get_redis_client
 from app.core.agents.factory import get_agent_factory, initialize_agent_factory
 from app.core.session.factory import get_session_manager
 
@@ -32,12 +32,21 @@ from langchain_openai import ChatOpenAI
 from app.repositories.dialog_repository import DialogRepository
 from app.services.history.cache import HistoryCacheService
 
+from redis.asyncio import Redis
+
 
 router = APIRouter(tags=["Completion"])
 
 
 # Re-export for backwards compatibility with existing Depends() calls
 get_db_session = async_session_dependency
+
+
+async def get_history_cache_service(
+    redis: Redis = Depends(get_redis_client),
+) -> HistoryCacheService:
+    """FastAPI dependency for HistoryCacheService."""
+    return HistoryCacheService(redis=redis)
 
 
 class WatchedStreamingResponse(StreamingResponse):
@@ -161,7 +170,8 @@ async def generate_stream(
     knowledge_ids: List[str],
     session: AsyncSession,
     dialog_id: str,
-    model: str
+    model: str,
+    cache_service: HistoryCacheService,
 ) -> AsyncGenerator[str, None]:
     """
     Generate streaming response with SSE format and save history.
@@ -186,7 +196,6 @@ async def generate_stream(
 
     # Build messages
     # Fetch history and prepend to messages
-    cache_service = HistoryCacheService()
     histories = await cache_service.get_history(dialog_id)
 
     messages = []
@@ -259,6 +268,7 @@ async def completion_stream(
     request: CompletionRequest,
     current_user: Optional[dict] = Depends(get_optional_user),  # 改为可选认证
     db: AsyncSession = Depends(async_session_dependency),
+    cache_service: HistoryCacheService = Depends(get_history_cache_service),
 ):
     """
     Streaming completion endpoint with RAG integration
@@ -330,7 +340,8 @@ async def completion_stream(
                 knowledge_ids=request.knowledge_ids,
                 session=db,
                 dialog_id=dialog.id,
-                model=request.model
+                model=request.model,
+                cache_service=cache_service,
             ),
             media_type="text/event-stream",
             headers={"X-Dialog-ID": dialog.id}
