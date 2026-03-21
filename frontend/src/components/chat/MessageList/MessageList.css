@@ -1,0 +1,9 @@
+/* src/components/chat/MessageList/MessageList.css */
+
+.message-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+}
