@@ -1,6 +1,8 @@
 // src/api/chat.ts
 import { parseSSELines, type SSEEvent } from '../utils/parseSSELines';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+
 export interface ChatStreamOptions {
   dialogId?: string;
   knowledgeIds: string[];
@@ -33,7 +35,7 @@ export function createChatStream(
   return new ReadableStream<ChatStreamResult>({
     async start(controller) {
       try {
-        const response = await fetch('/api/v1/completion/stream', {
+        const response = await fetch(`${BASE_URL}/completion/stream`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
