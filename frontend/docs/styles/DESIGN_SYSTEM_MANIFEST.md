@@ -162,22 +162,37 @@ You are building components for CampusMind, a scientific productivity platform. 
 
 ```
 frontend/
-├── styles/tokens/
-│   ├── colors.css      # Color system
-│   ├── spacing.css     # Spacing scale
-│   ├── typography.css  # Type scale
-│   └── elevation.css   # Shadows & motion
-├── components/ui/
-│   ├── Button/
-│   │   ├── index.tsx
-│   │   ├── types.ts
-│   │   └── styles.css
-│   ├── Input/
-│   ├── Card/
-│   ├── Badge/
-│   └── Chip/
-└── playground/
-    └── Playground.tsx  # Interactive preview
+├── index.html              # Business app entry
+├── playground.html         # Design system preview entry
+├── vite.config.ts         # Multi-entry Vite config
+├── package.json
+│   ├── npm run dev        # Business app (port 5173)
+│   └── npm run playground # Design system (port 5174/playground.html)
+├── src/
+│   ├── main.tsx           # Business app bootstrap
+│   ├── App.tsx            # Business app root component
+│   ├── components/ui/     # Design system components
+│   │   ├── Button/
+│   │   │   ├── index.tsx
+│   │   │   ├── types.ts
+│   │   │   └── styles.css
+│   │   ├── Input/
+│   │   ├── Card/
+│   │   ├── Badge/
+│   │   ├── Chip/
+│   │   └── index.ts       # Unified exports
+│   ├── styles/tokens/     # Design tokens
+│   │   ├── colors.css
+│   │   ├── spacing.css
+│   │   ├── typography.css
+│   │   └── elevation.css
+│   └── playground/
+│       ├── main.tsx       # Playground bootstrap
+│       ├── Playground.tsx  # Main playground component
+│       ├── ComponentsShowcase.tsx
+│       └── ColorPalette.tsx
+└── docs/styles/
+    └── DESIGN_SYSTEM_MANIFEST.md
 ```
 
 ---
