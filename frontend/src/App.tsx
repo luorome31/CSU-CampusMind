@@ -1,20 +1,17 @@
-import { useState } from 'react'
+// frontend/src/App.tsx
+import { useEffect } from 'react';
+import { RouterProvider } from 'react-router-dom';
+import { router } from './routes';
+import { authStore } from './features/auth/authStore';
 
-function App() {
-  const [count, setCount] = useState(0)
+export function App() {
+  const initAuth = authStore((s) => s.initAuth);
 
-  return (
-    <div style={{ padding: '2rem', fontFamily: 'system-ui' }}>
-      <h1>CampusMind Business App</h1>
-      <p>Your actual application code goes here.</p>
-      <button onClick={() => setCount(c => c + 1)}>
-        Count: {count}
-      </button>
-      <div style={{ marginTop: '2rem', padding: '1rem', background: '#f5f5f5', borderRadius: '8px' }}>
-        <p><strong>Design System:</strong> Run <code>npm run playground</code> to preview the design system.</p>
-      </div>
-    </div>
-  )
+  useEffect(() => {
+    initAuth();
+  }, [initAuth]);
+
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;
