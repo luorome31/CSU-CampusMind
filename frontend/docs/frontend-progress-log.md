@@ -119,6 +119,77 @@ Phase 1 实现过程中发现多处未遵循设计系统规范的实现，已全
 
 ---
 
+## 2026-03-21 Phase 2：流式聊天
+
+### 2.1 目标
+
+完成 Phase 2 的流式聊天功能：
+- SSE 流式输出
+- 工具调用事件卡片
+- 消息历史加载
+- 知识库选择
+
+### 2.2 完成的功能
+
+#### 依赖安装
+
+| 包 | 版本 | 用途 |
+|----|------|------|
+| `react-markdown` | ^10.x | Markdown 渲染 |
+| `remark-gfm` | ^4.x | GitHub Flavored Markdown |
+
+#### 文件结构变更
+
+新增文件：
+- `src/utils/parseSSELines.ts` - SSE 行解析工具
+- `src/api/chat.ts` - SSE stream API
+- `src/api/dialog.ts` - Dialog history API
+- `src/features/chat/useChatStream.ts` - SSE Hook
+- `src/components/chat/EmptyState/` - 空状态组件
+- `src/components/chat/KnowledgeSelector/` - 知识库选择
+- `src/components/chat/StreamingText/` - 流式文字
+- `src/components/chat/ToolEventCard/` - 工具事件卡片
+- `src/components/chat/MessageBubble/` - 消息气泡
+- `src/components/chat/MessageList/` - 消息列表
+- `src/components/chat/ChatInput/` - 输入框
+- `src/features/chat/ChatPage.css` - 聊天页样式
+
+修改文件：
+- `src/features/chat/chatStore.ts` - 完整状态管理
+- `src/features/chat/ChatPage.tsx` - 集成所有组件
+- `package.json` - 新增依赖
+
+### 2.3 设计决策
+
+- 消息气泡：双色对称（用户深色右对齐，助手浅色左对齐）
+- 知识库选择：聊前选择模式
+- 流式交互：流式中禁用发送
+- 工具事件：可展开详情卡片
+- 空状态：Logo + 系统介绍
+- Markdown：react-markdown + remark-gfm
+
+### 2.4 Git 提交记录
+
+| 提交 | 描述 |
+|------|------|
+| `b2a766e` | 重构 ChatPage，集成所有聊天组件 |
+| `5d20644` | 添加 ChatInput 组件 |
+| `79e3f17` | 添加 MessageList 组件 |
+| `6699226` | 添加 MessageBubble 组件 |
+| `c8ddd14` | 添加 ToolEventCard 组件 |
+| `c35842e` | 添加 StreamingText 组件 |
+| `e8cb773` | 添加 KnowledgeSelector 组件 |
+| `ed17fdd` | 添加 EmptyState 组件 |
+| `897cce6` | 添加 useChatStream Hook |
+| `532e301` | 添加 chat API 层（SSE stream + dialog history） |
+| `4cbfc00` | 重写 chatStore，包含完整状态管理 |
+| `20e8638` | 添加 SSE 行解析工具 |
+| `a49a4e5` | add react-markdown and remark-gfm for markdown rendering |
+| `becf738` | 添加 Phase 2 聊天模块实现计划 |
+| `37f83fd` | 添加 Phase 2 聊天模块设计方案 |
+
+---
+
 ## 更新日志
 
 | 日期 | 版本 | 更新内容 |
