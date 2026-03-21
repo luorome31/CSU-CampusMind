@@ -6,7 +6,7 @@ function getToken(): string | null {
 }
 
 class ApiClient {
-  private baseUrl = '/api/v1';
+  private baseUrl = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const token = getToken();

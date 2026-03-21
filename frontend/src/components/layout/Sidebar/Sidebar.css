@@ -1,22 +1,23 @@
 /* frontend/src/components/layout/Sidebar/Sidebar.css */
 
+/* Use card-glass for the warm glassmorphism effect */
 .sidebar {
   position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
   width: var(--sidebar-width, 260px);
-  background: var(--color-bg-surface);
-  backdrop-filter: blur(var(--glass-blur-sm));
-  -webkit-backdrop-filter: blur(var(--glass-blur-sm));
-  border-right: 1px solid var(--color-border-subtle);
+  background: var(--glass-surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   z-index: var(--z-sticky);
 }
 
 .sidebar-header {
-  padding: var(--space-6) var(--space-6);
+  padding: var(--space-6);
   border-bottom: 1px solid var(--color-border-subtle);
 }
 

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authStore } from './authStore';
+import { Card, CardBody } from '../../components/ui';
 import { Button } from '../../components/ui';
 import { Input } from '../../components/ui';
+import { authStore } from './authStore';
 import './LoginPage.css';
 
 export function LoginPage() {
@@ -27,32 +28,37 @@ export function LoginPage() {
 
   return (
     <div className="login-page">
-      <form className="login-form" onSubmit={handleSubmit}>
-        <h1 className="login-title">Sign In</h1>
+      <Card variant="auth" padding="lg" className="login-card">
+        <CardBody>
+          <h1 className="login-title">Sign In</h1>
+          <p className="login-subtitle">Welcome back to CampusMind</p>
 
-        <Input
-          label="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Enter username"
-          required
-        />
+          <form className="login-form" onSubmit={handleSubmit}>
+            <Input
+              label="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter username"
+              required
+            />
 
-        <Input
-          label="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter password"
-          required
-        />
+            <Input
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              required
+            />
 
-        {error && <p className="login-error">{error}</p>}
+            {error && <p className="login-error">{error}</p>}
 
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? 'Signing in...' : 'Sign In'}
-        </Button>
-      </form>
+            <Button type="submit" disabled={isLoading} fullWidth>
+              {isLoading ? 'Signing in...' : 'Sign In'}
+            </Button>
+          </form>
+        </CardBody>
+      </Card>
     </div>
   );
 }
