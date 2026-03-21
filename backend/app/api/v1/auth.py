@@ -6,14 +6,17 @@ from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Depends, status
 from pydantic import BaseModel
+from sqlalchemy.exc import IntegrityError
 
 from app.config import settings
 from app.core.security import jwt_manager
 from app.core.session.manager import UnifiedSessionManager, NeedReLoginError
 from app.core.session.factory import get_session_manager
 from app.core.session.rate_limiter import LoginRateLimiter
+from app.core.session.cas_login import AccountLockedError, CASLoginError
 from app.api.dependencies import get_current_user
-from app.database.session import async_session_dependency
+from app.database.session import async_session_maker
+from app.database.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -24,19 +27,25 @@ router = APIRouter(prefix="/auth", tags=["认证"])
 
 async def _ensure_user_exists(user_id: str) -> None:
     """
-    如果用户不存在则创建
+    如果用户不存在则创建。使用 INSERT ... ON CONFLICT 语义：
+    若并发请求同时创建同一用户，捕获 IntegrityError 忽略即可。
 
     Args:
         user_id: 用户 ID (CAS username)
     """
-    from app.database.models import User
-
-    session = async_session_dependency()
-    existing = await session.get(User, user_id)
-    if not existing:
-        user = User(id=user_id, username=user_id)
-        session.add(user)
-        await session.commit()
+    async with async_session_maker() as session:
+        try:
+            existing = await session.get(User, user_id)
+            if not existing:
+                user = User(id=user_id, username=user_id)
+                session.add(user)
+                await session.commit()
+        except IntegrityError:
+            # 并发请求已创建该用户，忽略主键冲突
+            await session.rollback()
+        except Exception:
+            await session.rollback()
+            raise
 
 
 # ============ Request/Response Models ============
@@ -97,8 +106,8 @@ async def login(request: LoginRequest):
         )
     except AccountLockedError as e:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"登录失败: {str(e)}"
+            status_code=status.HTTP_423_LOCKED,
+            detail=f"账号已被锁定: {str(e)}"
         )
     except CASLoginError as e:
         logger.error(f"CAS login failed for {request.username}: {e}")
@@ -122,8 +131,7 @@ async def login(request: LoginRequest):
     )
 
 
-# 导入异常类供本模块使用
-from app.core.session.cas_login import AccountLockedError, CASLoginError
+
 
 
 @router.post("/logout")

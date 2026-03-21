@@ -37,11 +37,6 @@ from redis.asyncio import Redis
 
 router = APIRouter(tags=["Completion"])
 
-
-# Re-export for backwards compatibility with existing Depends() calls
-get_db_session = async_session_dependency
-
-
 async def get_history_cache_service(
     redis: Redis = Depends(get_redis_client),
 ) -> HistoryCacheService:
