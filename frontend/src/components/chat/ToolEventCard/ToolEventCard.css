@@ -1,0 +1,88 @@
+/* src/components/chat/ToolEventCard/ToolEventCard.css */
+
+.tool-event-card {
+  border-left: 3px solid var(--color-accent);
+  background: var(--color-bg-surface);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  margin-top: var(--space-2);
+  overflow: hidden;
+}
+
+.tool-event-start {
+  border-left-color: var(--color-info);
+}
+
+.tool-event-end {
+  border-left-color: var(--color-success);
+}
+
+.tool-event-error {
+  border-left-color: var(--color-error);
+}
+
+.tool-event-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.tool-event-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tool-event-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+}
+
+.tool-event-status {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.tool-event-chevron {
+  color: var(--color-text-tertiary);
+  transition: transform var(--duration-fast);
+}
+
+.tool-event-chevron.expanded {
+  transform: rotate(180deg);
+}
+
+.tool-event-details {
+  padding: var(--space-2) var(--space-3);
+  padding-top: 0;
+}
+
+.tool-event-message {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.tool-icon-loading {
+  animation: spin 1s linear infinite;
+  color: var(--color-info);
+}
+
+.tool-icon-success {
+  color: var(--color-success);
+}
+
+.tool-icon-error {
+  color: var(--color-error);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
