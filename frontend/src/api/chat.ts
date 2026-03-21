@@ -1,5 +1,4 @@
 // src/api/chat.ts
-import { apiClient } from './client';
 import { parseSSELines, type SSEEvent } from '../utils/parseSSELines';
 
 export interface ChatStreamOptions {

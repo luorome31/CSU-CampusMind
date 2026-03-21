@@ -2,14 +2,12 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { StreamingText } from '../StreamingText';
 import { ToolEventCard } from '../ToolEventCard';
 import type { ChatMessage } from '../../../features/chat/chatStore';
 import './MessageBubble.css';
 
 interface MessageBubbleProps {
   message: ChatMessage;
-  isStreaming?: boolean;
 }
 
 /**
@@ -19,7 +17,6 @@ interface MessageBubbleProps {
  */
 export const MessageBubble: React.FC<MessageBubbleProps> = ({
   message,
-  isStreaming = false,
 }) => {
   const isUser = message.role === 'user';
 

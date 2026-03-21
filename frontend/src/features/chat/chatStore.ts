@@ -37,12 +37,7 @@ interface ChatActions {
 
 type ChatStore = ChatState & ChatActions;
 
-let messageIdCounter = 0;
-function generateId(): string {
-  return `msg_${Date.now()}_${++messageIdCounter}`;
-}
-
-export const chatStore = create<ChatStore>((set, get) => ({
+export const chatStore = create<ChatStore>((set) => ({
   currentDialogId: null,
   currentKnowledgeIds: [],
   messages: [],

@@ -1,11 +1,11 @@
 // src/features/chat/ChatPage.tsx
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { EmptyState } from '../../components/chat/EmptyState';
 import { KnowledgeSelector } from '../../components/chat/KnowledgeSelector';
 import { MessageList } from '../../components/chat/MessageList';
 import { ChatInput } from '../../components/chat/ChatInput';
 import { useChatStream } from './useChatStream';
-import { useChatStore } from './chatStore';
+import { chatStore } from './chatStore';
 import './ChatPage.css';
 
 // Mock knowledge bases for demo - replace with API call
@@ -21,7 +21,7 @@ const MOCK_KNOWLEDGE_BASES = [
  */
 export function ChatPage() {
   const { sendMessage, isStreaming, messages } = useChatStream();
-  const currentKnowledgeIds = useChatStore((s) => s.currentKnowledgeIds);
+  const currentKnowledgeIds = chatStore((s) => s.currentKnowledgeIds);
 
   const handleSend = useCallback(
     (content: string) => {

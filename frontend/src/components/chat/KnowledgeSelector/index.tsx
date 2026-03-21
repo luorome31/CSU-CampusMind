@@ -2,7 +2,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { Chip } from '../../ui/Chip';
-import { useChatStore } from '../../../features/chat/chatStore';
+import { chatStore } from '../../../features/chat/chatStore';
 import './KnowledgeSelector.css';
 
 interface KnowledgeBase {
@@ -21,19 +21,15 @@ interface KnowledgeSelectorProps {
 export const KnowledgeSelector: React.FC<KnowledgeSelectorProps> = ({
   knowledgeBases,
 }) => {
-  const currentKnowledgeIds = useChatStore((s) => s.currentKnowledgeIds);
-  const setCurrentKnowledgeIds = useChatStore((s) => s.setCurrentKnowledgeIds);
+  const currentKnowledgeIds = chatStore((s) => s.currentKnowledgeIds);
+  const setCurrentKnowledgeIds = chatStore((s) => s.setCurrentKnowledgeIds);
 
   const handleToggle = (kbId: string) => {
     if (currentKnowledgeIds.includes(kbId)) {
-      setCurrentKnowledgeIds(currentKnowledgeIds.filter((id) => id !== kbId));
+      setCurrentKnowledgeIds(currentKnowledgeIds.filter((id: string) => id !== kbId));
     } else {
       setCurrentKnowledgeIds([...currentKnowledgeIds, kbId]);
     }
-  };
-
-  const handleRemove = (kbId: string) => {
-    setCurrentKnowledgeIds(currentKnowledgeIds.filter((id) => id !== kbId));
   };
 
   return (

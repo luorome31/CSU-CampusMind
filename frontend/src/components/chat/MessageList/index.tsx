@@ -26,18 +26,12 @@ export const MessageList: React.FC<MessageListProps> = ({
 
   return (
     <div className="message-list">
-      {messages.map((msg) => {
-        const isLastAssistant =
-          msg.role === 'assistant' &&
-          messages[messages.length - 1].id === msg.id;
-        return (
-          <MessageBubble
-            key={msg.id}
-            message={msg}
-            isStreaming={isLastAssistant && isStreaming}
-          />
-        );
-      })}
+      {messages.map((msg) => (
+        <MessageBubble
+          key={msg.id}
+          message={msg}
+        />
+      ))}
       <div ref={bottomRef} />
     </div>
   );
