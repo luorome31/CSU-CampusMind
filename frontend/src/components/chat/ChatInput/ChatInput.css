@@ -1,0 +1,46 @@
+/* src/components/chat/ChatInput/ChatInput.css */
+
+.chat-input-form {
+  padding: var(--space-4);
+  background: var(--color-bg-surface);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.chat-input-wrapper {
+  display: flex;
+  gap: var(--space-2);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.chat-input {
+  flex: 1;
+  height: var(--input-height);
+  padding: 0 var(--space-4);
+  font-size: var(--text-base);
+  font-family: var(--font-sans);
+  color: var(--color-text-primary);
+  background: var(--color-bg-inset);
+  border: none;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-inset);
+  outline: none;
+  transition: box-shadow var(--duration-fast);
+}
+
+.chat-input:focus {
+  box-shadow: var(--shadow-inset-focus);
+}
+
+.chat-input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.chat-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.chat-input-send {
+  flex-shrink: 0;
+}
