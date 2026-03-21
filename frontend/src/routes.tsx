@@ -9,15 +9,9 @@ import { Sidebar } from './components/layout/Sidebar/Sidebar';
 
 function LayoutWithSidebar() {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
+    <div className="layout-sidebar">
       <Sidebar />
-      <main
-        style={{
-          marginLeft: 'var(--sidebar-width, 260px)',
-          flex: 1,
-          padding: 'var(--spacing-xl, 2rem)',
-        }}
-      >
+      <main className="layout-main">
         <Outlet />
       </main>
     </div>
@@ -27,9 +21,9 @@ function LayoutWithSidebar() {
 // Placeholder pages (empty for Phase 1, filled in later phases)
 function PlaceholderPage({ title }: { title: string }) {
   return (
-    <div style={{ color: 'var(--color-text-secondary)' }}>
-      <h2 style={{ marginBottom: 'var(--spacing-md, 1rem)' }}>{title}</h2>
-      <p>Component coming in a later phase.</p>
+    <div className="placeholder-page">
+      <h2 className="placeholder-title">{title}</h2>
+      <p className="placeholder-body">Component coming in a later phase.</p>
     </div>
   );
 }
