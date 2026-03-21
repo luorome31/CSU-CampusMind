@@ -82,16 +82,16 @@
 
 /* Error state */
 .input-error {
-  border-color: #cf222e;
+  border-color: var(--color-error);
 }
 
 .input-error:focus {
-  box-shadow: var(--shadow-inset-focus), 0 0 0 2px rgba(207, 34, 46, 0.2);
+  box-shadow: var(--shadow-inset-focus), 0 0 0 2px var(--color-error-bg);
 }
 
 .input-error-message {
   font-size: var(--text-xs);
-  color: #cf222e;
+  color: var(--color-error);
 }
 
 .input-hint {

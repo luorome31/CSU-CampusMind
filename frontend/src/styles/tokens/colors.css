@@ -1,57 +1,118 @@
 /**
  * Design Tokens: Color System
- * Based on extracted CSS from deepscientist.cc
- * Semantic naming for warm minimal aesthetic
+ * Theme: Warm Cream + Matte Terracotta Accent
+ * Inspired by Claude Desktop's refined, warm aesthetic
  */
 
 :root {
   /* === Background System === */
-  --color-bg-base: #f7f2ea;
-  --color-bg-surface: rgba(255, 255, 255, 0.82);
-  --color-bg-elevated: rgba(255, 255, 255, 0.92);
-  --color-bg-inset: #eee6dc;
-  --color-bg-overlay: rgba(255, 255, 255, 0.6);
-  --color-bg-overlay-strong: rgba(255, 255, 255, 0.72);
+  --bg:           #F4F3EE;
+  --bg-card:      #FAF9F5;
+  --bg-glass:     rgba(244, 243, 238, 0.92);
+
+  /* === Accent System (Matte Terracotta, desaturated) === */
+  --accent:       #B5846E;
+  --accent-hover: #A27460;
+  --accent-light: rgba(181, 132, 110, 0.08);
 
   /* === Text System === */
-  --color-text-primary: #2d2a26;
-  --color-text-secondary: #5d5a55;
-  --color-text-tertiary: #7e8b97;
-  --color-text-muted: rgba(93, 90, 85, 0.7);
+  --text:         #2D2B28;
+  --text-light:   #6B6864;
+  --text-muted:   #9B9793;
 
-  /* === Accent System === */
-  --color-accent: #9fb1c2;
-  --color-accent-light: #c7ad96;
-  --color-accent-hover: #d7c6ae;
-  --color-accent-bg: rgba(159, 177, 194, 0.2);
-  --color-accent-bg-hover: rgba(159, 177, 194, 0.26);
+  /* === Border & Shadow === */
+  --border:       rgba(177, 173, 161, 0.28);
+  --shadow:       rgba(45, 43, 40, 0.07);
 
-  /* === Border System === */
-  --color-border: rgba(45, 42, 38, 0.12);
-  --color-border-hover: rgba(159, 177, 194, 0.5);
-  --color-border-subtle: rgba(45, 42, 38, 0.08);
+  /* === Status Colors === */
+  --green:        #7BAE7F;
+  --green-rgb:    123, 174, 127;
+  --coral:        #C4917E;
+
+  /* === Sidebar === */
+  --sidebar-bg:   #EDEAE2;
+
+  /* === Note/Card === */
+  --note-bg:     #FAF5E9;
+  --note-border: rgba(180, 160, 130, 0.15);
+
+  /* === Chat Specific === */
+  --assistant-text:    #2D2B28;
+  --mood-bg:      rgba(181, 132, 110, 0.05);
+  --mood-text:    #8C6A58;
+  --mood-border:  rgba(181, 132, 110, 0.16);
+  --tool-bg:      rgba(177, 173, 161, 0.08);
+  --tool-text:    #6B6864;
+  --user-bg:      rgba(0, 0, 0, 0.035);
+  --drop-overlay-bg: rgba(244, 243, 238, 0.85);
+  --attach-bg:    rgba(0, 0, 0, 0.04);
+
+  /* === Auxiliary Colors === */
+  --accent-rgb:   181, 132, 110;
+  --coral-rgb:    196, 145, 126;
+  --danger:       #8B3A3A;
+  --danger-rgb:   139, 58, 58;
+  --overlay-subtle: rgba(0, 0, 0, 0.03);
+  --overlay-light:  rgba(0, 0, 0, 0.05);
+  --overlay-medium: rgba(0, 0, 0, 0.08);
+  --overlay-strong: rgba(0, 0, 0, 0.15);
+
+  /* === Semantic Aliases (for component compatibility) === */
+  --color-bg-base: var(--bg);
+  --color-bg-surface: var(--bg-card);
+  --color-bg-elevated: rgba(255, 255, 255, 0.92);
+  --color-bg-inset: #E8E5DD;
+  --color-bg-overlay: rgba(244, 243, 238, 0.6);
+  --color-bg-overlay-strong: rgba(244, 243, 238, 0.72);
+
+  --color-text-primary: var(--text);
+  --color-text-secondary: var(--text-light);
+  --color-text-tertiary: var(--text-muted);
+  --color-text-muted: rgba(107, 104, 100, 0.7);
+
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-bg: var(--mood-bg);
+  --color-accent-bg-hover: rgba(181, 132, 110, 0.1);
+
+  --color-border: var(--border);
+  --color-border-hover: rgba(181, 132, 110, 0.5);
+  --color-border-subtle: rgba(45, 43, 40, 0.08);
 
   /* === Shadow System === */
-  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-  --shadow-card-hover: 0 8px 18px rgba(45, 42, 38, 0.12);
-  --shadow-elevated: 0 12px 28px -14px rgba(45, 42, 38, 0.55);
-  --shadow-inset: inset 2px 2px 6px rgba(150, 140, 128, 0.15), inset -2px -2px 6px rgba(255, 255, 255, 0.6);
-  --shadow-inset-focus: inset 2px 2px 6px rgba(150, 140, 128, 0.18), inset -2px -2px 6px rgba(255, 255, 255, 0.7), 0 0 0 2px rgba(159, 177, 194, 0.35);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 8px 18px rgba(45, 43, 40, 0.1);
+  --shadow-elevated: 0 12px 28px -14px rgba(45, 43, 40, 0.45);
+  --shadow-inset: inset 2px 2px 6px rgba(150, 140, 128, 0.12), inset -2px -2px 6px rgba(255, 255, 255, 0.6);
+  --shadow-inset-focus: inset 2px 2px 6px rgba(150, 140, 128, 0.15), inset -2px -2px 6px rgba(255, 255, 255, 0.7), 0 0 0 2px rgba(181, 132, 110, 0.3);
 
   /* === Glassmorphism === */
   --glass-blur: blur(24px);
   --glass-blur-sm: blur(4px);
-  --glass-surface: rgba(255, 255, 255, 0.65);
-}
+  --glass-surface: rgba(244, 243, 238, 0.75);
 
-/* Semantic aliases for component use */
-:root {
-  --bg-primary: var(--color-bg-base);
-  --bg-secondary: var(--color-bg-surface);
+  /* === Legacy Semantic Aliases === */
+  --bg-primary: var(--bg);
+  --bg-secondary: var(--bg-card);
   --bg-tertiary: var(--color-bg-inset);
-  --text-primary: var(--color-text-primary);
-  --text-secondary: var(--color-text-secondary);
-  --text-tertiary: var(--color-text-tertiary);
-  --border-default: var(--color-border);
-  --accent-default: var(--color-accent);
+  --text-primary: var(--text);
+  --text-secondary: var(--text-light);
+  --text-tertiary: var(--text-muted);
+  --border-default: var(--border);
+  --accent-default: var(--accent);
+
+  /* === Status Colors (for Badge, Input error states) === */
+  --color-success: #1a7f37;
+  --color-success-bg: rgba(26, 127, 55, 0.1);
+  --color-success-border: rgba(26, 127, 55, 0.2);
+  --color-error: #cf222e;
+  --color-error-bg: rgba(207, 34, 46, 0.1);
+  --color-error-border: rgba(207, 34, 46, 0.2);
+  --color-warning: #d29922;
+  --color-warning-bg: rgba(210, 153, 34, 0.1);
+  --color-info: #0969da;
+
+  /* === Select Arrow === */
+  --select-arrow: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239B9793' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
 }

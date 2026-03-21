@@ -35,11 +35,11 @@
 }
 
 .login-error {
-  color: #dc2626;
+  color: var(--color-error);
   font-size: var(--text-sm);
   padding: var(--space-2) var(--space-3);
-  background: rgba(220, 38, 38, 0.08);
+  background: var(--color-error-bg);
   border-radius: var(--radius-sm);
-  border-left: 3px solid #dc2626;
+  border-left: 3px solid var(--color-error);
   margin: 0;
 }

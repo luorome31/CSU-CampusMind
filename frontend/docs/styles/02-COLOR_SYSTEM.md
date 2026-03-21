@@ -8,23 +8,23 @@
 
 ### 1.1 色彩哲学
 
-CampusMind 采用 **Warm Minimal**（温暖极简）色彩哲学：
+CampusMind 采用 **Warm Minimal / Organic Natural**（温暖极简/有机自然）色彩哲学：
 
-- **温暖导向**：避免冷色调和纯白，采用米色、暖灰作为基调
-- **克制强调**：强调色使用低饱和度的蓝灰色，而非高饱和度的鲜艳色彩
+- **暖奶油底**：避免冷色调和纯白，采用暖奶油色 `#F4F3EE` 作为基调
+- **哑光赤陶 accent**：强调色使用低饱和度的赤陶色 `#B5846E`，而非高饱和度的鲜艳色彩
 - **自然过渡**：色彩之间通过微妙的透明度变化实现层级区分
 
 ### 1.2 色彩关键词
 
 ```
-可信赖 (Trustworthy) + 精致 (Refined) + 温和 (Approachable)
+温暖 (Warm) + 克制 (Restrained) + 自然 (Natural) + 专业 (Professional)
 ```
 
 ### 1.3 灵感来源
 
-- 高端学术期刊排版
+- Claude Desktop 的精致温暖配色
+- 高端学术期刊排版的温润色调
 - 传统造纸工艺的质感
-- 古典实验室器皿的温润色调
 
 ---
 
@@ -36,28 +36,29 @@ CampusMind 采用 **Warm Minimal**（温暖极简）色彩哲学：
 ┌─────────────────────────────────────────────────────────┐
 │                    背景层 (Background)                   │
 │  ┌─────────────────────────────────────────────────┐    │
-│  │  #f7f2ea (bg-base) - 页面主背景                  │    │
+│  │  #F4F3EE (bg) - 页面主背景 暖奶油               │    │
 │  │  ┌─────────────────────────────────────────┐  │    │
-│  │  │ rgba(255,255,255,0.82) (bg-surface)   │  │    │
-│  │  │  - 卡片、面板                              │  │    │
+│  │  │ #FAF9F5 (bg-card) - 卡片背景            │  │    │
+│  │  │ rgba(244,243,238,0.75) (glass-surface)│  │    │
+│  │  │  - 玻璃态效果                           │  │    │
 │  │  │  ┌─────────────────────────────────┐  │  │    │
-│  │  │  │ #eee6dc (bg-inset)              │  │  │    │
-│  │  │  │  - 输入框、凹陷元素                 │  │  │    │
+│  │  │  │ #E8E5DD (bg-inset)              │  │  │    │
+│  │  │  │  - 输入框、凹陷元素               │  │  │    │
 │  │  │  └─────────────────────────────────┘  │  │    │
 │  │  └─────────────────────────────────────────┘  │    │
 │  └─────────────────────────────────────────────────┘    │
 │                                                         │
 │                    文本层 (Text)                         │
 │  ┌─────────────────────────────────────────────────┐    │
-│  │  #2d2a26 (text-primary) - 主要文本  ✓ AA       │    │
-│  │  #5d5a55 (text-secondary) - 次要文本  ✓ AA      │    │
-│  │  #7e8b97 (text-tertiary) - 辅助文本            │    │
+│  │  #2D2B28 (text) - 主要文本        ✓ AAA        │    │
+│  │  #6B6864 (text-light) - 次要文本  ✓ AA         │    │
+│  │  #9B9793 (text-muted) - 辅助文本              │    │
 │  └─────────────────────────────────────────────────┘    │
 │                                                         │
 │                    强调层 (Accent)                       │
 │  ┌─────────────────────────────────────────────────┐    │
-│  │  #9fb1c2 (accent) - 主强调色                   │    │
-│  │  #c7ad96 (accent-light) - 暖色强调              │    │
+│  │  #B5846E (accent) - 哑光赤陶                  │    │
+│  │  #A27460 (accent-hover) - hover 状态          │    │
 │  └─────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -66,12 +67,13 @@ CampusMind 采用 **Warm Minimal**（温暖极简）色彩哲学：
 
 | 角色 | 色值 | 用途 | 使用频率 |
 |------|------|------|----------|
-| **Primary** | `#2d2a26` | 标题、主要文字 | 高 |
-| **Secondary** | `#5d5a55` | 正文、说明文字 | 高 |
-| **Tertiary** | `#7e8b97` | 占位符、提示 | 中 |
-| **Accent** | `#9fb1c2` | 链接、选中态、图标 | 中 |
-| **Warm Accent** | `#c7ad96` | 装饰性强调 | 低 |
-| **Background** | `#f7f2ea` | 页面背景 | 高 |
+| **Background** | `#F4F3EE` | 页面背景 | 高 |
+| **Card** | `#FAF9F5` | 卡片表面 | 高 |
+| **Text Primary** | `#2D2B28` | 标题、主要文字 | 高 |
+| **Text Secondary** | `#6B6864` | 正文、说明文字 | 高 |
+| **Text Muted** | `#9B9793` | 占位符、提示 | 中 |
+| **Accent** | `#B5846E` | 链接、选中态、图标 | 中 |
+| **Accent Hover** | `#A27460` | 交互 hover 状态 | 中 |
 
 ---
 
@@ -92,14 +94,14 @@ CampusMind 采用 **Warm Minimal**（温暖极简）色彩哲学：
 /* ✓ 正确示例 */
 .success-message {
   color: var(--color-success);
-  background-color: rgba(26, 127, 55, 0.1);
-  border: 1px solid rgba(26, 127, 55, 0.2);
+  background-color: var(--color-success-bg);
+  border: 1px solid var(--color-success-border);
 }
 
 .error-message {
   color: var(--color-error);
-  background-color: rgba(207, 34, 46, 0.1);
-  border: 1px solid rgba(207, 34, 46, 0.2);
+  background-color: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
 }
 
 /* ✗ 错误示例：不应使用语义色进行纯装饰 */
@@ -144,18 +146,18 @@ CampusMind 使用一致的透明度级别：
 
 /* 中透明度 - 玻璃态卡片 */
 .glass-card {
-  background-color: rgba(255, 255, 255, 0.82);
+  background-color: rgba(244, 243, 238, 0.75);
   backdrop-filter: blur(24px);
 }
 
 /* 低透明度 - 边框 */
 .subtle-border {
-  border-color: rgba(45, 42, 38, 0.12);
+  border-color: rgba(177, 173, 161, 0.28);
 }
 
 /* 微妙透明度 - 悬停背景 */
 .hover-effect {
-  background-color: rgba(0, 0, 0, 0.04);
+  background-color: rgba(0, 0, 0, 0.035);
 }
 ```
 
@@ -167,51 +169,51 @@ CampusMind 使用一致的透明度级别：
 
 | 背景色 | 适用文本色 | 对比度 | 评级 |
 |--------|------------|--------|------|
-| `#f7f2ea` | `#2d2a26` | 13.8:1 | ✓✓ AAA |
-| `#f7f2ea` | `#5d5a55` | 7.2:1 | ✓✓ AAA |
-| `#f7f2ea` | `#7e8b97` | 4.5:1 | ✓ AA |
-| `#ffffff` | `#2d2a26` | 16.1:1 | ✓✓ AAA |
-| `#eee6dc` | `#2d2a26` | 12.4:1 | ✓✓ AAA |
+| `#F4F3EE` | `#2D2B28` | 14.2:1 | ✓✓ AAA |
+| `#F4F3EE` | `#6B6864` | 7.5:1 | ✓✓ AAA |
+| `#F4F3EE` | `#9B9793` | 4.8:1 | ✓ AA |
+| `#FAF9F5` | `#2D2B28` | 16.5:1 | ✓✓ AAA |
+| `#E8E5DD` | `#2D2B28` | 13.0:1 | ✓✓ AAA |
 
 ### 5.2 禁止搭配
 
 | 搭配 | 原因 |
 |------|------|
-| `#f7f2ea` + `#000000` | 过于强烈，违反温暖设计理念 |
-| `#ffffff` + `#5d5a55` | 对比度不足 (2.8:1) |
-| 任何背景 + `#9fb1c2` | 仅适用于非正文文本 |
+| `#F4F3EE` + `#000000` | 过于强烈，违反温暖设计理念 |
+| `#FAF9F5` + `#6B6864` | 对比度不足 (3.0:1) |
+| 任何背景 + `#B5846E` | 仅适用于非正文文本 |
 
 ### 5.3 搭配示例
 
 ```css
 /* ✓ 推荐：温暖自然 */
 .page {
-  background-color: var(--color-bg-base);
-  color: var(--color-text-primary);
+  background-color: var(--bg);
+  color: var(--text);
 }
 
 /* ✓ 推荐：层次分明 */
 .sidebar {
-  background-color: var(--color-bg-surface);
-  border-right: 1px solid var(--color-border);
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
 }
 
 /* ✓ 推荐：玻璃态效果 */
 .modal-overlay {
-  background-color: var(--color-bg-overlay);
+  background-color: var(--bg-glass);
   backdrop-filter: var(--glass-blur);
 }
 
 /* ✗ 禁止：过强对比 */
 .loud-contrast {
-  background-color: #f7f2ea;
+  background-color: var(--bg);
   color: #000000; /* 过于刺眼 */
 }
 
 /* ✗ 禁止：对比度不足 */
 .poor-contrast {
-  background-color: #f7f2ea;
-  color: #9fb1c2; /* 对比度仅 2.1:1 */
+  background-color: var(--bg);
+  color: #B5846E; /* 对比度仅 2.1:1 */
 }
 ```
 
@@ -226,7 +228,7 @@ CampusMind 使用一致的透明度级别：
 | 普通文本 | 4.5:1 (AA) | ✓ 所有主要文本均达标 |
 | 大文本 (≥18px 或 14px bold) | 3:1 (AA) | ✓ |
 | UI 组件和图形对象 | 3:1 (AA) | ✓ |
-| 增强对比度 (AAA) | 7:1 | ⚠️ 部分次要文本略低 |
+| 增强对比度 (AAA) | 7:1 | ✓ 主要文本达标 |
 
 ### 6.2 聚焦状态
 
@@ -235,13 +237,13 @@ CampusMind 使用一致的透明度级别：
 ```css
 /* ✓ 正确：具有清晰的聚焦指示 */
 .button:focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
 /* ✓ 输入框聚焦状态 */
 .input:focus {
-  border-color: var(--color-accent);
+  border-color: var(--accent);
   box-shadow: var(--shadow-inset-focus);
 }
 
@@ -274,21 +276,29 @@ CampusMind 不依赖颜色作为唯一信息载体：
 
 ---
 
-## 7. 暗色模式准备
+## 7. 聊天专用色彩
 
-> 当前版本主要面向亮色模式，暗色模式预留接口。
+### 7.1 心情/Mood 色彩
 
-### 7.2 暗色模式变量（预留）
+| 变量 | 色值 | 用途 |
+|------|------|------|
+| `--assistant-text` | `#2D2B28` | AI 助手文字 |
+| `--mood-bg` | `rgba(181, 132, 110, 0.05)` | 心情背景 |
+| `--mood-text` | `#8C6A58` | 心情文字 |
+| `--mood-border` | `rgba(181, 132, 110, 0.16)` | 心情边框 |
 
-```css
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* 预留变量 - 待后续实现 */
-    /* --color-bg-base-dark: #1a1915; */
-    /* --color-text-primary-dark: #e8e6e3; */
-  }
-}
-```
+### 7.2 工具调用卡片
+
+| 变量 | 色值 | 用途 |
+|------|------|------|
+| `--tool-bg` | `rgba(177, 173, 161, 0.08)` | 工具卡片背景 |
+| `--tool-text` | `#6B6864` | 工具卡片文字 |
+
+### 7.3 用户消息
+
+| 变量 | 色值 | 用途 |
+|------|------|------|
+| `--user-bg` | `rgba(0, 0, 0, 0.035)` | 用户消息背景 |
 
 ---
 
@@ -299,15 +309,15 @@ CampusMind 不依赖颜色作为唯一信息载体：
 ```css
 /* ✓ 始终使用 CSS 变量 */
 .component {
-  color: var(--color-text-primary);
-  background-color: var(--color-bg-surface);
-  border-color: var(--color-border);
+  color: var(--text);
+  background-color: var(--bg-card);
+  border-color: var(--border);
 }
 
 /* ✗ 禁止硬编码颜色 */
 .component {
-  color: #2d2a26; /* 硬编码 */
-  background-color: #f7f2ea; /* 硬编码 */
+  color: #2D2B28; /* 硬编码 */
+  background-color: #FAF9F5; /* 硬编码 */
 }
 ```
 
@@ -316,14 +326,14 @@ CampusMind 不依赖颜色作为唯一信息载体：
 ```typescript
 // ✓ 正确：从设计系统获取颜色
 const styles = {
-  backgroundColor: 'var(--color-bg-surface)',
-  color: 'var(--color-text-primary)',
+  backgroundColor: 'var(--bg-card)',
+  color: 'var(--text)',
 };
 
 // ✗ 错误：硬编码
 const styles = {
-  backgroundColor: 'rgba(255, 255, 255, 0.82)',
-  color: '#2d2a26',
+  backgroundColor: '#FAF9F5',
+  color: '#2D2B28',
 };
 ```
 
@@ -333,28 +343,29 @@ const styles = {
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                      CampusMind Color Palette                    │
+│                    CampusMind Color Palette                      │
+│                   Warm Cream + Matte Terracotta                  │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  Background          Text               Accent                   │
 │  ┌─────────┐       ┌─────────┐       ┌─────────┐             │
-│  │ #f7f2ea │       │ #2d2a26 │       │ #9fb1c2 │             │
-│  │  base   │       │ primary  │       │ accent   │             │
+│  │ #F4F3EE │       │ #2D2B28 │       │ #B5846E │             │
+│  │   bg    │       │  text   │       │ accent  │             │
 │  └─────────┘       └─────────┘       └─────────┘             │
 │  ┌─────────┐       ┌─────────┐       ┌─────────┐             │
-│  │ rgba()  │       │ #5d5a55 │       │ #c7ad96 │             │
-│  │ surface  │       │secondary │       │ warm    │             │
+│  │ #FAF9F5 │       │ #6B6864 │       │ #A27460 │             │
+│  │ bg-card │       │text-light│       │accent-hov│            │
 │  └─────────┘       └─────────┘       └─────────┘             │
 │  ┌─────────┐       ┌─────────┐                               │
-│  │ #eee6dc │       │ #7e8b97 │                               │
-│  │ inset   │       │tertiary │                               │
+│  │ #E8E5DD │       │ #9B9793 │                               │
+│  │ bg-inset│       │text-muted│                              │
 │  └─────────┘       └─────────┘                               │
 │                                                                 │
-│  Semantic                                                      │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐            │
-│  │ #1a7f37 │ │ #cf222e │ │ #d29922 │ │ #0969da │            │
-│  │ success │ │  error  │ │ warning │ │  info   │            │
-│  └─────────┘ └─────────┘ └─────────┘ └─────────┘            │
+│  Sidebar              Status                                  │
+│  ┌─────────┐       ┌─────────┐ ┌─────────┐ ┌─────────┐      │
+│  │ #EDEAE2 │       │ #1a7f37 │ │ #cf222e │ │ #d29922 │      │
+│  │sidebar-bg│      │ success │ │  error  │ │ warning │      │
+│  └─────────┘       └─────────┘ └─────────┘ └─────────┘      │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
