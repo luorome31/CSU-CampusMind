@@ -1,0 +1,50 @@
+/**
+ * Design Tokens: Spacing System
+ * 4px base unit with 8px step progression
+ * Mobile-first responsive scaling
+ */
+
+:root {
+  /* === Core Spacing Scale === */
+  --space-0: 0;
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;      /* 48px */
+  --space-16: 4rem;      /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+
+  /* === Component-Specific === */
+  --hit-target-min: 2.75rem;     /* 44px - WCAG touch target */
+  --input-height: 2.75rem;       /* 44px */
+  --button-height-sm: 2.25rem;    /* 36px */
+  --button-height-md: 2.75rem;    /* 44px */
+  --button-height-lg: 3rem;       /* 48px */
+
+  /* === Layout === */
+  --container-max: 90vw;
+  --container-max-sm: 440px;
+  --container-max-md: 720px;
+  --container-max-lg: 1024px;
+  --container-max-xl: 1280px;
+}
+
+/* Responsive spacing adjustments */
+@media (min-width: 768px) {
+  :root {
+    --container-max: 92vw;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --container-max: 94vw;
+    --space-section: 6rem;
+  }
+}

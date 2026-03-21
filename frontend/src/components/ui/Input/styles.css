@@ -1,0 +1,118 @@
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.input-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+}
+
+.input {
+  width: 100%;
+  min-height: var(--input-height);
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: all var(--duration-fast) var(--ease-default);
+  box-shadow: var(--shadow-inset);
+}
+
+.input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.input:hover:not(:disabled) {
+  border-color: var(--color-border-hover);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-inset-focus);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* With icons */
+.input-icon-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon-wrapper .input {
+  flex: 1;
+}
+
+.input-icon-left {
+  position: absolute;
+  left: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+}
+
+.input-icon-right {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-tertiary);
+}
+
+.input-with-left-icon {
+  padding-left: calc(var(--space-3) + 20px + var(--space-2));
+}
+
+.input-with-right-icon {
+  padding-right: calc(var(--space-3) + 20px + var(--space-2));
+}
+
+/* Error state */
+.input-error {
+  border-color: #cf222e;
+}
+
+.input-error:focus {
+  box-shadow: var(--shadow-inset-focus), 0 0 0 2px rgba(207, 34, 46, 0.2);
+}
+
+.input-error-message {
+  font-size: var(--text-xs);
+  color: #cf222e;
+}
+
+.input-hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+/* Sizes */
+.input-sm {
+  min-height: 2rem;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+}
+
+.input-lg {
+  min-height: 3rem;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-base);
+}
+
+/* Full width */
+.input-full {
+  width: 100%;
+}
