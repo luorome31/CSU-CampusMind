@@ -1,0 +1,16 @@
+/* src/features/chat/ChatPage.css */
+
+.chat-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+
+.chat-page-input-fixed {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-bg-base);
+}
