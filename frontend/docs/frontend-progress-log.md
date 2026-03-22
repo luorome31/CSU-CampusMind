@@ -293,5 +293,93 @@ npm run test:coverage   # 生成覆盖率报告
 
 | 日期 | 版本 | 更新内容 |
 |------|------|---------|
+| 2026-03-22 | 1.2.0 | 添加 Phase 3 前端样式重设计，升级为 Warm Paper 蓝灰色调 |
 | 2026-03-22 | 1.1.0 | 添加 Phase 2.5 单元测试，完成 164 个测试 |
 | 2026-03-21 | 1.0.0 | 初始版本，完成 Phase 1 基础骨架 |
+
+---
+
+## 2026-03-22 Phase 2：前端样式重设计
+
+### 3.1 目标
+
+根据 AI Agent 设计模板文档，对前端样式进行全面升级：
+
+- 核心色彩系统：从 Warm Cream + Terracotta 升级为 Warm Paper 蓝灰色调
+- 动画与交互：升级为弹簧曲线 cubic-bezier(0.16, 1, 0.3, 1)
+- 圆角与阴影体系：统一组件圆角，采用弥散阴影
+- 组件样式细化：Session Item、Message Bubble、ChatInput、Thinking Block、Tool Group
+
+### 3.2 完成的功能
+
+#### Phase 1：核心色彩系统
+
+更新 `src/styles/tokens/colors.css`：
+
+| Token | 原值 | 新值 |
+|-------|------|------|
+| `--bg` | `#F4F3EE` | `#F8F5ED` |
+| `--accent` | `#B5846E` | `#537D96` |
+| `--text` | `#2D2B28` | `#3B3D3F` |
+| `--border` | `rgba(177,173,161,0.28)` | `rgba(83,125,150,0.22)` |
+
+#### Phase 2：动画曲线与圆角体系
+
+更新 `src/styles/tokens/elevation.css`：
+
+| Token | 原值 | 新值 |
+|-------|------|------|
+| `--ease-default` | cubic-bezier(0.4, 0, 0.2, 1) | cubic-bezier(0.16, 1, 0.3, 1) |
+| `--radius-lg` | 12px | 16px |
+| `--radius-xl` | 16px | 18px |
+
+#### Phase 2：组件样式
+
+**ChatInput** (`src/components/chat/ChatInput/`):
+- 输入框背景改为透明
+- 使用 `.chat-input-wrapper` 类名
+- 添加 `align-items: center` 垂直居中
+- 移除白色长条
+
+**MessageBubble** (`src/components/chat/MessageBubble/`):
+- 用户消息宽度改为 `fit-content`
+- 助手消息保持 `width: 100%`
+- 添加 Markdown 表格样式
+- 气泡最大宽度限制为 70ch
+
+**ToolGroup** (`src/components/chat/ToolGroup/`) - 新增:
+- 折叠/展开聚合工具事件
+- 显示 "执行完成 X 个工具" 或 "运行中 X/Y 个工具"
+- 点击展开查看详情
+
+**ThinkingBlock** (`src/components/chat/ThinkingBlock/`) - 新增:
+- AI 思考过程折叠面板
+- 左侧极简划线指示
+
+**布局修复**:
+- `.layout-main` 添加 `height: 100vh; overflow: hidden`
+- `.chat-page` 添加 `overflow: hidden`
+- `.message-list` 添加底部 padding 预留输入框空间
+- 输入框始终固定在视口底部
+
+### 3.3 设计文档
+
+新增文件：
+- `frontend/docs/superpowers/specs/2026-03-22-frontend-style-redesign-design.md`
+- `frontend/docs/superpowers/plans/2026-03-22-frontend-style-redesign-plan.md`
+
+### 3.4 Git 提交记录
+
+| 提交 | 描述 |
+|------|------|
+| `0448159` | fix(frontend): 修复输入框定位和工具事件显示问题 |
+| `3b4d020` | fix(chatinput): 修复输入框样式不生效和定位问题 |
+| `b6dccdf` | feat(toolgroup): 新增 Tool Group 组件 Phase 3.5 |
+| `e5cbc0e` | feat(thinkingblock): 新增 Thinking Block 组件 Phase 3.4 |
+| `91a1ad6` | style(messagebubble): 应用消息气泡样式升级 Phase 3.3 |
+| `890b8ca` | style(chatinput): 应用输入框样式升级 Phase 3.2 |
+| `6c85d1c` | style(sidebar): 应用 session-item 样式升级 Phase 3.1 |
+| `48efee6` | style(elevation): 应用弹簧曲线和圆角升级 Phase 2 |
+| `0cbabee` | style(colors): 应用 Warm Paper 蓝灰色调主题 Phase 1 |
+| `e1d34e8` | docs(frontend): 添加前端样式重设计实施计划 |
+| `b099226` | docs(frontend): 添加前端样式重设计规范文档 |
