@@ -190,8 +190,108 @@ Phase 1 实现过程中发现多处未遵循设计系统规范的实现，已全
 
 ---
 
+## 2026-03-22 Phase 2.5：单元测试
+
+### 2.5.1 目标
+
+为已完成的组件和状态管理编写单元测试，确保代码质量：
+
+- UI 组件测试（Button、Input、Card、Chip、Badge）
+- 聊天组件测试（EmptyState、ToolEventCard、ChatInput、MessageBubble、MessageList、KnowledgeSelector、StreamingText）
+- 状态管理测试（authStore、chatStore）
+- 工具函数测试（parseSSELines）
+- 页面组件测试（LoginPage）
+
+### 2.5.2 测试框架配置
+
+| 包 | 版本 | 用途 |
+|----|------|------|
+| `vitest` | ^4.1.0 | 测试框架 |
+| `@testing-library/react` | ^16.3.2 | React 组件测试 |
+| `@testing-library/jest-dom` | ^6.9.1 | DOM 断言扩展 |
+| `happy-dom` | ^20.8.4 | DOM 环境 |
+
+**配置**: `vite.config.ts` 中配置了 `test` 块，使用 `happy-dom` 环境。
+
+### 2.5.3 测试文件结构
+
+```
+src/
+├── components/
+│   ├── ui/
+│   │   ├── Button/Button.test.tsx
+│   │   ├── Input/Input.test.tsx
+│   │   ├── Card/Card.test.tsx
+│   │   ├── Chip/Chip.test.tsx
+│   │   └── Badge/Badge.test.tsx
+│   └── chat/
+│       ├── EmptyState/EmptyState.test.tsx
+│       ├── ToolEventCard/ToolEventCard.test.tsx
+│       ├── ChatInput/ChatInput.test.tsx
+│       ├── MessageBubble/MessageBubble.test.tsx
+│       ├── MessageList/MessageList.test.tsx
+│       ├── KnowledgeSelector/KnowledgeSelector.test.tsx
+│       └── StreamingText/StreamingText.test.tsx
+├── features/
+│   ├── auth/
+│   │   ├── authStore.test.ts
+│   │   └── LoginPage.test.tsx
+│   └── chat/
+│       └── chatStore.test.ts
+└── utils/
+    └── parseSSELines.test.ts
+```
+
+### 2.5.4 测试覆盖
+
+| 测试文件 | 测试数量 | 覆盖内容 |
+|---------|---------|---------|
+| `Button.test.tsx` | 12 | 渲染、变体、尺寸、图标、禁用、加载状态 |
+| `Input.test.tsx` | 15 | 标签、错误、提示、图标、ID 生成 |
+| `Card.test.tsx` | 13 | Card、CardHeader、CardBody 渲染和样式 |
+| `Chip.test.tsx` | 8 | 渲染、变体、尺寸、图标 |
+| `Badge.test.tsx` | 6 | 渲染、变体、尺寸 |
+| `EmptyState.test.tsx` | 5 | Logo、标题、副标题、功能列表 |
+| `ToolEventCard.test.tsx` | 13 | 状态图标、展开/折叠、样式类 |
+| `ChatInput.test.tsx` | 13 | 输入、发送、禁用、加载状态 |
+| `MessageBubble.test.tsx` | 7 | 用户/助手样式、Markdown、工具事件 |
+| `MessageList.test.tsx` | 4 | 空状态、消息渲染 |
+| `KnowledgeSelector.test.tsx` | 6 | Chip 切换、清除按钮 |
+| `StreamingText.test.tsx` | 4 | 文本渲染、光标 |
+| `authStore.test.ts` | 21 | 登录、登出、会话恢复、sessionStorage |
+| `chatStore.test.ts` | 21 | 消息、流式、工具事件 |
+| `parseSSELines.test.ts` | 9 | SSE 解析、时间戳、错误处理 |
+| `LoginPage.test.tsx` | 8 | 表单渲染、提交、错误、加载状态 |
+
+**总计**: 16 个测试文件，164 个测试用例，全部通过
+
+### 2.5.5 测试最佳实践
+
+- 使用 React Testing Library 查询（by role、label、text）
+- 使用 `act()` 包装状态更新
+- Mock 外部 API 依赖
+- Zustand store 在 `beforeEach` 中重置
+- Vitest 用于 stores 和工具函数，RTL 用于组件
+
+### 2.5.6 运行测试
+
+```bash
+cd frontend
+npm run test:run        # 运行所有测试（单次）
+npm run test            # 运行测试（watch 模式）
+npm run test:coverage   # 生成覆盖率报告
+```
+
+### 2.5.7 已知问题
+
+- `ProtectedRoute.test.tsx` 在 happy-dom 环境中可能导致测试卡死，已移除
+- 完整测试套件运行时可能因内存不足导致 OOM，需使用 `NODE_OPTIONS="--max-old-space-size=4096"`
+
+---
+
 ## 更新日志
 
 | 日期 | 版本 | 更新内容 |
 |------|------|---------|
+| 2026-03-22 | 1.1.0 | 添加 Phase 2.5 单元测试，完成 164 个测试 |
 | 2026-03-21 | 1.0.0 | 初始版本，完成 Phase 1 基础骨架 |

@@ -167,6 +167,85 @@ style={{ borderRadius: '12px' }}                  // 应为 var(--radius-lg)
 
 ---
 
+## 问题 5：测试环境内存溢出 (OOM)
+
+### 问题描述
+
+运行全部测试时 Node.js 堆内存耗尽，Vitest 报错：
+```
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+```
+
+### 根因分析
+
+Vitest 默认使用多个 worker 并行执行测试，内存使用量很大。全部测试同时运行时导致系统内存耗尽。
+
+### 解决方案
+
+1. **分批运行测试**：将测试分成多个批次执行
+2. **增加 Node 内存限制**：
+   ```bash
+   NODE_OPTIONS="--max-old-space-size=4096" npm run test:run
+   ```
+3. **在 `package.json` 中添加测试脚本**：
+   ```json
+   {
+     "scripts": {
+       "test:run": "NODE_OPTIONS='--max-old-space-size=4096' vitest run"
+     }
+   }
+   ```
+
+### 经验教训
+
+- 长时间运行的测试套件应考虑内存限制
+- 大型测试套件应分批执行或使用 CI/CD 环境
+
+---
+
+## 问题 6：React Testing Library 查询不准确
+
+### 问题描述
+
+编写测试时遇到以下问题：
+
+1. `Card` 测试：使用 `screen.getByText('Content').parentElement` 获取 card 元素不准确
+2. `LoginPage` 测试：有多个 "Sign In" 元素（标题和按钮），导致 `getByText` 报错
+3. `ToolEventCard` 和 `KnowledgeSelector`：状态更新未包装在 `act()` 中，导致 warning
+
+### 解决方案
+
+1. **使用 `document.querySelector()` 直接查询 CSS 类**：
+   ```typescript
+   // 错误
+   expect(screen.getByText('Content').parentElement).toHaveClass('card')
+   // 正确
+   expect(document.querySelector('.card')).toHaveClass('card')
+   ```
+
+2. **使用更精确的查询**：
+   ```typescript
+   // 错误：多个 "Sign In"
+   expect(screen.getByText('Sign In')).toBeInTheDocument()
+   // 正确：指定按钮
+   expect(screen.getByRole('button', { name: 'Sign In' })).toBeInTheDocument()
+   ```
+
+3. **使用 `act()` 包装状态更新**：
+   ```typescript
+   await act(async () => {
+     header?.click()
+   })
+   ```
+
+### 经验教训
+
+- React Testing Library 查询应尽量精确（使用 role、label）
+- 状态更新必须用 `act()` 包装以避免 warning
+- 直接查询 DOM 元素比依赖 parentElement 更可靠
+
+---
+
 ## 总结
 
 | 问题 | 严重程度 | 根因 | 预防措施 |
@@ -175,6 +254,8 @@ style={{ borderRadius: '12px' }}                  // 应为 var(--radius-lg)
 | CSS 变量命名错误 | 中 | 未读文档 | 先读 `docs/styles/` |
 | 未复用 UI 组件 | 中 | 未探索代码库 | 先了解已有组件 |
 | 未用 frontend-design skill | 高 | 流程缺失 | 遵循 skill 工作流 |
+| 测试内存溢出 | 中 | 并行执行内存过大 | 增加内存或分批执行 |
+| RTL 查询不准确 | 低 | 查询方式不当 | 使用精确查询和 act() |
 
 ---
 
@@ -182,4 +263,5 @@ style={{ borderRadius: '12px' }}                  // 应为 var(--radius-lg)
 
 | 日期 | 版本 | 更新内容 |
 |------|------|---------|
+| 2026-03-22 | 1.1.0 | 添加 Phase 2.5 测试相关内容，记录测试问题 5、6 |
 | 2026-03-21 | 1.0.0 | 初始版本，记录 Phase 1 开发中的 4 个关键问题 |

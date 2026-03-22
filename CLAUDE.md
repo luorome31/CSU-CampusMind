@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides essential guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
@@ -20,114 +20,34 @@ CampusMind/
 │   └── docs/                   # Frontend documentation
 │       ├── ARCHITECTURE.md     # Frontend architecture overview
 │       ├── styles/             # Design system documentation
-│       │   ├── 01-DESIGN_TOKENS_REFERENCE.md
-│       │   ├── 02-COLOR_SYSTEM.md
-│       │   ├── 03-TYPOGRAPHY_GUIDE.md
-│       │   ├── 04-COMPONENT_GUIDELINES.md
-│       │   ├── 05-SPACING_SYSTEM.md
-│       │   ├── 06-ICON_GUIDELINES.md
-│       │   └── 07-RESPONSIVE_DESIGN.md
 │       ├── frontend-progress-log.md
 │       ├── frontend-question-log.md
 │       └── superpowers/        # Feature specs and plans
 │
 ├── backend/                    # FastAPI + Python backend
 │   ├── app/
-│   │   ├── api/v1/            # API routers (auth/, completion/, crawl/, knowledge/, etc.)
+│   │   ├── api/v1/            # API routers
 │   │   ├── core/              # Core modules (agents/, session/, tools/)
-│   │   ├── services/          # Service layer (rag/, knowledge/, crawl/, dialog/)
-│   │   ├── database/          # Database models and session
+│   │   ├── services/          # Service layer
 │   │   └── schema/            # Pydantic schemas
-│   ├── tests/                 # Backend tests
-│   ├── docs/                   # Backend documentation
-│   │   ├── api/               # API endpoint documentation
-│   │   ├── auth/               # Authentication docs (flow, session management)
-│   │   ├── models/             # Database model documentation
-│   │   ├── rag/                # RAG pipeline docs (indexing, retrieval)
-│   │   ├── tools/              # Tool integrations (jwc/, library/, career/, oa/)
-│   │   ├── config/             # Configuration docs
-│   │   ├── deploy/             # Deployment docs
-│   │   └── testing/            # Testing guide and fixtures
-│   └── CLAUDE.md              # Detailed backend guidance
+│   └── tests/                 # Backend tests
 ```
 
-## Common Commands
+## Rules Index
 
-### Frontend
-```bash
-cd frontend
-npm install              # Install dependencies
-npm run dev              # Start dev server (http://localhost:5173)
-npm run build            # Type check + production build
-npm run test             # Run tests in watch mode
-npm run test:run        # Run tests once
-npm run test:coverage   # Run tests with coverage report
-```
+Detailed rules are organized in `.claude/rules/`. These are automatically loaded by Claude Code:
 
-### Backend
-```bash
-cd backend
-uv sync                  # Install dependencies (uv)
-
-# Run the backend server in tmux (for agent observation)
-tmux new-session -d -s campusmind-server 'cd /home/luorome/software/CampusMind/backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000'
-tmux attach -t campusmind-server  # Attach to view logs
-
-# Run tests in tmux (for agent observation)
-tmux new-session -d -s campusmind-tests 'cd /home/luorome/software/CampusMind/backend && uv run pytest --tb=short -v'
-tmux attach -t campusmind-tests  # Attach to view logs
-
-# Run specific tests
-uv run pytest tests/ -v                                    # All tests
-uv run pytest tests/api/ -v                                # API tests only
-uv run pytest -m "not e2e"                               # Skip e2e tests
-uv run pytest -k "test_name"                              # Specific test
-```
-
-## Architecture
-
-### Frontend (React + Vite)
-- **State Management**: Zustand stores (`authStore`, `chatStore`)
-- **Routing**: React Router 6 with protected routes
-- **API Client**: Custom client in `frontend/src/api/` with SSE streaming support
-- **Key Routes**:
-  - `/login` - Login page
-  - `/` - Chat interface (index)
-  - `/knowledge` - Knowledge base list
-  - `/knowledge/build` - Knowledge base builder
-
-For detailed backend architecture, see `backend/CLAUDE.md`.
-
-## Environment Setup
-
-### Frontend
-Copy `frontend/.env.example` to `frontend/.env.local`:
-```
-VITE_API_BASE_URL=http://localhost:8000/api/v1
-```
-
-### Backend
-Copy `backend/.env.example` to `backend/.env` and configure:
-- Database: `DATABASE_URL` (SQLite for dev, PostgreSQL for prod)
-- Redis: `REDIS_URL`
-- LLM: `OPENAI_API_KEY` or `EMBEDDING_API_KEY`
-- ChromaDB: `CHROMA_PERSIST_PATH`
-- Elasticsearch: `ELASTICSEARCH_HOSTS`
-- CAS credentials for university systems: `CAS_USERNAME`, `CAS_PASSWORD`
-
-## Testing
-
-### Frontend (Vitest + React Testing Library)
-- **Framework**: Vitest with happy-dom environment
-- **Setup**: `src/test/setup.ts` imports `@testing-library/jest-dom`
-- **Test files**: `src/**/*.{test,spec}.{ts,tsx}`
-- **Commands**: `npm run test` (watch), `npm run test:run` (single run), `npm run test:coverage`
-
-### Backend (pytest)
-Backend tests use pytest with markers defined in `backend/pytest.ini`:
-- `unit`, `integration`, `api`, `e2e` - Test categories
-- `auth_required`, `public_tools`, `auth_tools` - Auth-related tests
-- `slow` - Slow-running tests
+| Category | File | When to Use |
+|----------|------|-------------|
+| **Frontend Docs** | `frontend-docs.md` | Frontend task 开始时读取，结束时更新 |
+| **Frontend Commands** | `frontend-commands.md` | 执行前端命令时 (dev/build/test) |
+| **Backend Commands** | `backend-commands.md` | 执行后端命令时 (server/test) |
+| **Frontend Skills** | `frontend-skills.md` | UI/组件实现前必须使用 /frontend-design skill |
+| **Playwright MCP** | `playwright-mcp.md` | 前端运行时验证、UI 调试时使用 |
+| **Backend Architecture** | `backend-architecture.md` | 理解后端结构或新增 API 时参考 |
+| **Environment Setup** | `environment-setup.md` | 初始化项目环境时配置 |
+| **Git Hooks** | `git-hooks.md` | git 操作触发 hooks 时参考 |
+| **Testing** | `testing.md` | 编写测试或运行测试时参考 |
 
 ## Test-Driven Development (TDD) Requirement
 
@@ -138,13 +58,6 @@ Backend tests use pytest with markers defined in `backend/pytest.ini`:
 3. **Implement the minimum code** - Write only enough code to make the test pass
 4. **Refactor if needed** - Improve code while keeping tests green
 
-```bash
-# TDD workflow example
-npm run test:run              # Verify new test fails
-# ... implement feature ...
-npm run test:run              # Verify test passes
-```
-
 - All new components, hooks, stores, and utility functions require tests
 - Test file location: next to the source file (e.g., `Button.test.tsx` alongside `Button.tsx`)
 - Use React Testing Library for component tests (query by role, label, or text)
@@ -153,21 +66,6 @@ npm run test:run              # Verify test passes
 ## Commit Message Format
 
 使用中文撰写 commit，格式为 `type(domain): action`，简洁专业。
-
-## Git Hooks (lefthook)
-
-This project uses [lefthook](https://github.com/evilmartians/lefthook) for local Git hooks. Hooks are configured in `lefthook.yml` at the project root.
-
-| Hook | Trigger | Actions |
-|------|---------|---------|
-| `pre-commit` | `git commit` | backend: `ruff check` / frontend: `npm run build` |
-| `pre-push` | `git push` | backend: `uv run pytest -m "not e2e"` / frontend: `npm run test:run` |
-| `pre-merge` | `git merge` | backend: `uv run pytest -m "not e2e"` / frontend: `npm run test:run` |
-| `pre-rebase` | `git rebase` | backend: `uv run pytest -m "not e2e"` / frontend: `npm run test:run` |
-
-- Hooks run in parallel when possible
-- `pre-commit` only checks staged files (skips if none)
-- Install hooks: `cd frontend && npm run prepare -- --force`
 
 ## Compact Instructions
 

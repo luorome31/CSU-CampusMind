@@ -1,0 +1,40 @@
+{
+  "rules": [
+    {
+      "description": "Frontend development documentation references",
+      "file": ".claude/rules/frontend-docs.md"
+    },
+    {
+      "description": "Frontend commands (tmux-based for agent observation)",
+      "file": ".claude/rules/frontend-commands.md"
+    },
+    {
+      "description": "Backend commands (tmux-based for agent observation)",
+      "file": ".claude/rules/backend-commands.md"
+    },
+    {
+      "description": "Frontend skills and workflows",
+      "file": ".claude/rules/frontend-skills.md"
+    },
+    {
+      "description": "Playwright MCP usage for frontend",
+      "file": ".claude/rules/playwright-mcp.md"
+    },
+    {
+      "description": "Backend architecture overview",
+      "file": ".claude/rules/backend-architecture.md"
+    },
+    {
+      "description": "Environment setup instructions",
+      "file": ".claude/rules/environment-setup.md"
+    },
+    {
+      "description": "Git hooks configuration (lefthook)",
+      "file": ".claude/rules/git-hooks.md"
+    },
+    {
+      "description": "Testing setup and commands",
+      "file": ".claude/rules/testing.md"
+    }
+  ]
+}

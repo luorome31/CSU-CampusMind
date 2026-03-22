@@ -4,7 +4,8 @@ progress.md
 task_plan.md
 reference_*/
 /.agents/
-/.claude/
+/.claude/skills
+/.claude/worktrees
 /.worktrees/
 /.agent/
 /backend/data/chroma/
