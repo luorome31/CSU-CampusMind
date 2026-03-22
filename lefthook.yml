@@ -1,0 +1,37 @@
+pre-commit:
+  parallel: true
+  jobs:
+    - name: backend-lint
+      glob: "*.py"
+      run: cd backend && uv run ruff check .
+
+    - name: frontend-typecheck
+      glob: "*.{ts,tsx}"
+      run: cd frontend && npm run build
+
+pre-push:
+  parallel: true
+  jobs:
+    - name: backend-test
+      run: cd backend && uv run pytest -m "not e2e"
+
+    - name: frontend-test
+      run: cd frontend && npm run test:run
+
+pre-merge:
+  parallel: true
+  jobs:
+    - name: backend-test
+      run: cd backend && uv run pytest -m "not e2e"
+
+    - name: frontend-test
+      run: cd frontend && npm run test:run
+
+pre-rebase:
+  parallel: true
+  jobs:
+    - name: backend-test
+      run: cd backend && uv run pytest -m "not e2e"
+
+    - name: frontend-test
+      run: cd frontend && npm run test:run

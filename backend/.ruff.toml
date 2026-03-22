@@ -1,0 +1,5 @@
+[lint]
+exclude = ["E501"]  # line too long
+ignore = [
+    "E402",  # module level import not at top of file (lazy loading pattern)
+]
