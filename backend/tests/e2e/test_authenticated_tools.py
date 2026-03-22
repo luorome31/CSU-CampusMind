@@ -261,6 +261,7 @@ class TestJwcTools:
                     break
 
 
+@pytest.mark.e2e
 @pytest.mark.auth_required
 @pytest.mark.auth_tools
 class TestOaTools:
@@ -410,6 +411,7 @@ class TestOaTools:
         )
 
 
+@pytest.mark.e2e
 @pytest.mark.auth_required
 class TestAuthToolErrorHandling:
     """Test error handling for authenticated tools"""
