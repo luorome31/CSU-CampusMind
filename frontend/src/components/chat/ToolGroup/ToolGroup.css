@@ -1,0 +1,21 @@
+.tool-group {
+  background: var(--tool-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  margin: 8px 0;
+}
+
+.tool-group-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-light);
+  font-size: 0.875rem;
+}
+
+.tool-group-details {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
