@@ -14,7 +14,8 @@
 }
 
 .message-content {
-  max-width: 80%;
+  max-width: 70ch;
+  overflow-wrap: break-word;
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
   line-height: var(--leading-normal);
@@ -24,12 +25,15 @@
   background: rgba(83, 125, 150, 0.08);
   color: var(--text);
   border-bottom-right-radius: var(--radius-sm);
+  width: fit-content;
+  max-width: 70ch;
 }
 
 .message-assistant .message-content {
   background: var(--color-bg-surface);
   color: var(--color-text-primary);
   border-bottom-left-radius: var(--radius-sm);
+  width: 100%;
 }
 
 .message-text {
@@ -89,4 +93,28 @@
 
 .message-events {
   margin-top: var(--space-3);
+}
+
+/* Markdown table styles */
+.message-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-2) 0;
+  font-size: var(--text-sm);
+}
+
+.message-markdown th,
+.message-markdown td {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.message-markdown th {
+  background: var(--color-bg-inset);
+  font-weight: var(--font-semibold);
+}
+
+.message-markdown tr:nth-child(even) {
+  background: rgba(0, 0, 0, 0.02);
 }

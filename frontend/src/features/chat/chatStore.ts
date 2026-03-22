@@ -69,9 +69,20 @@ export const chatStore = create<ChatStore>((set) => ({
     }),
 
   addToolEvent: (event) =>
-    set((state) => ({
-      toolEvents: [...state.toolEvents, event],
-    })),
+    set((state) => {
+      const messages = [...state.messages];
+      // Update last assistant message's events if exists
+      if (messages.length > 0 && messages[messages.length - 1].role === 'assistant') {
+        messages[messages.length - 1] = {
+          ...messages[messages.length - 1],
+          events: [...messages[messages.length - 1].events, event],
+        };
+      }
+      return {
+        toolEvents: [...state.toolEvents, event],
+        messages,
+      };
+    }),
 
   finishStreaming: () => set({ isStreaming: false }),
 

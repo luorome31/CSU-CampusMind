@@ -2,7 +2,7 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { ToolEventCard } from '../ToolEventCard';
+import { ToolGroup } from '../ToolGroup';
 import type { ChatMessage } from '../../../features/chat/chatStore';
 import './MessageBubble.css';
 
@@ -32,13 +32,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                 {message.content}
               </ReactMarkdown>
             </div>
-            {message.events.length > 0 && (
-              <div className="message-events">
-                {message.events.map((event) => (
-                  <ToolEventCard key={event.id} event={event} />
-                ))}
-              </div>
-            )}
+            {message.events.length > 0 && <ToolGroup events={message.events} />}
           </>
         )}
       </div>

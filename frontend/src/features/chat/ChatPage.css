@@ -5,6 +5,7 @@
   flex-direction: column;
   height: 100%;
   position: relative;
+  overflow: hidden;
 }
 
 .chat-page-input-fixed {
@@ -12,5 +13,6 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--color-bg-base);
+  background: transparent;
+  z-index: 10;
 }

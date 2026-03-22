@@ -64,7 +64,8 @@ describe('MessageBubble', () => {
       ],
     };
     render(<MessageBubble message={messageWithEvents} />);
-    expect(screen.getByText('Query JWC')).toBeInTheDocument();
+    // ToolGroup shows summary text when collapsed
+    expect(screen.getByText('执行完成 1 个工具')).toBeInTheDocument();
   });
 
   it('does not render tool events for user messages', () => {

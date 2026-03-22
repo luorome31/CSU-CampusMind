@@ -46,6 +46,8 @@ button {
   margin-left: var(--sidebar-width, 260px);
   padding: var(--space-8);
   max-width: calc(100vw - var(--sidebar-width, 260px));
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* === Placeholder Pages === */
