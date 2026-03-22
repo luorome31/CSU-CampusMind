@@ -38,7 +38,9 @@ export function ChatPage() {
         <>
           <KnowledgeSelector knowledgeBases={MOCK_KNOWLEDGE_BASES} />
           <MessageList messages={messages} isStreaming={isStreaming} />
-          <ChatInput onSend={handleSend} disabled={isStreaming} />
+          <div className="chat-page-input-fixed">
+            <ChatInput onSend={handleSend} disabled={isStreaming} />
+          </div>
         </>
       ) : (
         <>
