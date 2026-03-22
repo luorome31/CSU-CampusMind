@@ -21,8 +21,8 @@
 }
 
 .message-user .message-content {
-  background: var(--color-text-primary);
-  color: var(--color-bg-base);
+  background: rgba(83, 125, 150, 0.08);
+  color: var(--text);
   border-bottom-right-radius: var(--radius-sm);
 }
 
