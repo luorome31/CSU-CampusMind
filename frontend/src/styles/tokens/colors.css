@@ -1,36 +1,36 @@
 /**
  * Design Tokens: Color System
- * Theme: Warm Cream + Matte Terracotta Accent
+ * Theme: Warm Paper Blue-Grey Accent
  * Inspired by Claude Desktop's refined, warm aesthetic
  */
 
 :root {
   /* === Background System === */
-  --bg:           #F4F3EE;
-  --bg-card:      #FAF9F5;
-  --bg-glass:     rgba(244, 243, 238, 0.92);
+  --bg:           #F8F5ED;
+  --bg-card:      #FCFAF5;
+  --bg-glass:     rgba(250, 248, 242, 0.92);
 
-  /* === Accent System (Matte Terracotta, desaturated) === */
-  --accent:       #B5846E;
-  --accent-hover: #A27460;
-  --accent-light: rgba(181, 132, 110, 0.08);
+  /* === Accent System (Blue-Grey, desaturated) === */
+  --accent:       #537D96;
+  --accent-hover: #456A80;
+  --accent-light: rgba(83, 125, 150, 0.08);
 
   /* === Text System === */
-  --text:         #2D2B28;
-  --text-light:   #6B6864;
-  --text-muted:   #9B9793;
+  --text:         #3B3D3F;
+  --text-light:   #6B6F73;
+  --text-muted:   #8E9196;
 
   /* === Border & Shadow === */
-  --border:       rgba(177, 173, 161, 0.28);
-  --shadow:       rgba(45, 43, 40, 0.07);
+  --border:       rgba(83, 125, 150, 0.22);
+  --shadow:       rgba(59, 61, 63, 0.09);
 
   /* === Status Colors === */
   --green:        #7BAE7F;
   --green-rgb:    123, 174, 127;
-  --coral:        #C4917E;
+  --coral:        #EC8F8D;
 
   /* === Sidebar === */
-  --sidebar-bg:   #EDEAE2;
+  --sidebar-bg:   #F4F2EA;
 
   /* === Note/Card === */
   --note-bg:     #FAF5E9;
