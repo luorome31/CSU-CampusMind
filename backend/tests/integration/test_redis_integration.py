@@ -6,7 +6,6 @@ Redis 集成测试
 2. 历史缓存
 3. CAS 登录自动建户
 """
-import pytest
 import redis
 
 
@@ -23,7 +22,7 @@ class TestRedisSessionIntegration:
     def test_session_key_format(self):
         """验证 session key 格式"""
         r = redis.from_url("redis://localhost:6379/0", decode_responses=True)
-        key = f"session:user123:jwc"
+        key = "session:user123:jwc"
         r.setex(key, 60, "test_session")
         assert r.exists(key) == 1
         r.delete(key)

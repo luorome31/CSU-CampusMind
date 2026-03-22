@@ -1,6 +1,4 @@
-import pytest
-from unittest.mock import Mock, patch
-from app.core.tools.jwc.client import Grade, ClassEntry, RankEntry, JwcClient
+from app.core.tools.jwc.client import Grade, ClassEntry
 
 
 def test_grade_dataclass():

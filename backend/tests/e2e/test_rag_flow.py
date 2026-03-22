@@ -85,7 +85,7 @@ class RAGTestClient:
     def stream_completion(self, query: str, knowledge_ids: list) -> CompletionResponse:
         """发送流式 Completion 请求"""
         endpoint = "/completion/stream"
-        print(f"\n[3] 发送流式 Completion 请求")
+        print("\n[3] 发送流式 Completion 请求")
         print(f"    问题: {query}")
         print(f"    知识库: {knowledge_ids}")
 

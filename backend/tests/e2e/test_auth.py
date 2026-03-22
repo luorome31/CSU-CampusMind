@@ -17,9 +17,7 @@ from typing import Optional
 
 from tests.e2e.conftest import (
     API_V1,
-    DEFAULT_TEST_USER,
-    parse_sse_stream,
-    auth_headers
+    DEFAULT_TEST_USER
 )
 
 e2e_logger = logging.getLogger("e2e.auth")
@@ -163,7 +161,8 @@ class TestAuthLogout:
     def test_logout_with_valid_token_succeeds(
         self,
         http_session: requests.Session,
-        authenticated_token: Optional[str]
+        authenticated_token: Optional[str],
+        test_credentials: dict
     ):
         """
         Test successful logout with valid token.

@@ -22,7 +22,6 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from app.config import settings
-from app.core.session import FileSessionPersistence
 import requests
 
 
@@ -88,7 +87,7 @@ def load_session_from_file(storage_path: str) -> requests.Session:
 
     if not os.path.exists(storage_path):
         print(f"{Colors.RED}✗ Session 文件不存在: {storage_path}{Colors.RESET}")
-        print(f"  请先运行一次查询成绩，让系统创建 Session")
+        print("  请先运行一次查询成绩，让系统创建 Session")
         return None
 
     with open(storage_path, "r", encoding="utf-8") as f:
@@ -167,7 +166,7 @@ def check_url(session: requests.Session, name: str, url_info: dict, output_dir: 
             print(f"  {Colors.YELLOW}⚠{Colors.RESET} 可能需要重新登录（页面包含登录表单）")
 
         # 保存 HTML
-        filepath = save_html(response.text, name, output_dir)
+        _ = save_html(response.text, name, output_dir)
         return True
 
     except requests.RequestException as e:

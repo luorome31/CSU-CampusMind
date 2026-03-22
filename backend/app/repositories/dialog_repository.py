@@ -6,7 +6,6 @@ Handles:
 - Authenticated dialog access (user_id must match JWT)
 - IDOR prevention (cannot access another user's dialog)
 """
-import uuid
 from datetime import datetime
 from typing import Optional, Tuple
 from sqlmodel import select

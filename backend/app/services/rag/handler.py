@@ -1,7 +1,7 @@
 """
 RAG Handler - Main orchestration for retrieval
 """
-from typing import List, Optional
+from typing import List
 from loguru import logger
 
 from app.services.rag.retrieval import hybrid_retrieval

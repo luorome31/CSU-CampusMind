@@ -1,7 +1,6 @@
 """
 Tests for career tools factory function.
 """
-import pytest
 from unittest.mock import patch, MagicMock
 
 from app.core.tools.career import create_career_tools

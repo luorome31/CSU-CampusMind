@@ -28,6 +28,7 @@ from tests.e2e.conftest import (
 e2e_logger = logging.getLogger("e2e.auth_tools")
 
 
+@pytest.mark.e2e
 @pytest.mark.auth_required
 @pytest.mark.auth_tools
 class TestJwcTools:

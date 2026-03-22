@@ -244,7 +244,7 @@ def cas_login_only_castgc(username: str, password: str, rate_limiter=None) -> st
         if not castgc:
             if "密码" in resp.text or "错误" in resp.text:
                 raise CASLoginError("用户名或密码错误")
-            raise CASLoginError(f"登录失败: 未获取到 CASTGC")
+            raise CASLoginError("登录失败: 未获取到 CASTGC")
 
         logger.info(f"CASTGC obtained: {castgc[:30]}...")
         return castgc

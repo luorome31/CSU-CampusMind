@@ -1,7 +1,6 @@
 """
 Career tools unit tests
 """
-import pytest
 
 from app.core.tools.career.tools import (
     CAREER_TOOLS,

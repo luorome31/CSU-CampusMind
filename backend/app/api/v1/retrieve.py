@@ -2,7 +2,7 @@
 Retrieve API - RAG retrieval endpoints
 """
 from typing import List, Optional
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
 from app.services.rag.handler import rag_handler

@@ -2,7 +2,7 @@
 Knowledge File API - Knowledge file management endpoints
 """
 from typing import List, Optional
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from app.services.knowledge_file import KnowledgeFileService

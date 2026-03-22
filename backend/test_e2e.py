@@ -98,7 +98,7 @@ async def test_full_pipeline():
             print(f"    ✓ Found {len(result['sources'])} sources")
             print(f"    Context preview: {result['context'][:100]}...")
         else:
-            print(f"    ✗ No results found")
+            print("    ✗ No results found")
 
     print("\n" + "=" * 60)
     print("E2E Test Complete!")

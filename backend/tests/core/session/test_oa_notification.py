@@ -4,7 +4,6 @@ Tests for OANotificationList tool components.
 
 Tests DepartmentEnum and build_params function.
 """
-import pytest
 import base64
 import json
 

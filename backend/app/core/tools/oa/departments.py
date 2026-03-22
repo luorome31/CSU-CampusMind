@@ -6,7 +6,7 @@
 """
 import base64
 import json
-from enum import Enum, StrEnum
+from enum import Enum
 
 
 # === Department Enum ===

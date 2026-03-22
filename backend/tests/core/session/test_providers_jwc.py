@@ -1,5 +1,4 @@
 # backend/tests/core/session/test_providers_jwc.py
-import pytest
 from unittest.mock import Mock, patch, MagicMock
 from app.core.session.providers.jwc import JWCSessionProvider
 

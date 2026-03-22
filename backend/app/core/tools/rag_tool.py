@@ -1,7 +1,7 @@
 """
 RAG Tool - Wrapper for RagHandler as LangChain BaseTool
 """
-from typing import List, Optional
+from typing import List
 from pydantic import BaseModel, Field
 from langchain_core.tools import BaseTool
 from loguru import logger

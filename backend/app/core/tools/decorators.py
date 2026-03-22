@@ -6,7 +6,8 @@ import time
 import json
 import asyncio
 from loguru import logger
-from typing import Optional
+from app.database.session import async_session_dependency
+from app.database.models import ToolCallLog
 
 
 def tool_logger(func):
@@ -16,9 +17,7 @@ def tool_logger(func):
     Captures: tool_name, status, duration_ms, error_message (JSON with args/results)
     """
     @functools.wraps(func)
-    async def wrapper(self, tool_args):
-        from app.database.session import async_session_dependency
-        from app.database.models.tool_call_log import ToolCallLog
+    async def wrapper(self, *args, **kwargs):
         from app.core.tools.context import get_tool_context
 
         start_time = time.time()
@@ -26,17 +25,17 @@ def tool_logger(func):
         context = get_tool_context()
 
         try:
-            result = await func(self, tool_args)
+            result = await func(self, *args, **kwargs)
             status = "success"
             error_message = json.dumps({
-                "args": tool_args,
+                "args": kwargs if kwargs else args,
                 "result": str(result)[:1000]
             }, ensure_ascii=False)
             return result
         except Exception as e:
             status = "failed"
             error_message = json.dumps({
-                "args": tool_args,
+                "args": kwargs if kwargs else args,
                 "error": str(e)
             }, ensure_ascii=False)
             raise

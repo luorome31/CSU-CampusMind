@@ -1,7 +1,6 @@
 """
 Storage Client - Unified interface for OSS/MinIO storage
 """
-import os
 from typing import Optional
 from urllib.parse import urljoin
 
@@ -77,8 +76,6 @@ class StorageClient:
 
     def upload_file(self, object_name: str, file_path: str) -> str:
         """Upload local file to storage"""
-        client = self._get_client()
-
         with open(file_path, 'rb') as f:
             content = f.read()
 

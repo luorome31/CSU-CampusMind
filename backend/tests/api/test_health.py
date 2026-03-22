@@ -1,7 +1,6 @@
 """
 Health check tests
 """
-import pytest
 from fastapi.testclient import TestClient
 
 

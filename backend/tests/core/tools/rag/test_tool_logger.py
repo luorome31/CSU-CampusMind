@@ -2,7 +2,6 @@
 Tests for tool_logger decorator and context
 """
 import pytest
-import asyncio
 from unittest.mock import patch, AsyncMock, MagicMock
 
 
@@ -28,7 +27,7 @@ class TestToolContext:
 
     def test_get_context_defaults(self):
         """Test getting context when not set returns defaults"""
-        from app.core.tools.context import set_tool_context, get_tool_context, clear_tool_context
+        from app.core.tools.context import get_tool_context, clear_tool_context
 
         # Ensure no context is set
         clear_tool_context()
@@ -84,7 +83,7 @@ class TestToolLoggerDecorator:
         clear_tool_context()
         set_tool_context(user_id="user_123", dialog_id="dialog_456")
 
-        with patch("app.core.tools.decorators.async_session_dependency", mock_session_dependency):
+        with patch("app.database.session.async_session_dependency", mock_session_dependency):
             from app.core.tools.decorators import tool_logger
 
             # Create a mock tool with the decorator
@@ -92,11 +91,11 @@ class TestToolLoggerDecorator:
                 name = "mock_tool"
 
                 @tool_logger
-                async def _arun(self, tool_args):
+                async def _arun(self, query, knowledge_ids=None, top_k=5, min_score=0.0):
                     return "success result"
 
             tool = MockTool()
-            result = await tool._arun({"query": "test"})
+            result = await tool._arun(query="test")
 
             assert result == "success result"
 
@@ -110,20 +109,20 @@ class TestToolLoggerDecorator:
         clear_tool_context()
         set_tool_context(user_id="user_123", dialog_id="dialog_456")
 
-        with patch("app.core.tools.decorators.async_session_dependency", mock_session_dependency):
+        with patch("app.database.session.async_session_dependency", mock_session_dependency):
             from app.core.tools.decorators import tool_logger
 
             class MockTool:
                 name = "mock_tool"
 
                 @tool_logger
-                async def _arun(self, tool_args):
+                async def _arun(self, query, knowledge_ids=None, top_k=5, min_score=0.0):
                     raise ValueError("Test error")
 
             tool = MockTool()
 
             with pytest.raises(ValueError):
-                await tool._arun({"query": "test"})
+                await tool._arun(query="test")
 
         clear_tool_context()
 
@@ -135,18 +134,18 @@ class TestToolLoggerDecorator:
         clear_tool_context()
         set_tool_context(user_id=None, dialog_id=None)
 
-        with patch("app.core.tools.decorators.async_session_dependency", mock_session_dependency):
+        with patch("app.database.session.async_session_dependency", mock_session_dependency):
             from app.core.tools.decorators import tool_logger
 
             class MockTool:
                 name = "anon_tool"
 
                 @tool_logger
-                async def _arun(self, tool_args):
+                async def _arun(self, query, knowledge_ids=None, top_k=5, min_score=0.0):
                     return "result"
 
             tool = MockTool()
-            result = await tool._arun({"query": "test"})
+            result = await tool._arun(query="test")
 
             assert result == "result"
 

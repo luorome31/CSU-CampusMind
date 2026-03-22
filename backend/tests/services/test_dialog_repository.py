@@ -11,8 +11,6 @@ from app.repositories.dialog_repository import (
     DialogRepository,
     ForbiddenError,
 )
-from app.database.models.dialog import Dialog
-from app.database.models.chat_history import ChatHistory
 
 
 @pytest.fixture(scope="function")

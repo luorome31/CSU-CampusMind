@@ -2,7 +2,6 @@
 Knowledge File Model - SQLModel for knowledge_file table
 """
 from datetime import datetime
-from typing import Optional
 from sqlmodel import Field, SQLModel
 
 

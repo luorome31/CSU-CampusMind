@@ -270,7 +270,7 @@ class TestMultiToolScenarios:
             if e.type == "event" and e.data.get("status") == "START"
         ]
 
-        e2e_logger.info(f"Tool call sequence:")
+        e2e_logger.info("Tool call sequence:")
         for i, event in enumerate(tool_start_events):
             title = event.data.get("title", "")
             e2e_logger.info(f"  {i+1}. {title}")
@@ -364,7 +364,7 @@ class TestToolParameterPassing:
         # Verify tool was called
         tool_names = result.get_tool_names_called()
         assert "oa_notification_list" in tool_names, (
-            f"Expected oa_notification_list to be called"
+            "Expected oa_notification_list to be called"
         )
 
     def test_library_search_with_pagination(
@@ -414,7 +414,7 @@ class TestToolParameterPassing:
         # Verify tool was called
         tool_names = result.get_tool_names_called()
         assert "career_teachin" in tool_names, (
-            f"Expected career_teachin to be called"
+            "Expected career_teachin to be called"
         )
 
 

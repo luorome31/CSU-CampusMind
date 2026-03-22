@@ -7,7 +7,6 @@ from typing import Optional
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field
 
-from app.core.session.factory import get_session_manager
 from app.core.session.manager import UnifiedSessionManager
 from .service import JwcService, Grade, ClassEntry, RankEntry, LevelExamEntry
 
@@ -71,8 +70,8 @@ def _format_grades(grades: list[Grade]) -> str:
         return "未查询到成绩记录"
 
     lines = ["## 成绩查询结果\n"]
-    lines.append(f"| 学期 | 课程名称 | 成绩 | 学分 | 课程属性 | 课程性质 |")
-    lines.append(f"|------|----------|------|------|----------|----------|")
+    lines.append("| 学期 | 课程名称 | 成绩 | 学分 | 课程属性 | 课程性质 |")
+    lines.append("|------|----------|------|------|----------|----------|")
 
     for g in grades:
         lines.append(f"| {g.term} | {g.course_name} | {g.score} | {g.credit} | {g.attribute} | {g.nature} |")
@@ -97,8 +96,8 @@ def _format_schedule(classes: list[ClassEntry]) -> str:
         return "未查询到课表记录"
 
     lines = ["## 课表查询结果\n"]
-    lines.append(f"| 课程名称 | 教师 | 周次 | 地点 | 星期 | 节次 |")
-    lines.append(f"|----------|------|------|------|------|------|")
+    lines.append("| 课程名称 | 教师 | 周次 | 地点 | 星期 | 节次 |")
+    lines.append("|----------|------|------|------|------|------|")
 
     for c in classes:
         lines.append(f"| {c.course_name} | {c.teacher} | {c.weeks} | {c.place} | {c.day_of_week} | {c.time_of_day} |")
@@ -127,8 +126,8 @@ def _format_ranks(ranks: list[RankEntry]) -> str:
         return "未查询到排名记录"
 
     lines = ["## 专业排名结果\n"]
-    lines.append(f"| 学期 | 总分 | 班级排名 | 平均分 |")
-    lines.append(f"|------|------|----------|--------|")
+    lines.append("| 学期 | 总分 | 班级排名 | 平均分 |")
+    lines.append("|------|------|----------|--------|")
 
     for r in ranks:
         lines.append(f"| {r.term} | {r.total_score} | {r.class_rank} | {r.average_score} |")
@@ -153,8 +152,8 @@ def _format_level_exams(exams: list[LevelExamEntry]) -> str:
         return "未查询到等级考试记录"
 
     lines = ["## 等级考试成绩\n"]
-    lines.append(f"| 科目 | 笔试成绩 | 机试成绩 | 总分 | 笔试等级 | 机试等级 | 总等级 | 考试日期 |")
-    lines.append(f"|------|----------|----------|------|----------|----------|--------|----------|")
+    lines.append("| 科目 | 笔试成绩 | 机试成绩 | 总分 | 笔试等级 | 机试等级 | 总等级 | 考试日期 |")
+    lines.append("|------|----------|----------|------|----------|----------|--------|----------|")
 
     for e in exams:
         lines.append(f"| {e.course} | {e.written_score} | {e.computer_score} | {e.total_score} | {e.written_level} | {e.computer_level} | {e.total_level} | {e.exam_date} |")
@@ -233,7 +232,6 @@ def create_jwc_tools(ctx: ToolContext) -> List[BaseTool]:
 
     async def _get_jwc_service_factory() -> "JwcService":
         """获取 JwcService 实例"""
-        from app.core.session.manager import UnifiedSessionManager
         return JwcService(session_manager)
 
     async def _get_grades(term: str = "") -> str:

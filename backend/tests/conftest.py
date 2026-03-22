@@ -4,7 +4,6 @@ Pytest configuration and fixtures for CampusMind backend tests
 import os
 import sys
 import pytest
-from typing import Generator
 from unittest.mock import AsyncMock, MagicMock
 
 # Add backend directory to path
@@ -18,7 +17,6 @@ os.environ.setdefault("TESTING", "true")
 @pytest.fixture
 def mock_knowledge_service():
     """Mock KnowledgeService for testing"""
-    from unittest.mock import MagicMock
 
     mock = MagicMock()
     mock.create_knowledge = MagicMock(return_value=MagicMock(
@@ -72,7 +70,6 @@ def mock_knowledge_service():
 @pytest.fixture
 def mock_rag_handler():
     """Mock RAG handler for testing"""
-    from unittest.mock import MagicMock
 
     mock = MagicMock()
     mock.retrieve_with_sources = AsyncMock(return_value={
@@ -92,7 +89,6 @@ def mock_rag_handler():
 @pytest.fixture
 def mock_crawl_service():
     """Mock crawl service for testing"""
-    from unittest.mock import MagicMock
 
     mock = MagicMock()
     mock.crawl_url = AsyncMock(return_value={
@@ -145,7 +141,7 @@ def sample_crawl_request():
 @pytest.fixture
 def mock_langchain_model():
     """Mock LangChain chat model for ReactAgent testing"""
-    from unittest.mock import AsyncMock, MagicMock
+    from unittest.mock import AsyncMock
 
     mock_model = MagicMock()
 
@@ -166,7 +162,6 @@ def mock_langchain_model():
 @pytest.fixture
 def mock_base_tool():
     """Mock LangChain BaseTool for testing"""
-    from unittest.mock import MagicMock
 
     tool = MagicMock()
     tool.name = "test_tool"
@@ -181,7 +176,6 @@ def mock_base_tool():
 @pytest.fixture
 def mock_stream_writer():
     """Mock StreamWriter for testing"""
-    from unittest.mock import MagicMock
 
     writer = MagicMock()
     writer_calls = []

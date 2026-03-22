@@ -3,7 +3,6 @@ Knowledge Service - CRUD operations for knowledge base
 """
 import uuid
 from typing import List, Optional
-from datetime import datetime
 from sqlmodel import Session, select
 
 from app.database.models.knowledge import KnowledgeBase

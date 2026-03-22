@@ -1,7 +1,6 @@
 """
 Text Chunker 测试
 """
-import pytest
 from app.services.rag.chunker import TextChunker
 from app.schema.chunk import ChunkModel
 

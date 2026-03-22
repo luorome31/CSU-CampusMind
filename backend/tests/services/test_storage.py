@@ -3,7 +3,6 @@ Storage Client 测试
 """
 import pytest
 from unittest.mock import patch, MagicMock
-from urllib.parse import urljoin
 
 
 class TestStorageConfig:
@@ -91,7 +90,7 @@ class TestStorageClientMocked:
             config = StorageConfig(mode="minio", base_url="http://localhost:9000")
             client = StorageClient(config)
 
-            result = client.upload_content("test/file.txt", b"test content")
+            _ = client.upload_content("test/file.txt", b"test content")
 
             assert mock_client.put_object.called
 
@@ -124,7 +123,7 @@ class TestStorageClientMocked:
 
             # This will try to open a real file, so we need to mock properly
             with patch("os.path.exists", return_value=True):
-                result = client.upload_file("test/file.txt", "/tmp/test.txt")
+                _ = client.upload_file("test/file.txt", "/tmp/test.txt")
 
             assert mock_client.put_object.called or mock_open.called
 

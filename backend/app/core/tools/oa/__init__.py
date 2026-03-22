@@ -121,7 +121,7 @@ def create_oa_tools(ctx: ToolContext) -> List:
         if session is None:
             logger.error(f"oa_notification_list: get_subsystem_session('oa') returned None for user {ctx.user_id}")
             return "获取校内办公网会话失败，请稍后重试"
-        logger.info(f"oa_notification_list: OA session obtained successfully")
+        logger.info("oa_notification_list: OA session obtained successfully")
 
         # 3. 构造查询参数
         params_str = build_params(
@@ -155,7 +155,7 @@ def create_oa_tools(ctx: ToolContext) -> List:
                 logger.warning(f"OA notification query: got redirect (status {resp.status_code}), redirect URL: {redirect_url}")
                 # Force re-fetch of session
                 try:
-                    logger.info(f"OA notification query: attempting to re-fetch OA session")
+                    logger.info("OA notification query: attempting to re-fetch OA session")
                     session = ctx.session_manager.get_session(ctx.user_id, "oa")
                     resp = session.post(
                         NOTIFICATION_API_URL,

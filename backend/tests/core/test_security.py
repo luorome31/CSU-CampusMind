@@ -5,7 +5,7 @@ TDD 测试: JWT Security
 """
 import pytest
 from datetime import datetime, timedelta
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from app.core.security import JWTManager
 
@@ -109,7 +109,6 @@ class TestJWTExpiredToken:
         # 创建一个已过期的 token
         with patch("app.core.security.datetime") as mock_datetime:
             mock_datetime.utcnow.return_value = datetime(2024, 1, 1)
-            past_time = datetime(2023, 12, 31)
             expired_token = manager.create_token(
                 {"user_id": "123456"},
                 expires_delta=timedelta(hours=-24)  # 24 hours ago

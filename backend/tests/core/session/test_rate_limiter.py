@@ -1,4 +1,3 @@
-import pytest
 import time
 from app.core.session.rate_limiter import LoginRateLimiter
 

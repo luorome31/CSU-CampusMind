@@ -3,8 +3,7 @@
 """
 import logging
 from dataclasses import dataclass
-from typing import List, Optional
-from urllib.parse import urljoin
+from typing import List
 
 import requests
 from bs4 import BeautifulSoup

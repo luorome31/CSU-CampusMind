@@ -2,7 +2,7 @@
 RagTool 单元测试
 """
 import pytest
-from unittest.mock import patch, AsyncMock, MagicMock
+from unittest.mock import patch, AsyncMock
 
 
 class TestRagTool:
@@ -128,7 +128,6 @@ class TestRagTool:
     def test_rag_tool_input_schema(self):
         """测试输入参数模式"""
         from app.core.tools.rag_tool import RagToolInput
-        from pydantic import ValidationError
 
         # Valid input
         valid_input = RagToolInput(
@@ -182,7 +181,7 @@ class TestRagToolEdgeCases:
 
         tool = RagTool()
 
-        result = await tool._arun(
+        _ = await tool._arun(
             query="test",
             knowledge_ids=["kb_1"]
         )
@@ -203,7 +202,7 @@ class TestRagToolEdgeCases:
 
         tool = RagTool()
 
-        result = await tool._arun(
+        _ = await tool._arun(
             query="test",
             knowledge_ids=["kb_1"],
             top_k=10
@@ -224,7 +223,7 @@ class TestRagToolEdgeCases:
 
         tool = RagTool()
 
-        result = await tool._arun(
+        _ = await tool._arun(
             query="test",
             knowledge_ids=["kb_1"],
             min_score=0.5
@@ -246,7 +245,6 @@ class TestRagToolSync:
             })
 
             from app.core.tools.rag_tool import RagTool
-            import asyncio
 
             tool = RagTool()
 

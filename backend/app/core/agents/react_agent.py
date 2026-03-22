@@ -203,7 +203,7 @@ class ReactAgent:
                 writer(self._wrap_stream_output("event", {
                     "status": "END",
                     "title": tool_title,
-                    "message": f"执行完成"
+                    "message": "执行完成"
                 }))
 
                 tool_messages.append(

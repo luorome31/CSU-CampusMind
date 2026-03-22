@@ -58,7 +58,7 @@ def demo_tools():
         # 显示输入 schema
         if hasattr(tool, "args_schema") and tool.args_schema:
             schema = tool.args_schema.model_json_schema()
-            print(f"输入参数:")
+            print("输入参数:")
             props = schema.get("properties", {})
             for name, info in props.items():
                 required = name in schema.get("required", [])

@@ -2,7 +2,7 @@
 教务系统服务 - 整合 SessionManager 和 JwcClient
 """
 import logging
-from typing import List, Optional
+from typing import List
 
 from app.core.session.manager import UnifiedSessionManager
 from .client import Grade, ClassEntry, RankEntry, LevelExamEntry, JwcClient

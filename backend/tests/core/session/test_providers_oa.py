@@ -1,5 +1,4 @@
 # backend/tests/app/core/session/providers/test_oa.py
-import pytest
 from unittest.mock import Mock, patch, MagicMock
 from app.core.session.providers.oa import OASessionProvider
 

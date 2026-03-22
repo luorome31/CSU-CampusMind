@@ -4,7 +4,7 @@ TDD 测试: Auth Dependencies
 这些测试验证 API 认证依赖注入功能
 """
 import pytest
-from unittest.mock import Mock, AsyncMock, patch
+from unittest.mock import Mock, patch
 from fastapi import HTTPException
 
 from app.api.dependencies import get_current_user, get_optional_user

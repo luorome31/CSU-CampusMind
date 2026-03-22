@@ -4,7 +4,7 @@ import { Chip } from '../components/ui/Chip';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card, CardHeader, CardBody } from '../components/ui/Card';
-import { Mail, User, Lock, Check, X, AlertCircle, Info } from 'lucide-react';
+import { Mail, User, Lock, Check } from 'lucide-react';
 
 /**
  * Full Components Showcase

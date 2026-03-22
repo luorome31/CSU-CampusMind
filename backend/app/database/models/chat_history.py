@@ -2,8 +2,8 @@
 Chat History Model - SQLModel for chat_history table
 """
 from datetime import datetime
-from typing import Optional, Any
-from sqlmodel import Field, SQLModel, JSON
+from typing import Optional
+from sqlmodel import Field, SQLModel
 
 
 class ChatHistory(SQLModel, table=True):

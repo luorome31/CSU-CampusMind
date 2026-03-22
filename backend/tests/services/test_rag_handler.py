@@ -2,7 +2,7 @@
 RAG Handler 服务测试
 """
 import pytest
-from unittest.mock import patch, AsyncMock, MagicMock
+from unittest.mock import patch, AsyncMock
 from app.schema.search import SearchModel
 
 

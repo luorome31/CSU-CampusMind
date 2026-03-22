@@ -2,7 +2,7 @@
 Tests for HistoryCacheService
 """
 import pytest
-from unittest.mock import patch, AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 from dataclasses import dataclass
 
 from app.services.history.cache import HistoryCacheService

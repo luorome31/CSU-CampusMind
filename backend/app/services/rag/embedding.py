@@ -2,9 +2,8 @@
 Embedding Service - Text to vector conversion
 """
 import asyncio
-from typing import Union, List, Optional
+from typing import List, Optional
 from pydantic import BaseModel
-from loguru import logger
 
 
 class EmbeddingConfig(BaseModel):

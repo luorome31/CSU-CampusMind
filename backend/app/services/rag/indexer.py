@@ -2,11 +2,9 @@
 RAG Indexer - Orchestrates indexing pipeline
 """
 import uuid
-from typing import List, Optional
+from typing import Optional
 from loguru import logger
 
-from app.schema.chunk import ChunkModel
-from app.services.rag.chunker import default_chunker
 from app.services.rag.embedding import embedding_service
 from app.services.rag.vector_db import vector_db
 from app.services.rag.es_client import es_client

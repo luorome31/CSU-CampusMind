@@ -232,7 +232,7 @@ async def run_query(agent: ReactAgent, query: str):
                     print(chunk, end="", flush=True)
                     full_response += chunk
 
-        print(f"\n")
+        print("\n")
         log_success("查询完成")
 
         return full_response
@@ -260,7 +260,7 @@ async def test_flow():
         return
 
     # 2. 初始化 SessionManager
-    manager = init_session_manager()
+    _ = init_session_manager()
 
     # 3. 创建 Agent
     agent = create_agent()

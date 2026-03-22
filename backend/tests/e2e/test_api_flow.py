@@ -12,6 +12,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 
+@pytest.mark.e2e
 class TestLLMInteractionE2E:
     """LLM 交互端到端测试"""
 
@@ -63,6 +64,7 @@ class TestLLMInteractionE2E:
         assert "/api/v1/chat/stream" in routes or any("chat/stream" in r for r in routes)
 
 
+@pytest.mark.e2e
 class TestKnowledgeFlowE2E:
     """知识库流程端到端测试"""
 
@@ -96,6 +98,7 @@ class TestKnowledgeFlowE2E:
         assert isinstance(data, list)
 
 
+@pytest.mark.e2e
 class TestDialogFlowE2E:
     """对话流程端到端测试"""
 

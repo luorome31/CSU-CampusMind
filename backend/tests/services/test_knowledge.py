@@ -4,7 +4,7 @@ Knowledge Service 测试 - 使用内存 SQLite 进行集成测试
 import pytest
 import os
 import tempfile
-from sqlmodel import SQLModel, create_engine, Session, select
+from sqlmodel import SQLModel, create_engine
 from unittest.mock import patch
 
 
@@ -20,7 +20,6 @@ def test_db():
     engine = create_engine(f"sqlite:///{path}", echo=False)
 
     # 创建表
-    from app.database.models.knowledge import KnowledgeBase
     SQLModel.metadata.create_all(engine)
 
     yield engine
@@ -59,9 +58,9 @@ class TestKnowledgeServiceIntegration:
 
         with patch('app.services.knowledge.knowledge.engine', test_db):
             # 创建两个知识库
-            kb1 = KnowledgeService.create_knowledge(name="KB1", user_id="user_1")
-            kb2 = KnowledgeService.create_knowledge(name="KB2", user_id="user_1")
-            kb3 = KnowledgeService.create_knowledge(name="KB3", user_id="user_2")
+            _ = KnowledgeService.create_knowledge(name="KB1", user_id="user_1")
+            _ = KnowledgeService.create_knowledge(name="KB2", user_id="user_1")
+            _ = KnowledgeService.create_knowledge(name="KB3", user_id="user_2")
 
             # 列出 user_1 的知识库
             user1_kbs = KnowledgeService.list_knowledge_by_user("user_1")

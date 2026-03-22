@@ -2,7 +2,6 @@
 认证 API - 登录/登出接口
 """
 import logging
-from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Depends, status
 from pydantic import BaseModel
@@ -10,7 +9,6 @@ from sqlalchemy.exc import IntegrityError
 
 from app.config import settings
 from app.core.security import jwt_manager
-from app.core.session.manager import UnifiedSessionManager, NeedReLoginError
 from app.core.session.factory import get_session_manager
 from app.core.session.rate_limiter import LoginRateLimiter
 from app.core.session.cas_login import AccountLockedError, CASLoginError

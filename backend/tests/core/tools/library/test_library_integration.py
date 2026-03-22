@@ -28,7 +28,7 @@ class TestLibrarySearchIntegration:
         assert first_book.title, "应该有书名"
         assert first_book.physical_count >= 0, "应该有馆藏数量"
 
-        print(f"\n=== 搜索 'Vue' 结果 ===")
+        print("\n=== 搜索 'Vue' 结果 ===")
         print(f"总数: {result.total}")
         print(f"第一条: {first_book.title}")
         print(f"Record ID: {first_book.record_id}")
@@ -54,7 +54,7 @@ class TestLibrarySearchIntegration:
         assert result.total > 0, "应该找到 Python 相关的图书"
         assert len(result.items) <= 3, "应该最多返回 3 条"
 
-        print(f"\n=== 搜索 'Python' 结果 ===")
+        print("\n=== 搜索 'Python' 结果 ===")
         print(f"总数: {result.total}")
         for i, book in enumerate(result.items[:3], 1):
             print(f"{i}. {book.title} - {book.author}")
@@ -89,7 +89,7 @@ class TestLibraryGetBookCopiesIntegration:
         print(f"\n=== 《{book_title}》复本信息 ===")
         print(f"Record ID: {record_id}")
         print(f"复本总数: {copies_result.total}")
-        print(f"第一个复本:")
+        print("第一个复本:")
         print(f"  - 馆: {first_copy.lib_name}")
         print(f"  - 位置: {first_copy.cur_location_name or first_copy.location_name}")
         print(f"  - 索书号: {first_copy.call_no}")
@@ -117,7 +117,7 @@ class TestLibraryToolsIntegration:
         assert "共找到" in result, "结果应该包含总数"
         assert "Record ID:" in result, "结果应该包含 record_id"
 
-        print(f"\n=== library_search 工具测试 ===")
+        print("\n=== library_search 工具测试 ===")
         print(result[:500])  # 打印前 500 字符
 
     @pytest.mark.integration
@@ -137,7 +137,7 @@ class TestLibraryToolsIntegration:
         # 验证返回的是格式化字符串
         assert "复本" in result or "未找到" in result, "结果应该包含复本信息"
 
-        print(f"\n=== library_get_book_location 工具测试 ===")
+        print("\n=== library_get_book_location 工具测试 ===")
         print(result[:500])
 
 
@@ -165,7 +165,7 @@ class TestLibrarySearchEndToEnd:
         if copies_result.total > 0:
             assert copies_result.items[0].call_no, "索书号不应为空"
 
-        print(f"\n=== 端到端测试: 搜索 '机器学习' ===")
+        print("\n=== 端到端测试: 搜索 '机器学习' ===")
         print(f"找到 {search_result.total} 本书")
         print(f"第一本: {first_book.title}")
         print(f"作者: {first_book.author}")

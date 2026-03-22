@@ -10,8 +10,6 @@ Tests the /api/v1/completion/stream endpoint with various scenarios:
 import pytest
 import requests
 import logging
-import json
-import time
 from typing import Optional
 
 from tests.e2e.conftest import (

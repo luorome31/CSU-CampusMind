@@ -2,7 +2,7 @@
 Knowledge API - Knowledge base management endpoints
 """
 from typing import List, Optional
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from app.services.knowledge import KnowledgeService

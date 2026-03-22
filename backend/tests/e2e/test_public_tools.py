@@ -25,6 +25,7 @@ from tests.e2e.conftest import (
 e2e_logger = logging.getLogger("e2e.public_tools")
 
 
+@pytest.mark.e2e
 @pytest.mark.public_tools
 class TestPublicToolsViaCompletion:
     """
@@ -231,6 +232,7 @@ class TestPublicToolsViaCompletion:
         e2e_logger.info(f"Public tools called: {called_public_tools}")
 
 
+@pytest.mark.e2e
 @pytest.mark.public_tools
 class TestLibrarySearch:
     """Test library_search tool functionality"""
@@ -289,11 +291,13 @@ class TestLibrarySearch:
 
         # Check if response contains book-related content
         response_text = result.accumulated_text.lower()
+        assert len(response_text) > 0, "Response should not be empty"
         e2e_logger.info(
             f"Library search response length: {len(result.accumulated_text)} chars"
         )
 
 
+@pytest.mark.e2e
 @pytest.mark.public_tools
 class TestCareerTools:
     """Test career tools functionality"""

@@ -19,8 +19,6 @@ async def test_engine():
     engine = create_async_engine(db_url, echo=False)
 
     # 创建表
-    from app.database.models.dialog import Dialog
-    from app.database.models.chat_history import ChatHistory
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
 

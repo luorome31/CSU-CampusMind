@@ -11,7 +11,6 @@ from fastapi import Depends
 from redis.asyncio import Redis
 from loguru import logger
 
-from app.config import settings
 from app.api.dependencies import get_redis_client
 
 

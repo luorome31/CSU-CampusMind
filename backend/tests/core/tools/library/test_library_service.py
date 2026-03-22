@@ -1,8 +1,7 @@
 """
 Library Service Tests
 """
-import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch, MagicMock
 from app.core.tools.library.models import (
     LibraryBookItem,
     LibraryBookSearchResult,

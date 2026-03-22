@@ -379,7 +379,7 @@ const ColorSwatch: React.FC<{
   hex: string;
   isTransparent?: boolean;
   darkText?: boolean;
-}> = ({ name, var: varName, hex, isTransparent, darkText }) => (
+}> = ({ name, hex, isTransparent }) => (
   <div className="swatch">
     <div
       className={`swatch-color ${isTransparent ? 'is-transparent' : ''}`}

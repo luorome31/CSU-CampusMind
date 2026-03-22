@@ -7,9 +7,13 @@
 
 注意: 需要在 .env 中配置 CAS_USERNAME 和 CAS_PASSWORD
 """
+import pytest
+
+# Skip all tests in this file - this is a manual script, not a pytest test
+pytestmark = pytest.mark.skip(reason="Manual script, not a pytest test")
+
 import os
 import sys
-import requests
 from dotenv import load_dotenv
 
 # 加载 .env 配置
@@ -53,7 +57,7 @@ def test_jwc_provider(castgc: str):
         provider = JWCSessionProvider()
         session = provider.fetch_session(castgc)
         cookies = {c.name: c.value for c in session.cookies}
-        print(f"  ✓ JWC Session 获取成功")
+        print("  ✓ JWC Session 获取成功")
         print(f"    Cookies: {list(cookies.keys())}")
         return session
     except Exception as e:
@@ -64,7 +68,7 @@ def test_jwc_provider(castgc: str):
 def test_manager_login():
     """测试 UnifiedSessionManager.login()"""
     print("\n[测试 3] 测试 UnifiedSessionManager.login()...")
-    from app.core.session.manager import UnifiedSessionManager, NeedReLoginError
+    from app.core.session.manager import UnifiedSessionManager
     from app.core.session.persistence import FileSessionPersistence
     from app.core.session.rate_limiter import LoginRateLimiter
     import tempfile
@@ -77,7 +81,7 @@ def test_manager_login():
         try:
             manager.login(CAS_USERNAME, CAS_USERNAME, CAS_PASSWORD)
             castgc = manager._get_castgc(CAS_USERNAME)
-            print(f"  ✓ Manager.login() 成功")
+            print("  ✓ Manager.login() 成功")
             print(f"  ✓ CASTGC 已缓存: {castgc[:30]}...")
             return manager
         except Exception as e:
@@ -92,7 +96,7 @@ def test_get_session(manager):
     try:
         session = manager.get_session(CAS_USERNAME, "jwc")
         cookies = {c.name: c.value for c in session.cookies}
-        print(f"  ✓ get_session 成功")
+        print("  ✓ get_session 成功")
         print(f"    Cookies: {list(cookies.keys())}")
         return session
     except Exception as e:
@@ -112,7 +116,7 @@ def test_jwt_token():
 
         # 验证 token
         payload = jwt_manager.decode_token(token)
-        print(f"  ✓ Token 验证成功")
+        print("  ✓ Token 验证成功")
         print(f"    Payload: {payload}")
 
         # 验证 token 有效

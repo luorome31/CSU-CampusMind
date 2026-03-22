@@ -14,8 +14,6 @@ E2E 测试：真实调用 CAS 和教务系统
     uv run pytest tests/core/test_jwc_e2e.py -v -k "test_e2e"
 """
 import pytest
-import os
-import time
 from unittest.mock import MagicMock
 from app.config import settings
 from app.core.session import UnifiedSessionManager, FileSessionPersistence, LoginRateLimiter
@@ -25,6 +23,7 @@ from app.core.session import UnifiedSessionManager, FileSessionPersistence, Logi
 # Also mark as async since get_jwc_session is now async
 # Note: e2e tests require Redis for CASTGC caching
 pytestmark = [
+    pytest.mark.e2e,
     pytest.mark.skipif(
         not settings.cas_username or not settings.cas_password,
         reason="CAS credentials not configured in .env"
@@ -101,7 +100,7 @@ class TestJwcE2E:
 
     async def test_e2e_cache_session(self, session_manager):
         """测试 Session 缓存"""
-        print(f"\n测试 Session 缓存...")
+        print("\n测试 Session 缓存...")
 
         # 第一次获取
         session1 = await session_manager.get_jwc_session(settings.cas_username)
@@ -116,7 +115,7 @@ class TestJwcE2E:
 
     async def test_e2e_query_grades(self, session_manager):
         """测试查询成绩（真实网络请求）"""
-        print(f"\n尝试查询成绩...")
+        print("\n尝试查询成绩...")
 
         from app.core.tools.jwc import JwcService
 
@@ -148,7 +147,7 @@ class TestJwcSessionPersistenceE2E:
 
     async def test_e2e_persistence(self, tmp_path):
         """测试 Session 持久化"""
-        print(f"\n测试 Session 持久化...")
+        print("\n测试 Session 持久化...")
 
         session_path = tmp_path / "sessions_e2e.json"
 
@@ -162,7 +161,7 @@ class TestJwcSessionPersistenceE2E:
         )
 
         session1 = await manager1.get_jwc_session(settings.cas_username)
-        print(f"✓ 第一次登录成功")
+        print("✓ 第一次登录成功")
 
         # 第二次：从文件加载
         persistence2 = FileSessionPersistence(storage_path=str(session_path))
@@ -174,14 +173,14 @@ class TestJwcSessionPersistenceE2E:
 
         # 不需要再次登录
         session2 = await manager2.get_jwc_session(settings.cas_username)
-        print(f"✓ 第二次从文件加载成功")
+        print("✓ 第二次从文件加载成功")
 
         # 验证是同一个 Session
         cookies1 = dict(session1.cookies)
         cookies2 = dict(session2.cookies)
 
         assert cookies1.get("JSESSIONID") == cookies2.get("JSESSIONID")
-        print(f"✓ Session 一致")
+        print("✓ Session 一致")
 
 
 if __name__ == "__main__":

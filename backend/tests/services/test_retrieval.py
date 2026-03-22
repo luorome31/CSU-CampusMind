@@ -61,7 +61,7 @@ class TestHybridRetrieval:
         """测试混合检索-仅向量"""
         from app.services.rag.retrieval import HybridRetrieval
 
-        results = await HybridRetrieval.mix_retrieve(
+        _ = await HybridRetrieval.mix_retrieve(
             query="test query",
             knowledge_ids=["kb_1"],
             enable_vector=True,
@@ -77,7 +77,7 @@ class TestHybridRetrieval:
         """测试混合检索-仅关键词"""
         from app.services.rag.retrieval import HybridRetrieval
 
-        results = await HybridRetrieval.mix_retrieve(
+        _ = await HybridRetrieval.mix_retrieve(
             query="test query",
             knowledge_ids=["kb_1"],
             enable_vector=False,

@@ -5,7 +5,6 @@ CAS 登录流程:
 1. 用户登录 CAS 获取 CASTGC cookie (跨子系统共享)
 2. 使用 CASTGC 通过 SubsystemSessionProvider 获取各子系统的 session
 """
-import asyncio
 import json
 import logging
 import time
@@ -13,7 +12,6 @@ from typing import Optional
 
 import requests
 
-from app.config import settings
 from .persistence import SessionPersistence
 from .rate_limiter import LoginRateLimiter
 from . import cas_login

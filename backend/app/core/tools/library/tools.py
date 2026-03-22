@@ -2,11 +2,11 @@
 LangChain Tools - 图书馆查询
 """
 import logging
-from typing import Optional, List
+from typing import List
 from pydantic import BaseModel, Field
 from langchain_core.tools import StructuredTool, BaseTool
 from app.core.context import ToolContext
-from .service import LibraryService, get_library_service
+from .service import get_library_service
 from .models import LibraryBookSearchResult, LibraryBookItemCopiesResult
 
 logger = logging.getLogger(__name__)

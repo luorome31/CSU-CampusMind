@@ -16,7 +16,6 @@ def test_db():
     engine = create_engine(f"sqlite:///{path}", echo=False)
 
     # 创建表
-    from app.database.models.knowledge_file import KnowledgeFile
     SQLModel.metadata.create_all(engine)
 
     yield engine
@@ -54,15 +53,15 @@ class TestKnowledgeFileServiceIntegration:
 
         with patch('app.services.knowledge_file.knowledge_file.engine', test_db):
             # 创建多个文件
-            kf1 = KnowledgeFileService.create_knowledge_file(
+            _ = KnowledgeFileService.create_knowledge_file(
                 file_name="file1.txt", knowledge_id="kb_1", user_id="user_1",
                 oss_url="http://test.com/1"
             )
-            kf2 = KnowledgeFileService.create_knowledge_file(
+            _ = KnowledgeFileService.create_knowledge_file(
                 file_name="file2.txt", knowledge_id="kb_1", user_id="user_1",
                 oss_url="http://test.com/2"
             )
-            kf3 = KnowledgeFileService.create_knowledge_file(
+            _ = KnowledgeFileService.create_knowledge_file(
                 file_name="file3.txt", knowledge_id="kb_2", user_id="user_1",
                 oss_url="http://test.com/3"
             )

@@ -3,8 +3,8 @@ History Service - Service for chat history operations
 """
 import json
 from datetime import datetime
-from typing import Optional, Any, List
-from sqlmodel import select, desc
+from typing import Optional, List
+from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.chat_history import ChatHistory

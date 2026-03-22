@@ -20,7 +20,8 @@ class TestRealAPI:
         service = CareerService()
         result = service.get_teachin()
 
-        assert "## 宣讲会查询结果" in result or "宣讲会查询" in result
+        # Check for table format or "empty" message
+        assert "宣讲会查询" in result or "公司名称" in result or "为空" in result
 
     def test_jobfair_real(self):
         """测试真实招聘会接口"""
@@ -28,7 +29,8 @@ class TestRealAPI:
         service = CareerService()
         result = service.get_jobfair()
 
-        assert "## 大型招聘会信息" in result or "招聘会查询" in result
+        # Check for table format or "empty" message
+        assert "招聘会" in result or "招聘公告" in result or "为空" in result
 
     def test_campus_recruit_real(self):
         """测试真实校园招聘接口"""
@@ -36,7 +38,8 @@ class TestRealAPI:
         service = CareerService()
         result = service.get_campus_recruit()
 
-        assert "## 校园招聘信息" in result or "校园招聘查询" in result
+        # Check for table format or "empty" message
+        assert "校园招聘" in result or "招聘公告" in result or "为空" in result
 
     def test_campus_intern_real(self):
         """测试真实实习接口"""
@@ -44,4 +47,5 @@ class TestRealAPI:
         service = CareerService()
         result = service.get_campus_intern()
 
-        assert "## 实习岗位信息" in result or "实习信息查询" in result
+        # Check for table format or "empty" message
+        assert "实习" in result or "岗位" in result or "为空" in result

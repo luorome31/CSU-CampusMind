@@ -84,7 +84,7 @@ class LLMClient:
         发送流式 Completion 请求 (调用 LLM)
         """
         endpoint = "/completion/stream"
-        print(f"\n[3] 发送流式 Completion 请求")
+        print("\n[3] 发送流式 Completion 请求")
         print(f"    问题: {query}")
         print(f"    知识库: {knowledge_ids}")
         print(f"    端点: {endpoint}")

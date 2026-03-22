@@ -1,7 +1,7 @@
 """
 Elasticsearch Client - Keyword search
 """
-from typing import List, Optional
+from typing import List
 from elasticsearch import Elasticsearch
 from loguru import logger
 

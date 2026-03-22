@@ -5,10 +5,10 @@ import json
 import time
 from typing import List, Optional, Callable, AsyncGenerator
 from starlette.types import Receive
-from fastapi import APIRouter, Body, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
-from sqlmodel import Session, select
+from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
@@ -17,7 +17,7 @@ from app.config import settings
 from app.database.session import async_session_dependency
 from app.database.models import Dialog, ChatHistory
 from app.services.rag.handler import rag_handler
-from app.core.agents.react_agent import ReactAgent, StreamOutput
+from app.core.agents.react_agent import ReactAgent
 from app.core.tools.rag_tool import create_rag_tool
 
 # Import authentication dependency

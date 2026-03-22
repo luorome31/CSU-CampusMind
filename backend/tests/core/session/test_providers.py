@@ -1,6 +1,6 @@
 # backend/tests/core/session/test_providers.py
 import pytest
-from unittest.mock import Mock, MagicMock
+from unittest.mock import Mock
 from app.core.session.providers.base import SubsystemSessionProvider
 
 

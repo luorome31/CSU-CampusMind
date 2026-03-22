@@ -83,15 +83,6 @@ def create_db_and_tables():
     (uses CREATE TABLE IF NOT EXISTS).
     """
     # Import all models to ensure they are registered with SQLModel.metadata
-    from app.database.models import (
-        Dialog,
-        ChatHistory,
-        KnowledgeBase,
-        KnowledgeFile,
-        User,
-        ToolDefinition,
-        ToolCallLog,
-    )
     SQLModel.metadata.create_all(engine)
 
 

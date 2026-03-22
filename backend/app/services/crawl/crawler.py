@@ -3,9 +3,8 @@ Crawl Service - Web content crawling and storage
 """
 import asyncio
 import hashlib
-import uuid
 from datetime import datetime
-from typing import Optional, List
+from typing import List
 from urllib.parse import urlparse
 
 from crawl4ai import (
