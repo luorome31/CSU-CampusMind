@@ -31,13 +31,13 @@ export function ToolGroup({ events }: ToolGroupProps) {
   };
 
   const getStatusText = () => {
-    if (events.length === 0) return '等待工具执行...';
+    if (events.length === 0) return '正在准备工具...';
     if (allDone) {
       return errorCount > 0
-        ? `执行完成 ${doneCount} 个工具，${errorCount} 个错误`
-        : `执行完成 ${doneCount} 个工具`;
+        ? `调用了 ${events.length} 个工具 (${errorCount} 个失败)`
+        : `成功调用了 ${events.length} 个工具`;
     }
-    return `运行中 ${doneCount}/${events.length} 个工具`;
+    return `正在调用工具 (${doneCount}/${events.length})...`;
   };
 
   if (events.length === 0) {
@@ -64,20 +64,22 @@ export function ToolGroup({ events }: ToolGroupProps) {
             const isError = event.status === 'ERROR';
             return (
               <div key={event.id} className="tool-group-item">
-                <span
-                  className={`tool-group-status ${
-                    isEnd
-                      ? 'tool-group-status-done'
-                      : isError
-                        ? 'tool-group-status-error'
-                        : 'tool-group-status-running'
-                  }`}
-                >
-                  {isEnd ? '✓' : isError ? '✗' : '○'}
-                </span>
-                <span className="tool-group-item-title">{event.title}</span>
-                {event.message && (
-                  <span className="tool-group-item-msg">{event.message}</span>
+                <div className="tool-group-item-header">
+                   <span
+                     className={`tool-group-status ${
+                       isEnd
+                         ? 'tool-group-status-done'
+                         : isError
+                           ? 'tool-group-status-error'
+                           : 'tool-group-status-running'
+                     }`}
+                   >
+                     {isEnd ? '✓' : isError ? '✗' : '○'}
+                   </span>
+                   <span className="tool-group-item-title">{event.title}</span>
+                </div>
+                {event.message && (!isEnd || isError) && (
+                  <div className="tool-group-item-msg">{event.message}</div>
                 )}
               </div>
             );

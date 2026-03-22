@@ -67,9 +67,9 @@ export function useChatStream() {
             const data = event.data as { accumulated: string };
             chatStore.getState().updateStreamingMessage(data.accumulated);
           } else if (event.type === 'event') {
-            const data = event.data as { status: 'START' | 'END' | 'ERROR'; title: string; message: string };
+            const data = event.data as { id?: string; status: 'START' | 'END' | 'ERROR'; title: string; message: string };
             const toolEvent: ToolEvent = {
-              id: generateToolEventId(),
+              id: data.id || generateToolEventId(),
               status: data.status,
               title: data.title,
               message: data.message,

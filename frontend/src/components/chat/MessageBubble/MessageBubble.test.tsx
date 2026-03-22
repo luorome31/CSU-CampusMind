@@ -65,7 +65,7 @@ describe('MessageBubble', () => {
     };
     render(<MessageBubble message={messageWithEvents} />);
     // ToolGroup shows summary text when collapsed
-    expect(screen.getByText('执行完成 1 个工具')).toBeInTheDocument();
+    expect(screen.getByText('成功调用了 1 个工具')).toBeInTheDocument();
   });
 
   it('does not render tool events for user messages', () => {

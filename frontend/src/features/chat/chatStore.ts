@@ -71,17 +71,30 @@ export const chatStore = create<ChatStore>((set) => ({
   addToolEvent: (event) =>
     set((state) => {
       const messages = [...state.messages];
-      // Update last assistant message's events if exists
-      if (messages.length > 0 && messages[messages.length - 1].role === 'assistant') {
-        messages[messages.length - 1] = {
-          ...messages[messages.length - 1],
-          events: [...messages[messages.length - 1].events, event],
-        };
+      const globalEvents = [...state.toolEvents];
+      const globalIdx = globalEvents.findIndex(e => e.id === event.id);
+      if (globalIdx >= 0) {
+        globalEvents[globalIdx] = { ...globalEvents[globalIdx], status: event.status, message: event.message };
+      } else {
+        globalEvents.push(event);
       }
-      return {
-        toolEvents: [...state.toolEvents, event],
-        messages,
-      };
+
+      // Also update last assistant message's events if exists
+      if (messages.length > 0 && messages[messages.length - 1].role === 'assistant') {
+        const lastMsg = { ...messages[messages.length - 1] };
+        const events = [...lastMsg.events];
+        const existingIdx = events.findIndex(e => e.id === event.id);
+        if (existingIdx >= 0) {
+          events[existingIdx] = { ...events[existingIdx], status: event.status, message: event.message };
+        } else {
+          events.push(event);
+        }
+        lastMsg.events = events;
+        messages[messages.length - 1] = lastMsg;
+        return { toolEvents: globalEvents, messages };
+      }
+
+      return { toolEvents: globalEvents };
     }),
 
   finishStreaming: () => set({ isStreaming: false }),

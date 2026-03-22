@@ -228,7 +228,8 @@ async def generate_stream(
             else:
                 # Other events (tool calls, status updates)
                 yield f'data: {json.dumps(event)}\n\n'
-                events.append(event)
+                if event.get("type") == "event":
+                    events.append(event.get("data", {}))
 
     except Exception as e:
         from loguru import logger
@@ -243,7 +244,7 @@ async def generate_stream(
             }
         }
         yield f'data: {json.dumps(error_event)}\n\n'
-        events.append(error_event)
+        events.append(error_event.get("data", {}))
 
     finally:
         # Save assistant message to history (async dual-write for consistency)

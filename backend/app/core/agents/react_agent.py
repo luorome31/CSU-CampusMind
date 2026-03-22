@@ -124,7 +124,7 @@ class ReactAgent:
         )
 
         # Send tool analysis start event
-        writer(self._wrap_stream_output("event", {
+        writer(self._wrap_stream_output("agent_state", {
             "title": select_tool_message,
             "status": "START",
             "message": "正在分析需要使用的工具..."
@@ -138,7 +138,7 @@ class ReactAgent:
         if response.tool_calls:
             tool_call_names = sorted(list(set(tool_call["name"] for tool_call in response.tool_calls)))
             # Send tool selection complete event
-            writer(self._wrap_stream_output("event", {
+            writer(self._wrap_stream_output("agent_state", {
                 "title": select_tool_message,
                 "status": "END",
                 "message": f"将调用工具: {', '.join(tool_call_names)}"
@@ -148,7 +148,7 @@ class ReactAgent:
             return {"messages": state["messages"]}
         else:
             # Send no tool available event
-            writer(self._wrap_stream_output("event", {
+            writer(self._wrap_stream_output("agent_state", {
                 "title": select_tool_message,
                 "status": "END",
                 "message": "模型选择直接回复"
@@ -177,14 +177,15 @@ class ReactAgent:
             tool_args = tool_call["args"]
             tool_call_id = tool_call["id"]
 
-            tool_title = f"执行工具: {tool_name}"
+            # tool_title = f"执行工具: {tool_name}"
 
             try:
                 # Send tool execution start event
                 writer(self._wrap_stream_output("event", {
+                    "id": tool_call_id,
                     "status": "START",
-                    "title": tool_title,
-                    "message": f"参数: {tool_args}"
+                    "title": tool_name,
+                    "message": f"{tool_args}"
                 }))
 
                 current_tool = self.get_tool_by_name(tool_name)
@@ -201,8 +202,9 @@ class ReactAgent:
 
                 # Send tool execution complete event
                 writer(self._wrap_stream_output("event", {
+                    "id": tool_call_id,
                     "status": "END",
-                    "title": tool_title,
+                    "title": tool_name,
                     "message": "执行完成"
                 }))
 
@@ -215,8 +217,9 @@ class ReactAgent:
                 error_message = f"执行工具 {tool_name} 失败: {str(err)}"
                 # Send tool execution error event
                 writer(self._wrap_stream_output("event", {
+                    "id": tool_call_id,
                     "status": "ERROR",
-                    "title": tool_title,
+                    "title": tool_name,
                     "message": error_message
                 }))
 
