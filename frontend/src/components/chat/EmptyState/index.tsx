@@ -1,5 +1,6 @@
 // src/components/chat/EmptyState/index.tsx
 import React from 'react';
+import { EMPTY_STATE_AVATAR } from '../../../utils/avatar';
 import './EmptyState.css';
 
 /**
@@ -10,20 +11,7 @@ export const EmptyState: React.FC = () => {
   return (
     <div className="empty-state">
       <div className="empty-state-logo">
-        <svg
-          width="64"
-          height="64"
-          viewBox="0 0 64 64"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <circle cx="32" cy="32" r="30" stroke="var(--color-accent)" strokeWidth="2" />
-          <path
-            d="M32 16C23.163 16 16 23.163 16 32s7.163 16 16 16 16-7.163 16-16-7.163-16-16-16zm0 4c6.627 0 12 5.373 12 12s-5.373 12-12 12-12-5.373-12-12 5.373-12 12-12z"
-            fill="var(--color-accent)"
-          />
-          <circle cx="32" cy="32" r="4" fill="var(--color-accent)" />
-        </svg>
+        <img src={EMPTY_STATE_AVATAR} alt="CampusMind" />
       </div>
       <h1 className="empty-state-title">CampusMind</h1>
       <p className="empty-state-subtitle">你的智能校园助手</p>

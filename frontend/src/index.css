@@ -1,11 +1,15 @@
 /* === Global Reset === */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
 }
 
@@ -31,7 +35,7 @@ button {
 
 /* === Layout Variables === */
 :root {
-  --sidebar-width: 260px;
+  --sidebar-width: 330px;
   --header-height: 56px;
 }
 

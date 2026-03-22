@@ -3,10 +3,10 @@ import { render, screen } from '@testing-library/react';
 import { EmptyState } from './index';
 
 describe('EmptyState', () => {
-  it('renders the logo SVG', () => {
+  it('renders the logo image', () => {
     render(<EmptyState />);
-    // The EmptyState renders an SVG with a circle
-    expect(document.querySelector('.empty-state-logo svg')).toBeInTheDocument();
+    // The EmptyState renders an img element
+    expect(document.querySelector('.empty-state-logo img')).toBeInTheDocument();
   });
 
   it('renders the application title', () => {

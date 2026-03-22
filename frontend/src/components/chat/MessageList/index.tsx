@@ -26,13 +26,15 @@ export const MessageList: React.FC<MessageListProps> = ({
 
   return (
     <div className="message-list">
-      {messages.map((msg) => (
-        <MessageBubble
-          key={msg.id}
-          message={msg}
-        />
-      ))}
-      <div ref={bottomRef} />
+      <div className="message-list-content">
+        {messages.map((msg) => (
+          <MessageBubble
+            key={msg.id}
+            message={msg}
+          />
+        ))}
+        <div ref={bottomRef} />
+      </div>
     </div>
   );
 };

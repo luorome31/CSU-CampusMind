@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ToolGroup } from '../ToolGroup';
 import type { ChatMessage } from '../../../features/chat/chatStore';
+import { ASSISTANT_AVATAR } from '../../../utils/avatar';
 import './MessageBubble.css';
 
 interface MessageBubbleProps {
@@ -22,6 +23,11 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
 
   return (
     <div className={`message-bubble message-${isUser ? 'user' : 'assistant'}`}>
+      {!isUser && (
+        <div className="message-avatar">
+          <img src={ASSISTANT_AVATAR} alt="Assistant" />
+        </div>
+      )}
       <div className="message-content">
         {isUser ? (
           <p className="message-text">{message.content}</p>

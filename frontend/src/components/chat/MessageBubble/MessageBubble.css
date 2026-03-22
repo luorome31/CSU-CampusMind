@@ -3,6 +3,7 @@
 .message-bubble {
   display: flex;
   margin-bottom: var(--space-3);
+  align-items: flex-start;
 }
 
 .message-user {
@@ -11,6 +12,25 @@
 
 .message-assistant {
   justify-content: flex-start;
+}
+
+.message-avatar {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: var(--color-accent-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: var(--space-2);
+  overflow: hidden;
+}
+
+.message-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .message-content {
@@ -30,10 +50,10 @@
 }
 
 .message-assistant .message-content {
-  background: var(--color-bg-surface);
+  background: transparent;
   color: var(--color-text-primary);
   border-bottom-left-radius: var(--radius-sm);
-  width: 100%;
+  width: fit-content;
 }
 
 .message-text {

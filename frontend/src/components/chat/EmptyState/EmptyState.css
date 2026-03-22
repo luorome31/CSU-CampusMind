@@ -15,6 +15,12 @@
   opacity: 0.85;
 }
 
+.empty-state-logo img {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+}
+
 .empty-state-title {
   font-size: var(--text-3xl);
   font-weight: var(--font-semibold);
