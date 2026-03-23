@@ -52,7 +52,7 @@ class Settings(BaseModel):
     # JWT
     jwt_secret_key: str = "your-secret-key-change-in-production"
     jwt_algorithm: str = "HS256"
-    jwt_expire_hours: int = 24
+    jwt_expire_hours: int = 4
 
     # CAS Credentials (loaded from .env)
     cas_username: Optional[str] = None
@@ -85,7 +85,7 @@ class Settings(BaseModel):
             redis_url=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
             jwt_secret_key=os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production"),
             jwt_algorithm=os.getenv("JWT_ALGORITHM", "HS256"),
-            jwt_expire_hours=int(os.getenv("JWT_EXPIRE_HOURS", "24")),
+            jwt_expire_hours=int(os.getenv("JWT_EXPIRE_HOURS", "4")),
             cas_username=os.getenv("CAS_USERNAME"),
             cas_password=os.getenv("CAS_PASSWORD"),
         )
