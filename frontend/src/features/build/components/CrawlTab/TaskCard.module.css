@@ -1,0 +1,93 @@
+.card {
+  background: var(--color-bg-surface, #fff);
+  border: 1px solid var(--color-border, rgba(83, 125, 150, 0.22));
+  border-radius: var(--radius-md, 8px);
+  padding: var(--space-4, 16px);
+  margin-bottom: var(--space-3, 12px);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3, 12px);
+}
+
+.taskId {
+  font-size: var(--text-sm, 14px);
+  color: var(--color-text-secondary, #666);
+  font-family: monospace;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  font-size: var(--text-sm, 14px);
+  padding: var(--space-1, 4px) var(--space-2, 8px);
+  border-radius: var(--radius-sm, 4px);
+}
+
+.success {
+  color: var(--color-success, #22c55e);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.failed {
+  color: var(--color-error, #ef4444);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.processing,
+.pending {
+  color: var(--color-accent, #537d96);
+  background: rgba(83, 125, 150, 0.1);
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  margin-bottom: var(--space-2, 8px);
+}
+
+.progressBar {
+  flex: 1;
+  height: 8px;
+  background: var(--color-border, rgba(83, 125, 150, 0.22));
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--color-accent, #537d96);
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  font-size: var(--text-sm, 14px);
+  color: var(--color-text-secondary, #666);
+  min-width: 50px;
+  text-align: right;
+}
+
+.stats {
+  display: flex;
+  gap: var(--space-4, 16px);
+  font-size: var(--text-sm, 14px);
+  color: var(--color-text-secondary, #666);
+}
+
+.date {
+  margin-left: auto;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
