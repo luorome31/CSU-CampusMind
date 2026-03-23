@@ -3,6 +3,7 @@ Knowledge File API - Knowledge file management endpoints
 """
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
 
 from app.services.knowledge_file import KnowledgeFileService
@@ -152,7 +153,7 @@ async def delete_knowledge_file(
     return {"success": True}
 
 
-@router.get("/knowledge_file/{file_id}/content", response_model=str)
+@router.get("/knowledge_file/{file_id}/content", response_class=PlainTextResponse)
 async def get_knowledge_file_content(
     file_id: str,
     current_user: dict = Depends(get_current_user)
