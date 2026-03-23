@@ -165,9 +165,8 @@ async def get_knowledge_file_content(
     if knowledge_file.user_id != current_user["user_id"]:
         raise HTTPException(status_code=403, detail="No permission to view this file content")
         
-    object_name = "/".join(knowledge_file.oss_url.split("/")[-2:])
     try:
-        content = storage_client.get_content(object_name)
+        content = storage_client.get_content(knowledge_file.object_name)
         return content.decode("utf-8")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch content: {str(e)}")
@@ -187,11 +186,10 @@ async def update_knowledge_file_content(
     if knowledge_file.user_id != current_user["user_id"]:
         raise HTTPException(status_code=403, detail="No permission to update this file content")
         
-    object_name = "/".join(knowledge_file.oss_url.split("/")[-2:])
     content_bytes = request.content.encode("utf-8")
     
     try:
-        storage_client.upload_content(object_name, content_bytes)
+        storage_client.upload_content(knowledge_file.object_name, content_bytes)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to update stored content: {str(e)}")
         
@@ -226,9 +224,8 @@ async def trigger_knowledge_file_index(
         
     KnowledgeFileService.update_file_status(file_id, FileStatus.INDEXING)
     
-    object_name = "/".join(knowledge_file.oss_url.split("/")[-2:])
     try:
-        content_bytes = storage_client.get_content(object_name)
+        content_bytes = storage_client.get_content(knowledge_file.object_name)
         content_str = content_bytes.decode("utf-8")
     except Exception as e:
         KnowledgeFileService.update_file_status(file_id, FileStatus.FAIL)

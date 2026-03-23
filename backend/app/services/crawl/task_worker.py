@@ -101,6 +101,7 @@ async def process_batch_crawl_with_knowledge(
                         knowledge_id=knowledge_id,
                         user_id=user_id,
                         oss_url=oss_url,
+                        object_name=storage_key,
                         file_size=len(content),
                     )
 

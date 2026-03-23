@@ -21,6 +21,7 @@ class TestKnowledgeFileAPI:
             mock_file.user_id = "test_user"
             mock_file.status = "success"
             mock_file.oss_url = "https://oss.example.com/test.txt"
+            mock_file.object_name = "test_kb_1/test.txt"
             mock_file.file_size = 1024
             mock_file.to_dict.return_value = {
                 "id": "file_123",
@@ -29,6 +30,7 @@ class TestKnowledgeFileAPI:
                 "user_id": "test_user",
                 "status": "success",
                 "oss_url": "https://oss.example.com/test.txt",
+                "object_name": "test_kb_1/test.txt",
                 "file_size": 1024,
                 "create_time": "2024-01-01T00:00:00",
                 "update_time": "2024-01-01T00:00:00"

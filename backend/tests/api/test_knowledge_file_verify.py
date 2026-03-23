@@ -13,6 +13,7 @@ class TestKnowledgeFileVerificationAPI:
             mock_file = MagicMock()
             mock_file.id = "file_123"
             mock_file.oss_url = "http://minio:9000/campusmind/crawl/test_file.md"
+            mock_file.object_name = "crawl/test_file.md"
             mock_file.status = FileStatus.PENDING_VERIFY
             mock_file.knowledge_id = "test_kb_1"
             mock_file.file_name = "test_file.md"

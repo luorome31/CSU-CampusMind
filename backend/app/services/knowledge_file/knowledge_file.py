@@ -20,6 +20,7 @@ class KnowledgeFileService:
         knowledge_id: str,
         user_id: str,
         oss_url: str,
+        object_name: str,
         file_size: int = 0,
     ) -> KnowledgeFile:
         """Create a new knowledge file record"""
@@ -30,6 +31,7 @@ class KnowledgeFileService:
             knowledge_id=knowledge_id,
             user_id=user_id,
             oss_url=oss_url,
+            object_name=object_name,
             file_size=file_size,
             status=FileStatus.PROCESS,
         )
@@ -80,8 +82,7 @@ class KnowledgeFileService:
             if knowledge_file:
                 # Cleanup OSS
                 try:
-                    object_name = "/".join(knowledge_file.oss_url.split("/")[-2:])
-                    storage_client.delete_content(object_name)
+                    storage_client.delete_content(knowledge_file.object_name)
                 except Exception:
                     pass # Don't block DB deletion if OSS fails
                 
