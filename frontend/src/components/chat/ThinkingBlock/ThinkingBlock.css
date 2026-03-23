@@ -1,26 +1,136 @@
+/* src/components/chat/ThinkingBlock/ThinkingBlock.css */
+
 .thinking-block {
-  margin: 8px 0;
-  border-left: 2px solid var(--border);
-  padding-left: 12px;
+  margin: var(--space-2) 0;
+  border: 1px solid var(--mood-border);
+  border-radius: var(--radius-md);
+  background: var(--mood-bg);
+  overflow: hidden;
 }
 
-.thinking-block-summary {
-  cursor: pointer;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  user-select: none;
+.thinking-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  transition: color 0.2s;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: rgba(0, 0, 0, 0.02);
+  border-bottom: 1px solid var(--mood-border);
 }
 
-.thinking-block-summary:hover {
-  color: var(--text);
+.thinking-icon {
+  color: var(--mood-text);
+  flex-shrink: 0;
 }
 
-.thinking-block-body {
+.thinking-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--mood-text);
+}
+
+.thinking-count {
+  font-size: var(--text-xs);
+  color: var(--mood-text);
+  opacity: 0.7;
+}
+
+.thinking-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.thinking-action-btn {
+  background: none;
+  border: none;
+  padding: var(--space-1);
+  color: var(--mood-text);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thinking-action-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.thinking-content {
+  padding: var(--space-1) 0;
+}
+
+.thinking-item {
+  border-bottom: 1px solid var(--mood-border);
+}
+
+.thinking-item:last-child {
+  border-bottom: none;
+}
+
+.thinking-item-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: var(--text-sm);
+  color: var(--mood-text);
+  transition: background-color 0.2s;
+}
+
+.thinking-item-header:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.thinking-item-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.thinking-item-label {
+  font-weight: var(--font-medium);
+  color: var(--mood-text);
+}
+
+.thinking-item-body {
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  padding-left: calc(var(--space-3) + var(--space-3));
+  font-size: var(--text-sm);
   color: var(--text-light);
-  font-size: 0.9rem;
-  margin-top: 6px;
+  line-height: var(--leading-relaxed);
+}
+
+.thinking-item-body p {
+  margin: 0 0 var(--space-2);
+}
+
+.thinking-item-body p:last-child {
+  margin-bottom: 0;
+}
+
+.thinking-item-body code {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.1em 0.3em;
+  border-radius: var(--radius-sm);
+}
+
+.thinking-item-body ul,
+.thinking-item-body ol {
+  margin: var(--space-1) 0;
+  padding-left: var(--space-5);
+}
+
+.thinking-item-body li {
+  margin: var(--space-1) 0;
 }
