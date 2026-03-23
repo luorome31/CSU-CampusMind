@@ -1,0 +1,115 @@
+.file-content-viewer {
+  background: var(--bg-card, #FCFAF5);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border, rgba(83, 125, 150, 0.22));
+  overflow: hidden;
+}
+
+.file-content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  background: var(--bg-inset, #E8E5DD);
+  border-bottom: 1px solid var(--border, rgba(83, 125, 150, 0.22));
+}
+
+.file-content-name {
+  font-weight: 500;
+  color: var(--text, #3B3D3F);
+}
+
+.file-content-body {
+  padding: var(--space-6, 1.5rem);
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+}
+
+/* Markdown styles */
+.file-content-body h1,
+.file-content-body h2,
+.file-content-body h3,
+.file-content-body h4 {
+  color: var(--text, #3B3D3F);
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  line-height: 1.4;
+}
+
+.file-content-body h1 { font-size: var(--text-2xl, 1.5rem); }
+.file-content-body h2 { font-size: var(--text-xl, 1.25rem); }
+.file-content-body h3 { font-size: var(--text-lg, 1.125rem); }
+
+.file-content-body p {
+  margin: 0 0 1em 0;
+  line-height: 1.7;
+  color: var(--text, #3B3D3F);
+}
+
+.file-content-body code {
+  background: var(--bg-inset, #E8E5DD);
+  padding: 0.2em 0.4em;
+  border-radius: var(--radius-sm, 4px);
+  font-size: 0.9em;
+  font-family: ui-monospace, monospace;
+}
+
+.file-content-body pre {
+  margin: 1em 0;
+}
+
+.file-content-body pre code {
+  background: none;
+  padding: 0;
+}
+
+.file-content-body ul,
+.file-content-body ol {
+  margin: 1em 0;
+  padding-left: 1.5em;
+}
+
+.file-content-body li {
+  margin: 0.5em 0;
+  line-height: 1.6;
+}
+
+.file-content-body blockquote {
+  border-left: 3px solid var(--accent, #537D96);
+  margin: 1em 0;
+  padding-left: 1em;
+  color: var(--text-light, #6B6F73);
+}
+
+.file-content-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+.file-content-body th,
+.file-content-body td {
+  border: 1px solid var(--border, rgba(83, 125, 150, 0.22));
+  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  text-align: left;
+}
+
+.file-content-body th {
+  background: var(--bg-inset, #E8E5DD);
+  font-weight: 500;
+}
+
+.file-content-body a {
+  color: var(--accent, #537D96);
+  text-decoration: none;
+}
+
+.file-content-body a:hover {
+  text-decoration: underline;
+}
+
+.file-content-empty {
+  text-align: center;
+  padding: var(--space-12, 3rem);
+  color: var(--text-muted, #8E9196);
+}
