@@ -1,0 +1,55 @@
+.knowledge-file-detail-page {
+  padding: var(--space-6, 1.5rem);
+  max-width: var(--container-max-lg, 1024px);
+  margin: 0 auto;
+}
+
+.knowledge-file-detail-header {
+  margin-bottom: var(--space-6, 1.5rem);
+}
+
+.knowledge-file-detail-back {
+  margin-bottom: var(--space-3, 0.75rem);
+}
+
+.knowledge-file-detail-title {
+  font-size: var(--text-2xl, 1.5rem);
+  font-weight: 600;
+  color: var(--text, #3B3D3F);
+  margin: 0;
+  word-break: break-all;
+}
+
+.knowledge-file-detail-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.knowledge-file-detail-error {
+  text-align: center;
+  padding: var(--space-4, 1rem);
+  color: var(--color-error, #cf222e);
+  margin-bottom: var(--space-4, 1rem);
+}
+
+.knowledge-file-detail-content {
+  margin-top: var(--space-4, 1rem);
+}
+
+/* Spinner animation */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border, rgba(83, 125, 150, 0.22));
+  border-top-color: var(--accent, #537D96);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
