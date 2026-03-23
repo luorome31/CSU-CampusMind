@@ -31,7 +31,16 @@ class KnowledgeApi {
   }
 
   async fetchFileContent(fileId: string): Promise<string> {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/knowledge_file/${fileId}/content`);
+    const token = sessionStorage.getItem('token');
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+    const response = await fetch(`${baseUrl}/knowledge_file/${fileId}/content`, {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch content: ${response.status}`);
+    }
     return response.text();
   }
 

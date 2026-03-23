@@ -68,6 +68,14 @@ class CrawlTaskService:
             return task
 
     @staticmethod
+    def list_tasks(user_id: str) -> list[CrawlTask]:
+        """List all crawl tasks for a specific user"""
+        with Session(engine) as session:
+            statement = select(CrawlTask).where(CrawlTask.user_id == user_id).order_by(CrawlTask.create_time.desc())
+            return list(session.exec(statement).all())
+
+
+    @staticmethod
     def mark_task_failed(task_id: str) -> Optional[CrawlTask]:
         """Explicitly mark a task as completely failed"""
         with Session(engine) as session:

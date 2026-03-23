@@ -122,3 +122,25 @@ class TestKnowledgeFileAPI:
         assert response.status_code == 200
         data = response.json()
         assert data["success"] is True
+
+    def test_list_knowledge_files_with_status(self, mock_service, mock_auth):
+        """Test GET /api/v1/knowledge/{knowledge_id}/files?status=pending_verify"""
+        from app.main import app
+        client = TestClient(app)
+
+        response = client.get("/api/v1/knowledge/test_kb_1/files?status=pending_verify")
+
+        assert response.status_code == 200
+        mock_service.list_knowledge_files.assert_called_with("test_kb_1", status="pending_verify")
+
+    def test_list_pending_verification_files(self, mock_service, mock_auth):
+        """Test GET /api/v1/knowledge_file/pending_verify"""
+        from app.main import app
+        client = TestClient(app)
+
+        mock_service.list_all_pending_files.return_value = []
+        response = client.get("/api/v1/knowledge_file/pending_verify")
+
+        assert response.status_code == 200
+        assert response.json() == []
+        mock_service.list_all_pending_files.assert_called_once_with("test_user")

@@ -13,6 +13,7 @@
 
 2. **获取某一知识库的文件目录**
    `GET /api/v1/knowledge/{knowledge_id}/files`
+   *支持可选查询参数 `?status=indexed` 只看已生效文件。*
 
 3. **获取单个文件的详细文本内容 (Markdown)**
    为了在页面中直接渲染 Markdown 文本，并保持权限可控，引入了安全拉取内容的接口。
@@ -27,7 +28,13 @@
 
 支持单链接/批量链接提交后，界面实时显示总体爬取进度。
 
-1. **提交批量爬取任务**
+1. **查看历史任务列表** (新增)
+   如果用户刷新页面，可以拉取此前的任务继续监控：
+   ```http
+   GET /api/v1/crawl/tasks
+   ```
+
+2. **提交批量爬取任务**
    ```http
    POST /api/v1/crawl/batch-with-knowledge
    Body:
@@ -36,30 +43,22 @@
        "knowledge_id": "t_abc123"
    }
    ```
-   **响应**: 不再阻塞数百秒等待完成，而是立即返回 Task 信息。
-   ```json
-   {
-       "task_id": "d04a2...98b",
-       "status": "processing",
-       "message": "Batch crawl with knowledge task started"
-   }
-   ```
+   **响应**: 立即返回 Task ID。
 
-2. **任务监控轮询 (Task Progress)**
-   前端拿到 `task_id` 后，启动一个 Timer（比如每 1~2 秒），轮询以下接口刷新进度条：
+3. **任务监控轮询 (Task Progress)**
+   前端拿到 `task_id` 后，定时轮询刷新进度：
    ```http
    GET /api/v1/crawl/tasks/{task_id}
    ```
    **响应**:
    ```json
    {
-       "id": "d04a2...98b",
+       "id": "task_id",
        "total_urls": 10,
-       "completed_urls": 4,      <-- 进度 = completed_urls / total_urls
+       "completed_urls": 4, 
        "success_count": 3,
        "fail_count": 1,
-       "status": "processing",   <-- 当变为 "completed" 或 "failed" 时停止轮询
-       ...
+       "status": "processing"
    }
    ```
 
@@ -67,18 +66,24 @@
 
 ## 场景三：人工校验流
 
-爬取成功的条目需要经过详情页进行人工修改校验，保存后再触发 RAG 向量/关键词索引。
+爬取成功的条目需要经过详情页进行人工修改校验，保存后再触发 RAG 索引构建。
 
-1. **查阅待校验文件**
-   当后台 URL 爬取存入 OSS 后，数据库里对应的 `KnowledgeFile.status` 会被设置为 `pending_verify` (待校验)。您可以通过知识库文件列表 API 过滤出这些状态的文件。
+1. **查阅待校验文件 (Verification Inbox)**
+   *   **方案 A (推荐全局列表)**: 获取所有知识库下所有待处理文件：
+       ```http
+       GET /api/v1/knowledge_file/pending_verify
+       ```
+   *   **方案 B (特定知识库下)**: 
+       ```http
+       GET /api/v1/knowledge/{knowledge_id}/files?status=pending_verify
+       ```
 
-2. **请求文件的原始内容 (Markdown)**
-   进入修改详情页时，调用该接口获取文本填充进 Editor：
+2. **请求文件原始内容并在 Editor 中校对**
    ```http
    GET /api/v1/knowledge_file/{file_id}/content
    ```
 
-3. **保存修改并打上校验标签**
+3. **保存修改并确认有效性**
    在前端 Markdown Editor 完成修改后，保存最新的有效性内容。这会覆盖更新 OSS 内容，并将状态改变为 `verified`。
    ```http
    PUT /api/v1/knowledge_file/{file_id}/content
@@ -87,10 +92,9 @@
        "content": "# 修改后的标题\n\n校对后的正文..."
    }
    ```
-   **响应**: `{"success": true, "message": "Content updated and file verified"}`
 
-4. **主动触发后续索引 (RAG 索引构建)**
-   用户校验满意并保存后，前端发起最终动作：
+4. **主动触发最终索引 (RAG 索引构建)**
+   用户校对满意后，前端发起最终动作：
    ```http
    POST /api/v1/knowledge_file/{file_id}/trigger_index
    Body:
@@ -99,4 +103,4 @@
        "enable_keyword": true
    }
    ```
-   *注意*: 这个过程会将文件状态变为 `indexing`，如果完成会变为 `indexed` 或 `success`。如果报错，则变为 `fail`。
+   *注意*: 这个过程会将文件状态变为 `indexing`，如果完成会变为 `indexed` 或 `success`。

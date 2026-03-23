@@ -95,3 +95,15 @@ class TestCrawlAPI:
         assert isinstance(data, dict)
         assert "task_id" in data
         assert data["status"] == "processing"
+
+    def test_list_crawl_tasks(self, mock_crawl_service, mock_auth):
+        """Test GET /api/v1/crawl/tasks"""
+        from app.main import app
+        client = TestClient(app)
+
+        with patch("app.api.v1.crawl.CrawlTaskService.list_tasks") as mock_list:
+            mock_list.return_value = []
+            response = client.get("/api/v1/crawl/tasks")
+            assert response.status_code == 200
+            assert response.json() == []
+            mock_list.assert_called_once_with("test_user")

@@ -62,6 +62,14 @@ class CrawlTaskResponse(BaseModel):
     message: str
 
 
+@router.get("/crawl/tasks", response_model=List[CrawlTask])
+async def list_crawl_tasks(
+    current_user: dict = Depends(get_current_user)
+):
+    """List all crawl tasks for the current user"""
+    return CrawlTaskService.list_tasks(current_user["user_id"])
+
+
 @router.get("/crawl/tasks/{task_id}", response_model=CrawlTask)
 async def get_crawl_task(
     task_id: str,

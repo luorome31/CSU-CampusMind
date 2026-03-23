@@ -74,6 +74,15 @@ async def create_knowledge_file(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get("/knowledge_file/pending_verify", response_model=List[KnowledgeFileResponse])
+async def list_pending_verification_files(
+    current_user: dict = Depends(get_current_user)
+):
+    """List all files requiring manual verification across all KBs for the user"""
+    files = KnowledgeFileService.list_all_pending_files(current_user["user_id"])
+    return [KnowledgeFileResponse(**f.to_dict()) for f in files]
+
+
 @router.get("/knowledge_file/{file_id}", response_model=KnowledgeFileResponse)
 async def get_knowledge_file(
     file_id: str,
@@ -94,12 +103,11 @@ async def get_knowledge_file(
 @router.get("/knowledge/{knowledge_id}/files", response_model=List[KnowledgeFileResponse])
 async def list_knowledge_files(
     knowledge_id: str,
+    status: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
-    """List all files in a knowledge base"""
-    # Note: KnowledgeFileService.list_knowledge_files doesn't check ownership here, 
-    # but the API should probably verify knowledge_id belongs to user_id.
-    files = KnowledgeFileService.list_knowledge_files(knowledge_id)
+    """List all files in a knowledge base with optional status filtering"""
+    files = KnowledgeFileService.list_knowledge_files(knowledge_id, status=status)
     # Filter files by user_id for safety
     user_id = current_user["user_id"]
     return [KnowledgeFileResponse(**f.to_dict()) for f in files if f.user_id == user_id]
