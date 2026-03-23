@@ -37,10 +37,7 @@ export const knowledgeListStore = create<KnowledgeListStore>((set, get) => ({
   fetchKnowledgeBases: async () => {
     set({ isLoadingKBs: true, error: null });
     try {
-      const userStr = sessionStorage.getItem('user');
-      const user = userStr ? JSON.parse(userStr) : null;
-      const userId = user?.id || 'system';
-      const kb = await knowledgeApi.fetchKnowledgeBases(userId);
+      const kb = await knowledgeApi.fetchKnowledgeBases();
       set({ knowledgeBases: kb, isLoadingKBs: false });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : 'Failed to fetch knowledge bases', isLoadingKBs: false });

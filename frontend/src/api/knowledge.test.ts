@@ -16,9 +16,9 @@ describe('knowledgeApi', () => {
       text: async () => JSON.stringify(mockResponse),
     });
 
-    await knowledgeApi.fetchKnowledgeBases('user1');
+    await knowledgeApi.fetchKnowledgeBases();
     expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining('/users/user1/knowledge'),
+      expect.stringContaining('/knowledge'),
       expect.any(Object)
     );
   });

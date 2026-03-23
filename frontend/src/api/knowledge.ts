@@ -22,8 +22,8 @@ export interface KnowledgeFile {
 }
 
 class KnowledgeApi {
-  async fetchKnowledgeBases(userId: string): Promise<KnowledgeBase[]> {
-    return apiClient.get<KnowledgeBase[]>(`/users/${userId}/knowledge`);
+  async fetchKnowledgeBases(): Promise<KnowledgeBase[]> {
+    return apiClient.get<KnowledgeBase[]>(`/knowledge`);
   }
 
   async fetchFiles(knowledgeId: string): Promise<KnowledgeFile[]> {
