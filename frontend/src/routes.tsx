@@ -4,6 +4,8 @@ import { ProtectedRoute } from './features/auth/ProtectedRoute';
 import { LoginPage } from './features/auth/LoginPage';
 import { ChatPage } from './features/chat/ChatPage';
 import { KnowledgeListPage } from './features/knowledge/KnowledgeListPage';
+import { KnowledgeFileListPage } from './features/knowledge/KnowledgeFileListPage';
+import { KnowledgeFileDetailPage } from './features/knowledge/KnowledgeFileDetailPage';
 import { KnowledgeBuildPage } from './features/build/KnowledgeBuildPage';
 import { Sidebar } from './components/layout/Sidebar/Sidebar';
 
@@ -44,6 +46,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <ChatPage /> },
       { path: 'knowledge', element: <KnowledgeListPage /> },
+      { path: 'knowledge/:kbId', element: <KnowledgeFileListPage /> },
+      { path: 'knowledge/:kbId/files/:fileId', element: <KnowledgeFileDetailPage /> },
       {
         path: 'knowledge/build',
         element: (
