@@ -82,11 +82,11 @@
 }
 
 .message-markdown pre {
-  background: var(--color-bg-inset);
-  padding: var(--space-3);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-  margin: var(--space-2) 0;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  overflow-x: visible;
+  margin: 0;
 }
 
 .message-markdown pre code {

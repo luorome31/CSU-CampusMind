@@ -35,6 +35,10 @@ export default defineConfig(({ mode }) => {
             reporter: ['text', 'json', 'html'],
             exclude: ['node_modules/', 'src/test/'],
           },
+          // Fix ESM compatibility issues with react-syntax-highlighter
+          alias: [
+            { find: /^react-syntax-highlighter$/, replacement: 'react-syntax-highlighter/dist/esm/index' },
+          ],
         }
       : undefined,
   }
