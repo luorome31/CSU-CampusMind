@@ -1,0 +1,67 @@
+.file-table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border, rgba(83, 125, 150, 0.22));
+  background: var(--bg-card, #FCFAF5);
+}
+
+.file-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm, 0.875rem);
+}
+
+.file-table th {
+  text-align: left;
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  font-weight: 500;
+  color: var(--text-muted, #8E9196);
+  background: var(--bg-inset, #E8E5DD);
+  border-bottom: 1px solid var(--border, rgba(83, 125, 150, 0.22));
+}
+
+.file-table td {
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  color: var(--text, #3B3D3F);
+  border-bottom: 1px solid var(--border-subtle, rgba(45, 43, 40, 0.08));
+}
+
+.file-table-row {
+  cursor: pointer;
+  transition: background-color var(--ease-default, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.file-table-row:hover {
+  background: var(--overlay-subtle, rgba(0, 0, 0, 0.03));
+}
+
+.file-table-row:focus-visible {
+  outline: 2px solid var(--accent, #537D96);
+  outline-offset: -2px;
+}
+
+.file-table-row:last-child td {
+  border-bottom: none;
+}
+
+.file-table-name {
+  font-weight: 500;
+}
+
+.file-table-status {
+  white-space: nowrap;
+}
+
+.file-table-size {
+  color: var(--text-light, #6B6F73);
+}
+
+.file-table-date {
+  color: var(--text-light, #6B6F73);
+}
+
+.file-table-empty {
+  text-align: center;
+  padding: var(--space-8, 2rem);
+  color: var(--text-muted, #8E9196);
+}
