@@ -26,6 +26,7 @@ class KnowledgeResponse(BaseModel):
     user_id: str
     create_time: Optional[str] = None
     update_time: Optional[str] = None
+    file_count: int = 0
 
 
 @router.post("/knowledge/create", response_model=KnowledgeResponse)
@@ -70,7 +71,7 @@ async def list_user_knowledge(
     """List all knowledge bases for the current user"""
     user_id = current_user["user_id"]
     knowledge_list = KnowledgeService.list_knowledge_by_user(user_id)
-    return [KnowledgeResponse(**k.to_dict()) for k in knowledge_list]
+    return [KnowledgeResponse(**k) for k in knowledge_list]
 
 
 @router.delete("/knowledge/{knowledge_id}")

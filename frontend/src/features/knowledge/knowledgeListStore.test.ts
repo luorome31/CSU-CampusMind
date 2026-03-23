@@ -21,7 +21,7 @@ describe('knowledgeListStore', () => {
 
   it('fetchKnowledgeBases loads KBs successfully', async () => {
     const mockKBs: knowledgeApi.KnowledgeBase[] = [
-      { id: 'kb1', name: 'KB 1', description: 'desc', user_id: 'user1', create_time: '', update_time: '' }
+      { id: 'kb1', name: 'KB 1', description: 'desc', user_id: 'user1', create_time: '', update_time: '', file_count: 0 }
     ];
     vi.mocked(knowledgeApi.knowledgeApi.fetchKnowledgeBases).mockResolvedValue(mockKBs);
 
@@ -73,7 +73,7 @@ describe('knowledgeListStore', () => {
 
   it('createKnowledgeBase adds new KB to knowledgeBases array', async () => {
     const newKB: knowledgeApi.KnowledgeBase = {
-      id: 'kb-new', name: 'Test KB', description: 'Test desc', user_id: 'user1', create_time: '', update_time: ''
+      id: 'kb-new', name: 'Test KB', description: 'Test desc', user_id: 'user1', create_time: '', update_time: '', file_count: 0
     };
     vi.mocked(knowledgeApi.knowledgeApi.createKnowledgeBase).mockResolvedValue(newKB);
 

@@ -100,3 +100,10 @@ class KnowledgeFileService:
                 KnowledgeFile.status == FileStatus.PENDING_VERIFY
             ).order_by(KnowledgeFile.create_time.desc())
             return list(session.exec(statement).all())
+
+    @staticmethod
+    def count_knowledge_files(knowledge_id: str) -> int:
+        """Count files in a knowledge base"""
+        with Session(engine) as session:
+            statement = select(KnowledgeFile).where(KnowledgeFile.knowledge_id == knowledge_id)
+            return len(list(session.exec(statement).all()))

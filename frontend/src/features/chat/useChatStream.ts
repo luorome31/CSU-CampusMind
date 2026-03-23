@@ -47,7 +47,7 @@ export function useChatStream() {
         const stream = createChatStream(content, {
           dialogId: store.currentDialogId ?? undefined,
           knowledgeIds,
-          enableRag: knowledgeIds.length > 0,
+          enableRag: store.enableRag && knowledgeIds.length > 0,
         });
 
         const reader = stream.getReader();

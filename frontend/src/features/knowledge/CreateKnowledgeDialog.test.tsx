@@ -54,6 +54,7 @@ describe('CreateKnowledgeDialog', () => {
       user_id: 'user1',
       create_time: '',
       update_time: '',
+      file_count: 0,
     };
     vi.mocked(knowledgeApi.knowledgeApi.createKnowledgeBase).mockResolvedValue(mockKB);
 
@@ -88,6 +89,7 @@ describe('CreateKnowledgeDialog', () => {
           user_id: 'user1',
           create_time: '',
           update_time: '',
+          file_count: 0,
         };
       }
     );

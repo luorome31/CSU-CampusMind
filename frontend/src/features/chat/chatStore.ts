@@ -19,6 +19,7 @@ export interface ChatMessage {
 interface ChatState {
   currentDialogId: string | null;
   currentKnowledgeIds: string[];
+  enableRag: boolean;
   messages: ChatMessage[];
   isStreaming: boolean;
   toolEvents: ToolEvent[];
@@ -27,6 +28,8 @@ interface ChatState {
 interface ChatActions {
   setCurrentDialogId: (id: string | null) => void;
   setCurrentKnowledgeIds: (ids: string[]) => void;
+  setEnableRag: (enabled: boolean) => void;
+  toggleRag: () => void;
   addMessage: (msg: ChatMessage) => void;
   updateStreamingMessage: (content: string) => void;
   addToolEvent: (event: ToolEvent) => void;
@@ -40,6 +43,7 @@ type ChatStore = ChatState & ChatActions;
 export const chatStore = create<ChatStore>((set) => ({
   currentDialogId: null,
   currentKnowledgeIds: [],
+  enableRag: true,
   messages: [],
   isStreaming: false,
   toolEvents: [],
@@ -47,6 +51,10 @@ export const chatStore = create<ChatStore>((set) => ({
   setCurrentDialogId: (id) => set({ currentDialogId: id }),
 
   setCurrentKnowledgeIds: (ids) => set({ currentKnowledgeIds: ids }),
+
+  setEnableRag: (enabled) => set({ enableRag: enabled }),
+
+  toggleRag: () => set((state) => ({ enableRag: !state.enableRag })),
 
   addMessage: (msg) =>
     set((state) => ({

@@ -7,6 +7,7 @@ export interface KnowledgeBase {
   user_id: string;
   create_time: string;
   update_time: string;
+  file_count: number;
 }
 
 export interface KnowledgeFile {

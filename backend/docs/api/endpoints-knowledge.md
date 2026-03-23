@@ -33,7 +33,8 @@ POST /api/v1/knowledge/create
   "description": "知识库描述",
   "user_id": "20210001",
   "create_time": "2024-01-01T00:00:00",
-  "update_time": "2024-01-01T00:00:00"
+  "update_time": "2024-01-01T00:00:00",
+  "file_count": 0
 }
 ```
 
@@ -58,7 +59,8 @@ GET /api/v1/knowledge/{knowledge_id}
   "description": "知识库描述",
   "user_id": "20210001",
   "create_time": "2024-01-01T00:00:00",
-  "update_time": "2024-01-01T00:00:00"
+  "update_time": "2024-01-01T00:00:00",
+  "file_count": 0
 }
 ```
 
@@ -90,10 +92,15 @@ GET /api/v1/knowledge
     "description": "知识库描述",
     "user_id": "20210001",
     "create_time": "2024-01-01T00:00:00",
-    "update_time": "2024-01-01T00:00:00"
+    "update_time": "2024-01-01T00:00:00",
+    "file_count": 4
   }
 ]
 ```
+
+| 字段 | 类型 | 描述 |
+|------|------|------|
+| file_count | int | 知识库中的文件数量 |
 
 ---
 
