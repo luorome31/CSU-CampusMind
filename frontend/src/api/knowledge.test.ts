@@ -48,4 +48,31 @@ describe('knowledgeApi', () => {
     const result = await knowledgeApi.fetchFileContent('file1');
     expect(result).toBe(markdownContent);
   });
+
+  it('createKnowledgeBase calls POST /knowledge/create with name and description', async () => {
+    const mockResponse = {
+      id: 'kb2',
+      name: 'New KB',
+      description: 'New description',
+      user_id: 'user1',
+      create_time: '2026-03-23T00:00:00Z',
+      update_time: '2026-03-23T00:00:00Z',
+    };
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockResponse,
+      text: async () => JSON.stringify(mockResponse),
+    });
+
+    const result = await knowledgeApi.createKnowledgeBase('New KB', 'New description');
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/knowledge/create'),
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ name: 'New KB', description: 'New description' }),
+      })
+    );
+    expect(result).toEqual(mockResponse);
+  });
 });

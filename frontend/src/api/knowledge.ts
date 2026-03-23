@@ -34,6 +34,10 @@ class KnowledgeApi {
     const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/knowledge_file/${fileId}/content`);
     return response.text();
   }
+
+  async createKnowledgeBase(name: string, description?: string): Promise<KnowledgeBase> {
+    return apiClient.post<KnowledgeBase>(`/knowledge/create`, { name, description });
+  }
 }
 
 export const knowledgeApi = new KnowledgeApi();
