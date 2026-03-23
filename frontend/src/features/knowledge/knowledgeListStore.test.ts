@@ -70,4 +70,24 @@ describe('knowledgeListStore', () => {
     knowledgeListStore.getState().clearError();
     expect(knowledgeListStore.getState().error).toBeNull();
   });
+
+  it('createKnowledgeBase adds new KB to knowledgeBases array', async () => {
+    const newKB: knowledgeApi.KnowledgeBase = {
+      id: 'kb-new', name: 'Test KB', description: 'Test desc', user_id: 'user1', create_time: '', update_time: ''
+    };
+    vi.mocked(knowledgeApi.knowledgeApi.createKnowledgeBase).mockResolvedValue(newKB);
+
+    await knowledgeListStore.getState().createKnowledgeBase('Test KB', 'Test desc');
+
+    expect(knowledgeListStore.getState().knowledgeBases).toContainEqual(newKB);
+    expect(knowledgeListStore.getState().error).toBeNull();
+  });
+
+  it('createKnowledgeBase handles error', async () => {
+    vi.mocked(knowledgeApi.knowledgeApi.createKnowledgeBase).mockRejectedValue(new Error('Create failed'));
+
+    await knowledgeListStore.getState().createKnowledgeBase('Test KB', 'Test desc');
+
+    expect(knowledgeListStore.getState().error).toBe('Create failed');
+  });
 });

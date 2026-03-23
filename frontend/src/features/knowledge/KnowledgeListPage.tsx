@@ -1,6 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { KnowledgeCard } from '../../components/knowledge/KnowledgeCard/KnowledgeCard';
+import { Button } from '../../components/ui/Button';
+import { CreateKnowledgeDialog } from './CreateKnowledgeDialog';
 import { knowledgeListStore } from './knowledgeListStore';
 import './KnowledgeListPage.css';
 
@@ -11,6 +13,7 @@ function Spinner() {
 export function KnowledgeListPage() {
   const navigate = useNavigate();
   const { knowledgeBases, isLoadingKBs, error, fetchKnowledgeBases } = knowledgeListStore();
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchKnowledgeBases();
@@ -18,6 +21,14 @@ export function KnowledgeListPage() {
 
   const handleKBClick = (kbId: string) => {
     navigate(`/knowledge/${kbId}`);
+  };
+
+  const handleCreateClick = () => {
+    setIsCreateDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsCreateDialogOpen(false);
   };
 
   if (isLoadingKBs) {
@@ -34,6 +45,7 @@ export function KnowledgeListPage() {
     <div className="knowledge-list-page">
       <header className="knowledge-list-header">
         <h1 className="knowledge-list-title">知识库</h1>
+        <Button variant="ghost" onClick={handleCreateClick}>+ 新建</Button>
       </header>
 
       {error && (
@@ -59,6 +71,7 @@ export function KnowledgeListPage() {
           ))}
         </div>
       )}
+      <CreateKnowledgeDialog isOpen={isCreateDialogOpen} onClose={handleCloseDialog} />
     </div>
   );
 }

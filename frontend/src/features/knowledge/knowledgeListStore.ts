@@ -17,6 +17,7 @@ interface KnowledgeListActions {
   fetchKnowledgeBases: () => Promise<void>;
   fetchFiles: (kbId: string) => Promise<void>;
   fetchFileContent: (fileId: string) => Promise<void>;
+  createKnowledgeBase: (name: string, description?: string) => Promise<void>;
   setCurrentKB: (kb: KnowledgeBase | null) => void;
   clearError: () => void;
 }
@@ -62,6 +63,16 @@ export const knowledgeListStore = create<KnowledgeListStore>((set, get) => ({
       set({ currentFile: file, currentFileContent: content, isLoadingContent: false });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : 'Failed to fetch file content', isLoadingContent: false });
+    }
+  },
+
+  createKnowledgeBase: async (name: string, description?: string) => {
+    set({ isLoadingKBs: true, error: null });
+    try {
+      const newKB = await knowledgeApi.createKnowledgeBase(name, description);
+      set({ knowledgeBases: [...get().knowledgeBases, newKB], isLoadingKBs: false });
+    } catch (err) {
+      set({ error: err instanceof Error ? err.message : 'Failed to create knowledge base', isLoadingKBs: false });
     }
   },
 
