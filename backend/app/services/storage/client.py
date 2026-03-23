@@ -1,8 +1,9 @@
 """
 Storage Client - Unified interface for OSS/MinIO storage
 """
-from typing import Optional
+from typing import Optional, Union, IO
 from urllib.parse import urljoin
+from io import BytesIO
 from loguru import logger
 from pydantic import BaseModel
 
@@ -69,21 +70,24 @@ class StorageClient:
                 raise
         return self._client
 
-    def upload_content(self, object_name: str, content: bytes) -> str:
+    def upload_content(self, object_name: str, content: Union[bytes, IO]) -> str:
         """Upload content to storage and return URL"""
         client = self._get_client()
-        logger.info(f"Uploading content to {object_name} ({len(content)} bytes)")
+        content_bytes = content if isinstance(content, bytes) else content.read()
+        logger.info(f"Uploading content to {object_name} ({len(content_bytes)} bytes)")
 
         try:
             if self.config.mode == "minio":
+                # MinIO requires a file-like object with .read() method
+                data_stream = BytesIO(content_bytes)
                 client.put_object(
                     self.config.bucket_name,
                     object_name,
-                    data=content, # Minio expects a stream or bytes/buffer
-                    length=len(content),
+                    data=data_stream,
+                    length=len(content_bytes),
                 )
             elif self.config.mode == "oss":
-                client.put_object(object_name, content)
+                client.put_object(object_name, content_bytes)
             
             url = urljoin(self.config.base_url, object_name)
             logger.success(f"Successfully uploaded to {url}")
