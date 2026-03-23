@@ -305,6 +305,100 @@ npm run test:coverage   # 生成覆盖率报告
 
 ---
 
+---
+
+## 2026-03-23 Phase 4：知识库构建工作流
+
+### 4.1 目标
+
+完成 Phase 4 知识库构建工作流：
+
+- 爬取面板（CrawlPanel）：知识库选择 + URL 列表输入
+- 批量导入模态框（UrlImportModal）：支持 .txt/.csv 文件拖拽上传
+- 任务列表（TaskList + TaskCard）：实时任务进度展示
+- 内容审核（ReviewInbox + ReviewEditor）：审核队列 + Markdown 编辑器
+- Tab 页面布局：爬取任务 / 审核队列
+
+### 4.2 完成的功能
+
+#### 新增文件
+
+```
+src/features/build/
+├── KnowledgeBuildPage.tsx      # Tab 页面主组件
+├── KnowledgeBuildPage.module.css
+├── buildStore.ts              # Zustand 状态管理
+├── buildStore.test.ts
+├── api/
+│   ├── crawl.ts              # 爬取 API 客户端
+│   └── crawl.test.ts
+└── components/
+    ├── CrawlTab/
+    │   ├── CrawlPanel.tsx           # 爬取表单
+    │   ├── CrawlPanel.module.css
+    │   ├── UrlImportModal.tsx       # 批量导入
+    │   ├── UrlImportModal.module.css
+    │   ├── UrlImportModal.test.tsx
+    │   ├── TaskList.tsx             # 任务列表
+    │   ├── TaskList.test.tsx
+    │   ├── TaskCard.tsx             # 任务卡片
+    │   └── TaskCard.module.css
+    └── ReviewTab/
+        ├── ReviewInbox.tsx          # 审核收件箱
+        ├── ReviewInbox.module.css
+        ├── ReviewInbox.test.tsx
+        ├── ReviewEditor.tsx         # 内容编辑器
+        ├── ReviewEditor.module.css
+        └── ReviewEditor.test.tsx
+```
+
+#### API 集成
+
+| 端点 | 方法 | 功能 |
+|------|------|------|
+| `/crawl/batch-with-knowledge` | POST | 批量爬取 |
+| `/crawl/tasks` | GET | 获取任务列表 |
+| `/crawl/tasks/{task_id}` | GET | 获取任务进度 |
+| `/knowledge_file/pending_verify` | GET | 获取待审核文件 |
+| `/knowledge_file/{file_id}/content` | GET/PUT | 获取/更新文件内容 |
+| `/knowledge_file/{file_id}/trigger_index` | POST | 触发索引 |
+
+#### 状态管理
+
+`buildStore` 包含：
+
+- **UI 状态**：`activeTab`
+- **爬取状态**：`selectedKnowledgeId`, `crawlUrls`, `tasks`, `isPolling`
+- **导入模态框**：`isImportModalOpen`, `previewUrls`
+- **审核状态**：`pendingFiles`, `pendingReviewCount`, `selectedFile`, `fileContent`
+
+#### 轮询机制
+
+- 间隔：3 秒
+- 终止条件：终端状态（SUCCESS/FAILED/completed）或 3 次连续错误
+- 终端状态时自动刷新待审核文件数
+
+### 4.3 设计决策
+
+- Tab 布局：爬取任务 + 审核队列，支持 pendingReviewCount badge
+- 审核面板：左侧收件箱列表 + 右侧 Markdown 编辑器
+- 文件导入：支持 .txt（每行一个 URL）和 .csv（第一列）格式
+- 任务卡片：进度条 + 成功/失败计数 + 状态图标
+
+### 4.4 Git 提交记录
+
+| 提交 | 描述 |
+|------|------|
+| `crawl API` | 添加 crawl API 客户端 |
+| `buildStore` | 添加 buildStore 状态管理 |
+| `TaskCard + TaskList` | 添加任务卡片和列表组件 |
+| `CrawlPanel + UrlImportModal` | 添加爬取面板和导入模态框 |
+| `ReviewInbox` | 添加审核收件箱组件 |
+| `ReviewEditor` | 添加内容编辑器组件 |
+| `KnowledgeBuildPage` | 实现 Tab 页面布局 |
+
+---
+
 ## 2026-03-22 Phase 2：前端样式重设计
 
 ### 3.1 目标
