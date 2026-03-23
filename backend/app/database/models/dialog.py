@@ -14,6 +14,7 @@ class Dialog(SQLModel, table=True):
     - id: Conversation unique UUID
     - user_id: User identifier
     - agent_id: Agent template ID used
+    - title: Conversation title (auto-generated or manual)
     - updated_at: Last interaction time
     """
     __tablename__ = "dialog"
@@ -21,6 +22,7 @@ class Dialog(SQLModel, table=True):
     id: str = Field(default=None, primary_key=True, description="Dialog ID (UUID)")
     user_id: Optional[str] = Field(default=None, index=True, description="User ID (NULL for anonymous)")
     agent_id: Optional[str] = Field(default=None, index=True, description="Agent template ID")
+    title: Optional[str] = Field(default=None, description="Conversation title")
     updated_at: datetime = Field(default_factory=datetime.now, description="Last update time")
 
     def to_dict(self):
@@ -28,5 +30,6 @@ class Dialog(SQLModel, table=True):
             "id": self.id,
             "user_id": self.user_id,
             "agent_id": self.agent_id,
+            "title": self.title,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }

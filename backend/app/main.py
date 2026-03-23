@@ -22,7 +22,7 @@ logger.configure(
     ]
 )
 
-from app.api.v1 import crawl, index, knowledge, knowledge_file, retrieve, completion, auth
+from app.api.v1 import crawl, index, knowledge, knowledge_file, retrieve, completion, auth, dialog
 
 
 @asynccontextmanager
@@ -78,6 +78,7 @@ def create_app() -> FastAPI:
     app.include_router(knowledge_file.router, prefix="/api/v1")
     app.include_router(retrieve.router, prefix="/api/v1")
     app.include_router(completion.router, prefix="/api/v1")
+    app.include_router(dialog.router, prefix="/api/v1")
 
     @app.get("/health")
     async def health_check():

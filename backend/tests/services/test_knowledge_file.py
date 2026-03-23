@@ -37,6 +37,7 @@ class TestKnowledgeFileServiceIntegration:
                 knowledge_id="kb_1",
                 user_id="user_1",
                 oss_url="https://oss.example.com/test.txt",
+                object_name="user_1/kb_1/test.txt",
                 file_size=1024
             )
 
@@ -55,15 +56,15 @@ class TestKnowledgeFileServiceIntegration:
             # 创建多个文件
             _ = KnowledgeFileService.create_knowledge_file(
                 file_name="file1.txt", knowledge_id="kb_1", user_id="user_1",
-                oss_url="http://test.com/1"
+                oss_url="http://test.com/1", object_name="user_1/kb_1/file1.txt"
             )
             _ = KnowledgeFileService.create_knowledge_file(
                 file_name="file2.txt", knowledge_id="kb_1", user_id="user_1",
-                oss_url="http://test.com/2"
+                oss_url="http://test.com/2", object_name="user_1/kb_1/file2.txt"
             )
             _ = KnowledgeFileService.create_knowledge_file(
                 file_name="file3.txt", knowledge_id="kb_2", user_id="user_1",
-                oss_url="http://test.com/3"
+                oss_url="http://test.com/3", object_name="user_1/kb_2/file3.txt"
             )
 
             # 列出 kb_1 的文件
@@ -77,8 +78,11 @@ class TestKnowledgeFileServiceIntegration:
         with patch('app.services.knowledge_file.knowledge_file.engine', test_db):
             # 创建
             kf = KnowledgeFileService.create_knowledge_file(
-                file_name="test.txt", knowledge_id="kb_1", user_id="user_1",
-                oss_url="http://test.com/test"
+                file_name="test.txt", 
+                knowledge_id="kb_1", 
+                user_id="user_1",
+                oss_url="http://test.com/test", 
+                object_name="user_1/kb_1/test.txt"
             )
 
             # 更新状态
@@ -95,8 +99,11 @@ class TestKnowledgeFileServiceIntegration:
 
         with patch('app.services.knowledge_file.knowledge_file.engine', test_db):
             kf = KnowledgeFileService.create_knowledge_file(
-                file_name="test.txt", knowledge_id="kb_1", user_id="user_1",
-                oss_url="http://test.com/test"
+                file_name="test.txt", 
+                knowledge_id="kb_1", 
+                user_id="user_1",
+                oss_url="http://test.com/test", 
+                object_name="user_1/kb_1/test.txt"
             )
 
             result = KnowledgeFileService.delete_knowledge_file(kf.id)

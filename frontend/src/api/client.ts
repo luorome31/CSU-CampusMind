@@ -53,6 +53,13 @@ class ApiClient {
   delete<T>(url: string) {
     return this.request<T>(url, { method: 'DELETE' });
   }
+
+  patch<T>(url: string, data?: unknown) {
+    return this.request<T>(url, {
+      method: 'PATCH',
+      body: data ? JSON.stringify(data) : undefined,
+    });
+  }
 }
 
 export const apiClient = new ApiClient();

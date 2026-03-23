@@ -15,7 +15,7 @@
 
 ```
 frontend/src/
-├── api/               # API clients (client.ts, auth.ts, chat.ts, knowledge.ts, crawl.ts)
+├── api/               # API clients (client.ts, auth.ts, chat.ts, dialog.ts, knowledge.ts, crawl.ts)
 ├── components/
 │   ├── ui/            # Design system (Button, Input, Card, Chip, Badge)
 │   ├── layout/        # Sidebar, Header, MainViewport
@@ -60,13 +60,9 @@ frontend/src/
 
 ```
 Sidebar/
-├── Sidebar.tsx          # Container with toggle logic
-├── NewChatButton.tsx    # "新建对话" button
-├── NavSection.tsx       # Fixed function area
-├── NavItem.tsx          # Individual nav tile
-├── Divider.tsx          # Visual separator
-├── SessionHistory.tsx   # Historical dialogue list
-└── SessionItem.tsx     # Individual history entry
+├── Sidebar.tsx          # Container with toggle + history list integration
+├── HistoryItem.tsx      # Individual history entry (title, time, delete)
+└── HistoryItem.css      # History item styles (hover, transition animation)
 ```
 
 ## 4. Routes
@@ -84,7 +80,7 @@ Sidebar/
 |-------|-------|-----------|
 | `authStore` | Global | `user`, `token`, `isAuthenticated` |
 | `layoutStore` | Global | `sidebarOpen`, `sidebarCollapsed` |
-| `chatStore` | Chat | `currentDialogId`, `messages`, `isStreaming`, `toolEvents` |
+| `chatStore` | Chat | `currentDialogId`, `messages`, `isStreaming`, `toolEvents`, `dialogs` |
 | `knowledgeListStore` | Knowledge | `knowledgeBases`, `selectedKB`, `files` |
 | `buildStore` | Build | `crawlResults`, `tasks`, `reviewContent` |
 
@@ -94,12 +90,19 @@ Sidebar/
 - Endpoint: `POST /api/v1/completion/stream`
 - **Required**: `knowledge_ids` when `enable_rag=true`
 - **Important**: Extract `X-Dialog-ID` header for new dialogs
-- SSE events: `response_chunk`, `event` (START/END/ERROR)
+- SSE events: `response_chunk`, `event` (START/END/ERROR), `new_dialog`, `title_update`
 
 ### 6.2 API Client
 - Base URL: `/api/v1`
 - Token: `Authorization: Bearer <token>` from sessionStorage
 - 401 response → auto logout
+- Methods: `get`, `post`, `delete`, `patch`
+
+### 6.3 Dialog API (`api/dialog.ts`)
+- `listDialogs(limit?)` → GET `/dialogs`
+- `getDialogMessages(dialogId)` → GET `/dialogs/{id}/messages`
+- `deleteDialog(dialogId)` → DELETE `/dialogs/{id}`
+- `updateDialogTitle(dialogId, title)` → PATCH `/dialogs/{id}`
 
 ## 7. Component Styling
 

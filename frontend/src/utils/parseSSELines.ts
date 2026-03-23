@@ -1,4 +1,4 @@
-export type SSEEventType = 'event' | 'response_chunk';
+export type SSEEventType = 'event' | 'response_chunk' | 'new_dialog' | 'title_update';
 
 export interface SSEEvent {
   type: SSEEventType;
@@ -30,11 +30,18 @@ export function* parseSSELines(text: string): Generator<SSEEvent> {
 
     try {
       const data = JSON.parse(trimmed.slice(6));
-      yield {
-        type: data.type,
-        data: data.data,
-        timestamp: data.timestamp,
-      };
+      if (data.newDialogId) {
+        yield {
+          type: 'new_dialog',
+          data: { dialog_id: data.newDialogId }
+        };
+      } else {
+        yield {
+          type: data.type,
+          data: data.data,
+          timestamp: data.timestamp,
+        };
+      }
     } catch {
       // Skip malformed JSON
     }

@@ -220,6 +220,9 @@ async def generate_stream(
     start_time = time.time()
 
     try:
+        # Yield the dialog ID first so the frontend can update its sidebar immediately
+        yield f'data: {json.dumps({"newDialogId": dialog_id})}\n\n'
+
         async for event in agent.astream(messages):
             if event.get("type") == "response_chunk":
                 # Text chunk: wrap in SSE format
@@ -264,18 +267,51 @@ async def generate_stream(
         )
         session.add(assistant_history)
 
-        # Update dialog timestamp
+        # Update dialog timestamp and refine title if it was a snippet
         statement = select(Dialog).where(Dialog.id == dialog_id)
         result = await session.execute(statement)
         dialog = result.scalar_one_or_none()
+        
+        refined_title = None
         if dialog:
             dialog.updated_at = datetime.now()
+            # If title is short/snippet and we have content, try to refine it
+            # Sniper is usually request.message[:25]
+            is_snippet = dialog.title.endswith("...") or len(dialog.title) >= 20
+            if dialog.title and is_snippet:
+                try:
+                    # Quick non-streaming call to summarize
+                    llm_fast = get_llm(model) # UseSameModel for now, or a cheaper one
+                    # Clean reasoning tags from assistant response for summary context
+                    import re
+                    clean_assistant = re.sub(r'<think>.*?</think>', '', accumulated_content, flags=re.DOTALL | re.IGNORECASE).strip()
+                    
+                    summary_prompt = (
+                        "你是一个会话记录整理助手。请根据以下对话内容，总结一个4-8字的简短标题。\n"
+                        "要求：直接输出标题，**绝对不要包含任何思考过程、<think> 标签、引号或解释性文字**。\n\n"
+                        f"用户问题：{message}\n"
+                        f"助手回答：{clean_assistant[:200]}"
+                    )
+                    summary_res = await llm_fast.ainvoke(summary_prompt)
+                    refined_title = summary_res.content.strip().strip('"').strip('“').strip('”')
+                    # Remove the entire <think>...</think> block and any other tags
+                    refined_title = re.sub(r'<think>.*?</think>', '', refined_title, flags=re.DOTALL | re.IGNORECASE).strip()
+                    refined_title = re.sub(r'<.*?>', '', refined_title).strip()
+                    if refined_title:
+                        dialog.title = refined_title
+                except Exception as e:
+                    from loguru import logger
+                    logger.warning(f"Failed to refine title: {e}")
 
         # Async triple-write: concurrent DB commit, cache append, and dialog update
         await asyncio.gather(
             session.commit(),
             cache_service.append_to_cache(dialog_id, assistant_history.to_dict())
         )
+        
+        # If we got a refined title, push it as a final SSE event
+        if refined_title:
+            yield f'data: {json.dumps({"type": "title_update", "data": {"title": refined_title}})}\n\n'
 
 
 @router.post("/completion/stream")
@@ -336,12 +372,20 @@ async def completion_stream(
         # Get or create dialog using DialogRepository
         # Generate dialog_id if not provided
         dialog_id = request.dialog_id or str(uuid.uuid4())
-        dialog, _ = await DialogRepository.get_or_create_dialog(
+        dialog, created = await DialogRepository.get_or_create_dialog(
             session=db,
             dialog_id=dialog_id,
             jwt_user_id=jwt_user_id,
             agent_id=request.agent_id
         )
+
+        # Immediate title: If dialog has no title, set a temporary snippet
+        if not dialog.title:
+            initial_title = request.message[:25]
+            if len(request.message) > 25:
+                initial_title += "..."
+            dialog.title = initial_title
+            await db.commit()
 
         # Set tool context for logging
         from app.core.tools.context import set_tool_context

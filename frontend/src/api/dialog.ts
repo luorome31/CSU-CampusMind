@@ -1,43 +1,35 @@
 // src/api/dialog.ts
 import { apiClient } from './client';
-import type { ChatMessage, ToolEvent } from '../features/chat/chatStore';
 
 export interface Dialog {
   id: string;
-  title: string;
-  created_at: string;
+  user_id?: string;
+  agent_id?: string;
+  title?: string;
   updated_at: string;
 }
 
-interface ChatHistoryResponse {
+export interface ChatMessage {
   id: string;
-  dialog_id: string;
-  role: string;
+  role: 'user' | 'assistant';
   content: string;
-  events: ToolEvent[];
+  file_url?: string;
+  events?: string;
   created_at: string;
 }
 
-/**
- * Get dialog history messages.
- */
-export async function getDialogHistory(dialogId: string): Promise<ChatMessage[]> {
-  const history = await apiClient.get<ChatHistoryResponse[]>(
-    `/dialogs/${dialogId}/history`
-  );
-
-  return history.map((item) => ({
-    id: item.id,
-    role: item.role as 'user' | 'assistant',
-    content: item.content,
-    events: item.events || [],
-    createdAt: new Date(item.created_at),
-  }));
+export async function listDialogs(limit = 50): Promise<Dialog[]> {
+  return apiClient.get<Dialog[]>(`/dialogs?limit=${limit}`);
 }
 
-/**
- * Get all user dialogs.
- */
-export async function getUserDialogs(userId: string): Promise<Dialog[]> {
-  return apiClient.get<Dialog[]>(`/users/${userId}/dialogs`);
+export async function getDialogMessages(dialogId: string): Promise<ChatMessage[]> {
+  return apiClient.get<ChatMessage[]>(`/dialogs/${dialogId}/messages`);
+}
+
+export async function deleteDialog(dialogId: string): Promise<void> {
+  return apiClient.delete<void>(`/dialogs/${dialogId}`);
+}
+
+export async function updateDialogTitle(dialogId: string, title: string): Promise<Dialog> {
+  return apiClient.patch<Dialog>(`/dialogs/${dialogId}`, { title });
 }

@@ -23,6 +23,7 @@ class CreateKnowledgeFileRequest(BaseModel):
     file_name: str = Field(..., description="File name")
     knowledge_id: str = Field(..., description="Knowledge base ID")
     oss_url: str = Field(..., description="OSS/MinIO URL")
+    object_name: str = Field(..., description="Stable storage key/path in bucket")
     file_size: int = Field(default=0, description="File size in bytes")
 
 
@@ -34,6 +35,7 @@ class KnowledgeFileResponse(BaseModel):
     user_id: str
     status: str
     oss_url: str
+    object_name: str
     file_size: int
     create_time: Optional[str] = None
     update_time: Optional[str] = None
@@ -68,6 +70,7 @@ async def create_knowledge_file(
             knowledge_id=request.knowledge_id,
             user_id=user_id,
             oss_url=request.oss_url,
+            object_name=request.object_name,
             file_size=request.file_size,
         )
         return KnowledgeFileResponse(**knowledge_file.to_dict())

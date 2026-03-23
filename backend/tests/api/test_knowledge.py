@@ -17,26 +17,29 @@ class TestKnowledgeAPI:
         """Mock KnowledgeService"""
         with patch("app.api.v1.knowledge.KnowledgeService") as mock:
             # Setup mock create_knowledge
-            mock_kb = MagicMock()
-            mock_kb.id = "test_kb_1"
-            mock_kb.name = "Test Knowledge"
-            mock_kb.description = "Test description"
-            mock_kb.user_id = "test_user"
-            mock_kb.to_dict.return_value = {
+            kb_data = {
                 "id": "test_kb_1",
                 "name": "Test Knowledge",
                 "description": "Test description",
                 "user_id": "test_user",
                 "create_time": "2024-01-01T00:00:00",
-                "update_time": "2024-01-01T00:00:00"
+                "update_time": "2024-01-01T00:00:00",
+                "file_count": 0
             }
+            mock_kb = MagicMock()
+            mock_kb.id = "test_kb_1"
+            mock_kb.name = "Test Knowledge"
+            mock_kb.description = "Test description"
+            mock_kb.user_id = "test_user"
+            mock_kb.to_dict.return_value = kb_data
+            
             mock.create_knowledge.return_value = mock_kb
 
             # Setup mock get_knowledge
             mock.get_knowledge.return_value = mock_kb
 
             # Setup mock list_knowledge_by_user
-            mock.list_knowledge_by_user.return_value = [mock_kb]
+            mock.list_knowledge_by_user.return_value = [kb_data]
 
             # Setup mock delete_knowledge
             mock.delete_knowledge.return_value = True

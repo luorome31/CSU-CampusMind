@@ -55,6 +55,7 @@ class TestKnowledgeFileAPI:
                 "file_name": "test.txt",
                 "knowledge_id": "test_kb_1",
                 "oss_url": "https://oss.example.com/test.txt",
+                "object_name": "test_kb_1/test.txt",
                 "file_size": 1024
             }
         )

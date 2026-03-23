@@ -133,6 +133,64 @@ class DialogRepository:
         return list(result.scalars().all())
 
     @staticmethod
+    async def delete_dialog(
+        session: AsyncSession,
+        dialog_id: str,
+        jwt_user_id: Optional[str]
+    ) -> bool:
+        """Delete a dialog if user is authorized."""
+        dialog = await DialogRepository.get_dialog_if_authorized(session, dialog_id, jwt_user_id)
+        if dialog:
+            # Delete associated chat history first
+            from app.database.models.chat_history import ChatHistory
+            history_stmt = select(ChatHistory).where(ChatHistory.dialog_id == dialog_id)
+            history_result = await session.execute(history_stmt)
+            for msg in history_result.scalars().all():
+                await session.delete(msg)
+            
+            await session.delete(dialog)
+            await session.commit()
+            return True
+        return False
+
+    @staticmethod
+    async def get_dialog_history(
+        session: AsyncSession,
+        dialog_id: str,
+        jwt_user_id: Optional[str]
+    ) -> list:
+        """Get full message history for a dialog if user is authorized."""
+        dialog = await DialogRepository.get_dialog_if_authorized(session, dialog_id, jwt_user_id)
+        if not dialog:
+            return []
+        
+        from app.database.models.chat_history import ChatHistory
+        statement = (
+            select(ChatHistory)
+            .where(ChatHistory.dialog_id == dialog_id)
+            .order_by(ChatHistory.created_at.asc())
+        )
+        result = await session.execute(statement)
+        return list(result.scalars().all())
+
+    @staticmethod
+    async def update_dialog_title(
+        session: AsyncSession,
+        dialog_id: str,
+        title: str,
+        jwt_user_id: Optional[str]
+    ) -> Optional[Dialog]:
+        """Update dialog title if user is authorized."""
+        dialog = await DialogRepository.get_dialog_if_authorized(session, dialog_id, jwt_user_id)
+        if dialog:
+            dialog.title = title
+            dialog.updated_at = datetime.now()
+            await session.commit()
+            await session.refresh(dialog)
+            return dialog
+        return None
+
+    @staticmethod
     async def list_anonymous_dialogs(
         session: AsyncSession,
         limit: int = 50

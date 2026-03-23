@@ -214,4 +214,39 @@ describe('chatStore', () => {
       expect(chatStore.getState().toolEvents).toEqual(events);
     });
   });
+
+  describe('dialog management', () => {
+    const mockDialogs = [
+      { id: 'd1', title: 'Dialog 1', updated_at: '2024-01-01T00:00:00Z' },
+      { id: 'd2', title: 'Dialog 2', updated_at: '2024-01-01T01:00:00Z' },
+    ];
+
+    it('sets dialogs', () => {
+      chatStore.getState().setDialogs(mockDialogs);
+      expect(chatStore.getState().dialogs).toEqual(mockDialogs);
+    });
+
+    it('updates dialog title', () => {
+      chatStore.setState({ dialogs: mockDialogs });
+      chatStore.getState().updateDialogTitle('d1', 'New Title');
+      expect(chatStore.getState().dialogs[0].title).toBe('New Title');
+    });
+
+    it('removes dialog', () => {
+      chatStore.setState({ dialogs: mockDialogs, currentDialogId: 'd1' });
+      chatStore.getState().removeDialog('d1');
+      expect(chatStore.getState().dialogs).toHaveLength(1);
+      expect(chatStore.getState().currentDialogId).toBeNull();
+    });
+
+    it('loads dialog messages', () => {
+      const dbMessages = [
+        { id: 'm1', role: 'user', content: 'Hello', created_at: '2024-01-01T00:00:00Z' },
+      ];
+      chatStore.getState().loadDialog('d1', dbMessages);
+      expect(chatStore.getState().currentDialogId).toBe('d1');
+      expect(chatStore.getState().messages).toHaveLength(1);
+      expect(chatStore.getState().messages[0].content).toBe('Hello');
+    });
+  });
 });

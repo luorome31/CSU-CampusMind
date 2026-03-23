@@ -293,6 +293,7 @@ npm run test:coverage   # 生成覆盖率报告
 
 | 日期 | 版本 | 更新内容 |
 |------|------|---------|
+| 2026-03-23 | 1.8.0 | 新增对话历史管理功能：Sidebar 侧边栏显示历史记录、HistoryItem 组件（带删除和标题过渡动画）、chatStore 新增 dialogs 状态管理、dialog API 重构、SSE 支持 `new_dialog` 和 `title_update` 事件 |
 | 2026-03-23 | 1.7.0 | 优化知识库卡片 UI：修复 badge 与添加按钮重叠、调细选中边框、添加 iOS 风格 Toggle Switch RAG 开关 |
 | 2026-03-23 | 1.6.0 | 修复知识库文件数量显示（后端添加 file_count），添加 RAG 开关和知识库选择功能到知识库列表页面 |
 | 2026-03-23 | 1.5.0 | 添加代码语法高亮（Warm Paper 主题），修复文件内容获取 auth 问题，添加 Modal 组件和创建知识库对话框 |

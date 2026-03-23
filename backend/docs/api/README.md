@@ -42,3 +42,4 @@ Authorization: Bearer <your_jwt_token>
 - [内容索引](./endpoints-index.md) - 向量/关键词索引
 - [RAG 检索](./endpoints-retrieve.md) - 混合检索
 - [LLM 对话](./endpoints-completion.md) - 流式对话与历史
+- [对话管理](./endpoints-dialog.md) - 会话列表、消息、删除、标题更新

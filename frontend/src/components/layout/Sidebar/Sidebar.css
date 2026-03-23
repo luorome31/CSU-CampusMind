@@ -104,53 +104,27 @@
   border-color: var(--color-border-hover);
 }
 
-.session-item {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 8px 12px;
-  border-radius: var(--radius-md);
-  transition: background-color var(--ease-spring) 0.2s;
-  cursor: pointer;
-  border: none;
-  background: transparent;
+.sidebar-divider {
+  height: 1px;
+  background: var(--color-border-subtle);
+  margin: var(--space-4) var(--space-3);
+  opacity: 0.5;
 }
 
-.session-item:hover {
-  background-color: var(--overlay-light, rgba(0, 0, 0, 0.05));
+.sidebar-section-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #8e9196;
+  padding: 0 var(--space-3);
+  margin-bottom: var(--space-2);
+  letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
-.session-item:active {
-  background-color: var(--overlay-medium, rgba(0, 0, 0, 0.08));
-}
-
-.session-item-content {
-  flex: 1;
+.sidebar-history-list {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-}
-
-.session-item-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.session-item-title {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.session-item-meta {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  gap: 2px;
+  overflow-y: auto;
+  max-height: 45vh;
 }

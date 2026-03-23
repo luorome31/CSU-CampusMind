@@ -3,7 +3,8 @@ React Agent - LangGraph based ReAct agent with streaming support
 """
 import time
 from loguru import logger
-from typing import List, Dict, Any, AsyncGenerator, NotRequired, TypedDict, Union, Optional
+from typing import List, Dict, Any, AsyncGenerator, TypedDict, Union, Optional
+from typing_extensions import NotRequired
 from langchain_core.language_models import BaseChatModel
 from langgraph.constants import START, END
 from langgraph.graph import MessagesState, StateGraph

@@ -1,5 +1,6 @@
 // src/features/chat/chatStore.ts
 import { create } from 'zustand';
+import { type Dialog } from '../../api/dialog';
 
 export interface ToolEvent {
   id: string;
@@ -23,6 +24,7 @@ interface ChatState {
   messages: ChatMessage[];
   isStreaming: boolean;
   toolEvents: ToolEvent[];
+  dialogs: Dialog[];
 }
 
 interface ChatActions {
@@ -36,6 +38,11 @@ interface ChatActions {
   finishStreaming: () => void;
   clearMessages: () => void;
   setToolEvents: (events: ToolEvent[]) => void;
+  setDialogs: (dialogs: Dialog[]) => void;
+  updateDialogTitle: (dialogId: string | null, title: string) => void;
+  removeDialog: (dialogId: string) => void;
+  upsertDialog: (dialog: Dialog) => void;
+  loadDialog: (dialogId: string, dbMessages: any[]) => void;
 }
 
 type ChatStore = ChatState & ChatActions;
@@ -47,6 +54,7 @@ export const chatStore = create<ChatStore>((set) => ({
   messages: [],
   isStreaming: false,
   toolEvents: [],
+  dialogs: [],
 
   setCurrentDialogId: (id) => set({ currentDialogId: id }),
 
@@ -80,20 +88,31 @@ export const chatStore = create<ChatStore>((set) => ({
     set((state) => {
       const messages = [...state.messages];
       const globalEvents = [...state.toolEvents];
-      const globalIdx = globalEvents.findIndex(e => e.id === event.id);
+      const globalIdx = globalEvents.findIndex((e) => e.id === event.id);
       if (globalIdx >= 0) {
-        globalEvents[globalIdx] = { ...globalEvents[globalIdx], status: event.status, message: event.message };
+        globalEvents[globalIdx] = {
+          ...globalEvents[globalIdx],
+          status: event.status,
+          message: event.message,
+        };
       } else {
         globalEvents.push(event);
       }
 
       // Also update last assistant message's events if exists
-      if (messages.length > 0 && messages[messages.length - 1].role === 'assistant') {
+      if (
+        messages.length > 0 &&
+        messages[messages.length - 1].role === 'assistant'
+      ) {
         const lastMsg = { ...messages[messages.length - 1] };
-        const events = [...lastMsg.events];
-        const existingIdx = events.findIndex(e => e.id === event.id);
+        const events = [...lastMsg.events ?? []];
+        const existingIdx = events.findIndex((e) => e.id === event.id);
         if (existingIdx >= 0) {
-          events[existingIdx] = { ...events[existingIdx], status: event.status, message: event.message };
+          events[existingIdx] = {
+            ...events[existingIdx],
+            status: event.status,
+            message: event.message,
+          };
         } else {
           events.push(event);
         }
@@ -107,7 +126,51 @@ export const chatStore = create<ChatStore>((set) => ({
 
   finishStreaming: () => set({ isStreaming: false }),
 
-  clearMessages: () => set({ messages: [], toolEvents: [], currentDialogId: null }),
+  clearMessages: () =>
+    set({ messages: [], toolEvents: [], currentDialogId: null }),
 
   setToolEvents: (events) => set({ toolEvents: events }),
+
+  setDialogs: (dialogs) => set({ dialogs }),
+
+  updateDialogTitle: (dialogId, title) =>
+    set((state) => {
+      const updatedDialogs = state.dialogs.map((d) =>
+        d.id === dialogId ? { ...d, title } : d
+      );
+      return { dialogs: updatedDialogs };
+    }),
+
+  removeDialog: (dialogId) =>
+    set((state) => ({
+      dialogs: state.dialogs.filter((d) => d.id !== dialogId),
+      currentDialogId:
+        state.currentDialogId === dialogId ? null : state.currentDialogId,
+      messages: state.currentDialogId === dialogId ? [] : state.messages,
+    })),
+
+  upsertDialog: (dialog: Dialog) => {
+    set((state) => {
+      const exists = state.dialogs.some((d) => d.id === dialog.id);
+      if (exists) {
+        return {
+          dialogs: state.dialogs.map((d) => (d.id === dialog.id ? { ...d, ...dialog } : d)),
+        };
+      }
+      return {
+        dialogs: [dialog, ...state.dialogs],
+      };
+    });
+  },
+
+  loadDialog: (dialogId, dbMessages) => {
+    const messages: ChatMessage[] = dbMessages.map((m) => ({
+      id: m.id,
+      role: m.role as 'user' | 'assistant',
+      content: m.content,
+      events: m.events ? JSON.parse(m.events) : [],
+      createdAt: new Date(m.created_at),
+    }));
+    set({ currentDialogId: dialogId, messages, toolEvents: [] });
+  },
 }));

@@ -48,7 +48,7 @@ class TestKnowledgeFileVerificationAPI:
         client = TestClient(app)
         response = client.get("/api/v1/knowledge_file/file_123/content")
         assert response.status_code == 200
-        assert response.json() == "# Hello Raw Content"
+        assert response.text == "# Hello Raw Content"
         
         # Verify object name parsing
         mock_storage.get_content.assert_called_with("crawl/test_file.md")

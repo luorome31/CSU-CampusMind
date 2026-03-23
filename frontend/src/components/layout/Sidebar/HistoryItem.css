@@ -1,0 +1,78 @@
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  margin: 2px 8px;
+  border-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+  transition: all var(--ease-default, cubic-bezier(0.16, 1, 0.3, 1));
+  position: relative;
+  border: 1px solid transparent;
+  color: var(--text-light, #6B6F73);
+}
+
+.history-item:hover {
+  background: var(--bg-inset, #E8E5DD);
+  color: var(--text, #3B3D3F);
+}
+
+.history-item.active {
+  background: var(--bg-inset, #E8E5DD);
+  color: var(--accent, #537D96);
+  border-color: rgba(83, 125, 150, 0.2);
+}
+
+.history-item-icon {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.history-item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.history-item-title {
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.history-item.updating .history-item-title {
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+.history-item-time {
+  font-size: 10px;
+  opacity: 0.5;
+  margin-top: 1px;
+}
+
+.history-item-delete {
+  position: absolute;
+  right: 4px;
+  opacity: 0;
+  background: none;
+  border: none;
+  padding: 4px;
+  color: var(--text-muted, #8E9196);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.history-item:hover .history-item-delete {
+  opacity: 1;
+}
+
+.history-item-delete:hover {
+  background: rgba(207, 34, 46, 0.1);
+  color: #cf222e;
+}

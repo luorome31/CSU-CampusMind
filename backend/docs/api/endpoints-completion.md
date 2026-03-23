@@ -53,6 +53,16 @@ data: {"type": "event", "timestamp": 1234567890, "data": {"status": "END", "titl
 data: {"type": "response_chunk", "timestamp": 1234567890, "data": {"chunk": "你的成绩是", "accumulated": "你的成绩是"}}
 ```
 
+**新对话创建事件:**
+```
+data: {"type": "new_dialog", "newDialogId": "dialog_001"}
+```
+
+**对话标题更新事件** (首轮对话完成后 AI 精化标题):
+```
+data: {"type": "title_update", "data": {"title": "成绩查询"}}
+```
+
 **错误事件:**
 ```
 data: {"type": "event", "timestamp": 1234567890, "data": {"status": "ERROR", "title": "错误", "message": "处理请求时发生错误"}}
@@ -135,3 +145,19 @@ POST /api/v1/completion
 | events | json | 工具调用事件记录 |
 | extra | json | 额外信息（模型、耗时等） |
 | created_at | datetime | 创建时间 |
+
+### Dialog 数据结构
+
+| 字段 | 类型 | 描述 |
+|------|------|------|
+| id | string | 对话 ID (UUID) |
+| user_id | string | 用户 ID（未登录为 null） |
+| agent_id | string | Agent 模板 ID |
+| title | string | 对话标题（自动生成或手动设置） |
+| updated_at | datetime | 最后更新时间 |
+
+### 标题生成策略
+
+1. **立即标题**：新对话创建时，使用用户消息前 25 字符作为临时标题
+2. **AI 精化**：第二轮对话时，若标题以 `...` 结尾或长度 ≥ 20，则调用 LLM 精化为 4-8 字标题
+3. **实时推送**：精化完成后通过 SSE `title_update` 事件推送给前端

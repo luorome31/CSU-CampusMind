@@ -23,14 +23,15 @@ def setup_test_db():
 
 @pytest.fixture
 def mock_auth():
-    """Override get_current_user dependency for testing"""
+    """Override auth dependencies for testing"""
     from app.main import app
-    from app.api.dependencies import get_current_user
+    from app.api.dependencies import get_current_user, get_optional_user
     
     async def override_get_current_user():
         return {"user_id": "test_user", "username": "test_user"}
     
     app.dependency_overrides[get_current_user] = override_get_current_user
+    app.dependency_overrides[get_optional_user] = override_get_current_user
     yield {"user_id": "test_user", "username": "test_user"}
     app.dependency_overrides.clear()
 

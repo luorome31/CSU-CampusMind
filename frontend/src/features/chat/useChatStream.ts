@@ -58,12 +58,27 @@ export function useChatStream() {
 
           const { event, newDialogId } = value as ChatStreamResult;
 
-          // Set new dialog ID if this is a new dialog
-          if (newDialogId && !store.currentDialogId) {
+          // Set new dialog ID from header fallback
+          if (newDialogId && !chatStore.getState().currentDialogId) {
             chatStore.getState().setCurrentDialogId(newDialogId);
+            chatStore.getState().upsertDialog({
+              id: newDialogId,
+              title: content.slice(0, 25) + (content.length > 25 ? '...' : ''),
+              updated_at: new Date().toISOString()
+            });
           }
 
-          if (event.type === 'response_chunk') {
+          if (event.type === 'new_dialog') {
+            const data = event.data as { dialog_id: string };
+            if (!chatStore.getState().currentDialogId) {
+              chatStore.getState().setCurrentDialogId(data.dialog_id);
+              chatStore.getState().upsertDialog({
+                id: data.dialog_id,
+                title: content.slice(0, 25) + (content.length > 25 ? '...' : ''),
+                updated_at: new Date().toISOString()
+              });
+            }
+          } else if (event.type === 'response_chunk') {
             const data = event.data as { accumulated: string };
             chatStore.getState().updateStreamingMessage(data.accumulated);
           } else if (event.type === 'event') {
@@ -75,6 +90,16 @@ export function useChatStream() {
               message: data.message,
             };
             chatStore.getState().addToolEvent(toolEvent);
+          } else if (event.type === 'title_update') {
+            const data = event.data as { title: string };
+            const currentId = chatStore.getState().currentDialogId;
+            if (currentId) {
+              chatStore.getState().upsertDialog({
+                id: currentId,
+                title: data.title,
+                updated_at: new Date().toISOString()
+              });
+            }
           }
         }
       } catch (err) {

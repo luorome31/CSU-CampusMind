@@ -12,6 +12,9 @@ from unittest.mock import patch
 @pytest.fixture(scope="function")
 def test_db():
     """创建临时测试数据库"""
+    from app.database.models.knowledge import KnowledgeBase  # noqa: F401 - registers model
+    from app.database.models.knowledge_file import KnowledgeFile  # noqa: F401 - registers model
+    
     # 使用临时文件
     fd, path = tempfile.mkstemp(suffix=".db")
     os.close(fd)
@@ -56,7 +59,11 @@ class TestKnowledgeServiceIntegration:
         """测试列出用户知识库"""
         from app.services.knowledge.knowledge import KnowledgeService
 
-        with patch('app.services.knowledge.knowledge.engine', test_db):
+        with patch('app.services.knowledge.knowledge.engine', test_db), \
+             patch('app.services.knowledge.knowledge.KnowledgeFileService') as mock_kf_service:
+            # Mock file count
+            mock_kf_service.count_knowledge_files.return_value = 0
+            
             # 创建两个知识库
             _ = KnowledgeService.create_knowledge(name="KB1", user_id="user_1")
             _ = KnowledgeService.create_knowledge(name="KB2", user_id="user_1")
