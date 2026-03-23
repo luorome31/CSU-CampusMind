@@ -102,65 +102,40 @@ POST /api/v1/crawl/batch
 ### 响应
 
 ```json
-[
-  {
-    "success": true,
-    "url": "https://example.com/article1",
-    "oss_url": "https://oss.example.com/crawl/xxx1.md",
-    "title": "文章1"
-  },
-  {
-    "success": false,
-    "url": "https://example.com/article2",
-    "error": "Connection timeout"
-  }
-]
+{
+  "task_id": "task_xyz",
+  "status": "processing",
+  "message": "Batch crawl task started"
+}
 ```
 
 ---
 
-## 批量爬取并索引
+## 查询批量任务进度
 
-批量爬取并为每个 URL 创建文件记录和索引。
+查询异步爬取任务的具体状态与进度。
 
 ### 请求
 
 ```
-POST /api/v1/crawl/batch-with-knowledge
-```
-
-```json
-{
-  "urls": [
-    "https://example.com/article1",
-    "https://example.com/article2"
-  ],
-  "knowledge_id": "t_abc123",
-  "user_id": "system",
-  "enable_vector": true,
-  "enable_keyword": true
-}
+GET /api/v1/crawl/tasks/{task_id}
 ```
 
 ### 响应
 
 ```json
-[
-  {
-    "success": true,
-    "url": "https://example.com/article1",
-    "oss_url": "https://oss.example.com/crawl/xxx1.md",
-    "title": "文章1",
-    "file_id": "file_001"
-  },
-  {
-    "success": true,
-    "url": "https://example.com/article2",
-    "oss_url": "https://oss.example.com/crawl/xxx2.md",
-    "title": "文章2",
-    "file_id": "file_002"
-  }
-]
+{
+  "id": "task_xyz",
+  "knowledge_id": "t_abc123",
+  "user_id": "system",
+  "total_urls": 10,
+  "completed_urls": 4,
+  "success_count": 3,
+  "fail_count": 1,
+  "status": "processing",
+  "create_time": "2024-01-01T00:00:00",
+  "update_time": "2024-01-01T00:00:00"
+}
 ```
 
 ---

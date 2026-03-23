@@ -93,5 +93,6 @@ class TestCrawlAPI:
 
         assert response.status_code == 200
         data = response.json()
-        assert isinstance(data, list)
-        assert len(data) == 2
+        assert isinstance(data, dict)
+        assert "task_id" in data
+        assert data["status"] == "processing"

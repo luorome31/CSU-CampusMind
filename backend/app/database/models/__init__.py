@@ -6,6 +6,7 @@ from app.database.models.chat_history import ChatHistory
 from app.database.models.user import User
 from app.database.models.tool_definition import ToolDefinition
 from app.database.models.tool_call_log import ToolCallLog
+from app.database.models.crawl_task import CrawlTask
 
 __all__ = [
     "KnowledgeBase",
@@ -15,4 +16,5 @@ __all__ = [
     "User",
     "ToolDefinition",
     "ToolCallLog",
+    "CrawlTask",
 ]

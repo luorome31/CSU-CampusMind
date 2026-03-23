@@ -13,6 +13,12 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 os.environ.setdefault("DATABASE_URL", "sqlite:///./test_campusmind.db")
 os.environ.setdefault("TESTING", "true")
 
+@pytest.fixture(autouse=True, scope="session")
+def setup_test_db():
+    """Initialize test database tables"""
+    from app.database.session import create_db_and_tables
+    create_db_and_tables()
+
 
 @pytest.fixture
 def mock_knowledge_service():

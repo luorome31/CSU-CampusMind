@@ -10,6 +10,10 @@ class FileStatus:
     SUCCESS = "success"
     PROCESS = "process"
     FAIL = "fail"
+    PENDING_VERIFY = "pending_verify"
+    VERIFIED = "verified"
+    INDEXING = "indexing"
+    INDEXED = "indexed"
 
 
 class KnowledgeFile(SQLModel, table=True):

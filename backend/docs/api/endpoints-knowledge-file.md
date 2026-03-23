@@ -161,3 +161,77 @@ DELETE /api/v1/knowledge_file/{file_id}
 ### 错误
 
 - **404**: 文件不存在
+
+---
+
+## 获取文件原始内容
+
+获取储存在 OSS 上的 Markdown 纯文本。
+
+### 请求
+
+```
+GET /api/v1/knowledge_file/{file_id}/content
+```
+
+### 响应
+
+```markdown
+# 标题
+这是从 OSS 返回的纯文本 Markdown 内容。
+```
+
+---
+
+## 更新文件原始内容
+
+修改文件的 Markdown 内容（并保存至 OSS）。
+
+### 请求
+
+```
+PUT /api/v1/knowledge_file/{file_id}/content
+```
+
+```json
+{
+  "content": "# 修改后的标题\n\n新内容..."
+}
+```
+
+### 响应
+
+```json
+{
+  "success": true,
+  "message": "Content updated and file verified"
+}
+```
+
+---
+
+## 触发手动索引
+
+用户完成文件内容的校验之后，主动触发 RAG 构建索引过程。
+
+### 请求
+
+```
+POST /api/v1/knowledge_file/{file_id}/trigger_index
+```
+
+```json
+{
+  "enable_vector": true,
+  "enable_keyword": true
+}
+```
+
+### 响应
+
+```json
+{
+  "success": true,
+  "message": "File indexed successfully"
+}
+```

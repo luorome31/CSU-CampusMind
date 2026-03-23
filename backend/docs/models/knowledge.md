@@ -68,7 +68,7 @@ CREATE TABLE knowledge_file (
 | file_name | string | 必填 | 文件名 |
 | knowledge_id | string | 必填 | 所属知识库 ID |
 | user_id | string | 可选 | 上传用户 ID，默认为 "system" |
-| status | string | 可选 | 处理状态：`process`/`success`/`fail` |
+| status | string | 可选 | 处理状态：`process`/`success`/`fail`/`pending_verify`/`verified`/`indexing`/`indexed` |
 | oss_url | string | 可选 | OSS/MinIO 存储 URL |
 | file_size | int | 可选 | 文件大小（字节） |
 | create_time | datetime | 自动 | 创建时间 |
@@ -77,8 +77,16 @@ CREATE TABLE knowledge_file (
 ### 状态流转
 
 ```
-[创建] --> process --> success
-                   └--> fail
+[后台爬取完成] --> pending_verify (待人工校验)
+                    └--> fail (爬取失败)
+
+[人工校验提交] --> verified (已校验)
+                    │
+[触发构建索引] --> indexing (索引中)
+                    └--> indexed / success (索引完成)
+                    └--> fail (索引失败)
+
+* 注：普通上传可能直接进入 process -> success，批量导入和爬取触发 verify 流程。
 ```
 
 ### Python 模型

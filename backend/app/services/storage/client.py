@@ -74,6 +74,21 @@ class StorageClient:
 
         return urljoin(self.config.base_url, object_name)
 
+    def get_content(self, object_name: str) -> bytes:
+        """Download content from storage and return bytes"""
+        client = self._get_client()
+
+        if self.config.mode == "minio":
+            response = client.get_object(self.config.bucket_name, object_name)
+            try:
+                return response.read()
+            finally:
+                response.close()
+                response.release_conn()
+        elif self.config.mode == "oss":
+            return client.get_object(object_name).read()
+        return b""
+
     def upload_file(self, object_name: str, file_path: str) -> str:
         """Upload local file to storage"""
         with open(file_path, 'rb') as f:

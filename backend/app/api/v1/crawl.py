@@ -2,21 +2,16 @@
 Crawl API - Web content crawling endpoints
 """
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel, Field
 
-from crawl4ai import (
-    AsyncWebCrawler,
-    BrowserConfig,
-    CrawlerRunConfig,
-    DefaultMarkdownGenerator,
-    PruningContentFilter,
-    SemaphoreDispatcher,
-)
 
 from app.services.crawl.crawler import crawl_service
 from app.services.storage.client import storage_client
 from app.services.knowledge_file import KnowledgeFileService
+from app.services.crawl.task_service import CrawlTaskService
+from app.services.crawl.task_worker import process_batch_crawl, process_batch_crawl_with_knowledge
+from app.database.models.crawl_task import CrawlTask
 
 
 router = APIRouter(tags=["Crawl"])
@@ -60,6 +55,22 @@ class CrawlResponse(BaseModel):
     title: Optional[str] = None
     file_id: Optional[str] = None
     error: Optional[str] = None
+
+
+class CrawlTaskResponse(BaseModel):
+    """Response model for async crawl task submission"""
+    task_id: str
+    status: str
+    message: str
+
+
+@router.get("/crawl/tasks/{task_id}", response_model=CrawlTask)
+async def get_crawl_task(task_id: str):
+    """Get the progress and status of a batch crawl task"""
+    task = CrawlTaskService.get_task(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return task
 
 
 @router.post("/crawl/create", response_model=CrawlResponse)
@@ -166,151 +177,71 @@ async def crawl_and_index(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/crawl/batch", response_model=List[CrawlResponse])
+@router.post("/crawl/batch", response_model=CrawlTaskResponse)
 async def crawl_batch(
     request: CrawlBatchRequest,
+    background_tasks: BackgroundTasks,
 ):
     """
-    Crawl multiple URLs concurrently using SemaphoreDispatcher
+    Crawl multiple URLs asynchronously using BackgroundTasks
 
-    Returns per-URL status with partial success handling.
+    Returns a task ID that can be polled for progress.
     """
     try:
-        browser_config = BrowserConfig(headless=True, verbose=False)
-        run_config = CrawlerRunConfig(
-            markdown_generator=DefaultMarkdownGenerator(
-                content_filter=PruningContentFilter()
-            ),
+        # We need a user_id, use "system" or extract from request if available later
+        user_id = "system"
+        task = CrawlTaskService.create_task(
+            user_id=user_id,
+            total_urls=len(request.urls),
         )
 
-        async with AsyncWebCrawler(config=browser_config) as crawler:
-            dispatcher = SemaphoreDispatcher(semaphore_count=5)
-            results = await crawler.arun_many(
-                urls=request.urls,
-                config=run_config,
-                dispatcher=dispatcher,
-            )
+        background_tasks.add_task(
+            process_batch_crawl,
+            task_id=task.id,
+            urls=request.urls,
+            store_to_oss=request.store_to_oss,
+        )
 
-        responses = []
-        for i, result in enumerate(results):
-            url = request.urls[i]
-            if result.success:
-                # Store to OSS if requested
-                oss_url = None
-                if request.store_to_oss:
-                    storage_key = crawl_service.generate_storage_key(url)
-                    content = result.markdown.raw_markdown.encode("utf-8")
-                    oss_url = storage_client.upload_content(storage_key, content)
-
-                responses.append(CrawlResponse(
-                    success=True,
-                    url=url,
-                    oss_url=oss_url,
-                    title=result.metadata.get("title", "") if result.metadata else "",
-                ))
-            else:
-                responses.append(CrawlResponse(
-                    success=False,
-                    url=url,
-                    error=result.error_message or "Unknown error",
-                ))
-
-        return responses
+        return CrawlTaskResponse(
+            task_id=task.id,
+            status=task.status,
+            message="Batch crawl task started",
+        )
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/crawl/batch-with-knowledge", response_model=List[CrawlResponse])
+@router.post("/crawl/batch-with-knowledge", response_model=CrawlTaskResponse)
 async def crawl_batch_with_knowledge(
     request: CrawlBatchWithKnowledgeRequest,
+    background_tasks: BackgroundTasks,
 ):
     """
-    Crawl multiple URLs and create knowledge_file records for each
+    Crawl multiple URLs and create knowledge_file records for each asynchronously
 
-    End-to-end flow for multiple URLs: crawl -> OSS -> knowledge_file -> index
-    Uses parallel crawling with SemaphoreDispatcher for performance.
+    File records will be created with status PENDING_VERIFY allowing manual verification.
     """
-    from app.services.rag.indexer import indexer
-
     try:
-        browser_config = BrowserConfig(headless=True, verbose=False)
-        run_config = CrawlerRunConfig(
-            markdown_generator=DefaultMarkdownGenerator(
-                content_filter=PruningContentFilter()
-            ),
+        task = CrawlTaskService.create_task(
+            user_id=request.user_id,
+            total_urls=len(request.urls),
+            knowledge_id=request.knowledge_id,
         )
 
-        async with AsyncWebCrawler(config=browser_config) as crawler:
-            dispatcher = SemaphoreDispatcher(semaphore_count=5)
-            results = await crawler.arun_many(
-                urls=request.urls,
-                config=run_config,
-                dispatcher=dispatcher,
-            )
+        background_tasks.add_task(
+            process_batch_crawl_with_knowledge,
+            task_id=task.id,
+            urls=request.urls,
+            knowledge_id=request.knowledge_id,
+            user_id=request.user_id,
+        )
 
-        responses = []
-        for i, result in enumerate(results):
-            url = request.urls[i]
-
-            if not result.success:
-                responses.append(CrawlResponse(
-                    success=False,
-                    url=url,
-                    error=result.error_message or "Unknown error",
-                ))
-                continue
-
-            try:
-                # Store to OSS
-                storage_key = crawl_service.generate_storage_key(url)
-                content = result.markdown.raw_markdown.encode("utf-8")
-                oss_url = storage_client.upload_content(storage_key, content)
-
-                # Create knowledge_file
-                file_name = storage_key.split("/")[-1]
-                knowledge_file = KnowledgeFileService.create_knowledge_file(
-                    file_name=file_name,
-                    knowledge_id=request.knowledge_id,
-                    user_id=request.user_id,
-                    oss_url=oss_url,
-                    file_size=len(content),
-                )
-
-                # Index to vector/keyword DB
-                index_result = await indexer.index_content(
-                    content=result.markdown.raw_markdown,
-                    knowledge_id=request.knowledge_id,
-                    source_name=file_name,
-                    metadata={
-                        "file_id": knowledge_file.id,
-                        "enable_vector": request.enable_vector,
-                        "enable_keyword": request.enable_keyword,
-                    }
-                )
-
-                # Update file status
-                if index_result.get("success"):
-                    KnowledgeFileService.update_file_status(knowledge_file.id, "success")
-                else:
-                    KnowledgeFileService.update_file_status(knowledge_file.id, "fail")
-
-                responses.append(CrawlResponse(
-                    success=True,
-                    url=url,
-                    oss_url=oss_url,
-                    title=result.metadata.get("title", "") if result.metadata else "",
-                    file_id=knowledge_file.id,
-                ))
-
-            except Exception as e:
-                responses.append(CrawlResponse(
-                    success=False,
-                    url=url,
-                    error=str(e),
-                ))
-
-        return responses
+        return CrawlTaskResponse(
+            task_id=task.id,
+            status=task.status,
+            message="Batch crawl with knowledge task started",
+        )
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
