@@ -17,7 +17,22 @@ os.environ.setdefault("TESTING", "true")
 def setup_test_db():
     """Initialize test database tables"""
     from app.database.session import create_db_and_tables
+    # Import models to ensure they are registered with SQLModel
     create_db_and_tables()
+
+
+@pytest.fixture
+def mock_auth():
+    """Override get_current_user dependency for testing"""
+    from app.main import app
+    from app.api.dependencies import get_current_user
+    
+    async def override_get_current_user():
+        return {"user_id": "test_user", "username": "test_user"}
+    
+    app.dependency_overrides[get_current_user] = override_get_current_user
+    yield {"user_id": "test_user", "username": "test_user"}
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture

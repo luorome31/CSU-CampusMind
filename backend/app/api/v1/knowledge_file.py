@@ -2,7 +2,7 @@
 Knowledge File API - Knowledge file management endpoints
 """
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 
 from app.services.knowledge_file import KnowledgeFileService
@@ -11,6 +11,7 @@ from app.database.models.knowledge_file import FileStatus, KnowledgeFile
 from app.database.session import engine
 from sqlmodel import Session, select
 from datetime import datetime
+from app.api.dependencies import get_current_user
 
 
 router = APIRouter(tags=["Knowledge-File"])
@@ -20,7 +21,6 @@ class CreateKnowledgeFileRequest(BaseModel):
     """Request model for creating knowledge file"""
     file_name: str = Field(..., description="File name")
     knowledge_id: str = Field(..., description="Knowledge base ID")
-    user_id: str = Field(default="system", description="User ID")
     oss_url: str = Field(..., description="OSS/MinIO URL")
     file_size: int = Field(default=0, description="File size in bytes")
 
@@ -57,13 +57,15 @@ class TriggerIndexRequest(BaseModel):
 @router.post("/knowledge_file/create", response_model=KnowledgeFileResponse)
 async def create_knowledge_file(
     request: CreateKnowledgeFileRequest,
+    current_user: dict = Depends(get_current_user)
 ):
     """Create a new knowledge file record"""
+    user_id = current_user["user_id"]
     try:
         knowledge_file = KnowledgeFileService.create_knowledge_file(
             file_name=request.file_name,
             knowledge_id=request.knowledge_id,
-            user_id=request.user_id,
+            user_id=user_id,
             oss_url=request.oss_url,
             file_size=request.file_size,
         )
@@ -73,48 +75,87 @@ async def create_knowledge_file(
 
 
 @router.get("/knowledge_file/{file_id}", response_model=KnowledgeFileResponse)
-async def get_knowledge_file(file_id: str):
+async def get_knowledge_file(
+    file_id: str,
+    current_user: dict = Depends(get_current_user)
+):
     """Get knowledge file by ID"""
     knowledge_file = KnowledgeFileService.get_knowledge_file(file_id)
     if not knowledge_file:
         raise HTTPException(status_code=404, detail="Knowledge file not found")
+    
+    # Ownership check
+    if knowledge_file.user_id != current_user["user_id"]:
+        raise HTTPException(status_code=403, detail="No permission to access this file")
+
     return KnowledgeFileResponse(**knowledge_file.to_dict())
 
 
 @router.get("/knowledge/{knowledge_id}/files", response_model=List[KnowledgeFileResponse])
-async def list_knowledge_files(knowledge_id: str):
+async def list_knowledge_files(
+    knowledge_id: str,
+    current_user: dict = Depends(get_current_user)
+):
     """List all files in a knowledge base"""
+    # Note: KnowledgeFileService.list_knowledge_files doesn't check ownership here, 
+    # but the API should probably verify knowledge_id belongs to user_id.
     files = KnowledgeFileService.list_knowledge_files(knowledge_id)
-    return [KnowledgeFileResponse(**f.to_dict()) for f in files]
+    # Filter files by user_id for safety
+    user_id = current_user["user_id"]
+    return [KnowledgeFileResponse(**f.to_dict()) for f in files if f.user_id == user_id]
 
 
 @router.patch("/knowledge_file/{file_id}")
 async def update_knowledge_file_status(
     file_id: str,
     request: UpdateStatusRequest,
+    current_user: dict = Depends(get_current_user)
 ):
     """Update file processing status"""
+    knowledge_file = KnowledgeFileService.get_knowledge_file(file_id)
+    if not knowledge_file:
+        raise HTTPException(status_code=404, detail="Knowledge file not found")
+        
+    if knowledge_file.user_id != current_user["user_id"]:
+        raise HTTPException(status_code=403, detail="No permission to update this file")
+
     success = KnowledgeFileService.update_file_status(file_id, request.status)
     if not success:
-        raise HTTPException(status_code=404, detail="Knowledge file not found")
+        raise HTTPException(status_code=500, detail="Failed to update file status")
     return {"success": True}
 
 
 @router.delete("/knowledge_file/{file_id}")
-async def delete_knowledge_file(file_id: str):
+async def delete_knowledge_file(
+    file_id: str,
+    current_user: dict = Depends(get_current_user)
+):
     """Delete a knowledge file"""
+    knowledge_file = KnowledgeFileService.get_knowledge_file(file_id)
+    if not knowledge_file:
+        raise HTTPException(status_code=404, detail="Knowledge file not found")
+        
+    if knowledge_file.user_id != current_user["user_id"]:
+        raise HTTPException(status_code=403, detail="No permission to delete this file")
+
     success = KnowledgeFileService.delete_knowledge_file(file_id)
     if not success:
-        raise HTTPException(status_code=404, detail="Knowledge file not found")
+        raise HTTPException(status_code=500, detail="Failed to delete knowledge file")
     return {"success": True}
 
 
 @router.get("/knowledge_file/{file_id}/content", response_model=str)
-async def get_knowledge_file_content(file_id: str):
+async def get_knowledge_file_content(
+    file_id: str,
+    current_user: dict = Depends(get_current_user)
+):
     """Get the raw markdown content of a knowledge file"""
     knowledge_file = KnowledgeFileService.get_knowledge_file(file_id)
     if not knowledge_file:
         raise HTTPException(status_code=404, detail="Knowledge file not found")
+        
+    if knowledge_file.user_id != current_user["user_id"]:
+        raise HTTPException(status_code=403, detail="No permission to view this file content")
         
     object_name = "/".join(knowledge_file.oss_url.split("/")[-2:])
     try:
@@ -128,11 +169,15 @@ async def get_knowledge_file_content(file_id: str):
 async def update_knowledge_file_content(
     file_id: str,
     request: UpdateContentRequest,
+    current_user: dict = Depends(get_current_user)
 ):
     """Update the raw markdown content of a knowledge file"""
     knowledge_file = KnowledgeFileService.get_knowledge_file(file_id)
     if not knowledge_file:
         raise HTTPException(status_code=404, detail="Knowledge file not found")
+        
+    if knowledge_file.user_id != current_user["user_id"]:
+        raise HTTPException(status_code=403, detail="No permission to update this file content")
         
     object_name = "/".join(knowledge_file.oss_url.split("/")[-2:])
     content_bytes = request.content.encode("utf-8")
@@ -158,11 +203,15 @@ async def update_knowledge_file_content(
 async def trigger_knowledge_file_index(
     file_id: str,
     request: TriggerIndexRequest,
+    current_user: dict = Depends(get_current_user)
 ):
     """Trigger manual indexing for a verified knowledge file"""
     knowledge_file = KnowledgeFileService.get_knowledge_file(file_id)
     if not knowledge_file:
         raise HTTPException(status_code=404, detail="Knowledge file not found")
+        
+    if knowledge_file.user_id != current_user["user_id"]:
+        raise HTTPException(status_code=403, detail="No permission to index this file")
         
     if knowledge_file.status not in [FileStatus.VERIFIED, FileStatus.SUCCESS, FileStatus.PENDING_VERIFY]:
         raise HTTPException(status_code=400, detail="File is not ready for indexing")

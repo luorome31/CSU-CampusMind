@@ -1,6 +1,6 @@
 # 网页爬取接口
 
-使用 Crawl4AI 进行网页内容爬取，支持单 URL 和批量爬取。
+所有接口均需要在 Header 中携带 `Authorization: Bearer <token>`。
 
 ## 爬取单个 URL
 
@@ -51,7 +51,6 @@ POST /api/v1/crawl/create-and-index
 {
   "url": "https://example.com/article",
   "knowledge_id": "t_abc123",
-  "user_id": "system",
   "enable_vector": true,
   "enable_keyword": true
 }
@@ -61,7 +60,6 @@ POST /api/v1/crawl/create-and-index
 |------|------|------|------|
 | url | string | 是 | 待爬取 URL |
 | knowledge_id | string | 是 | 目标知识库 ID |
-| user_id | string | 否 | 用户 ID |
 | enable_vector | bool | 否 | 启用向量索引，默认 true |
 | enable_keyword | bool | 否 | 启用关键词索引，默认 true |
 
@@ -113,7 +111,7 @@ POST /api/v1/crawl/batch
 
 ## 查询批量任务进度
 
-查询异步爬取任务的具体状态与进度。
+查询异步爬取任务的具体状态与进度。只能查询自己发起的任务。
 
 ### 请求
 
@@ -127,7 +125,7 @@ GET /api/v1/crawl/tasks/{task_id}
 {
   "id": "task_xyz",
   "knowledge_id": "t_abc123",
-  "user_id": "system",
+  "user_id": "20210001",
   "total_urls": 10,
   "completed_urls": 4,
   "success_count": 3,
@@ -137,6 +135,12 @@ GET /api/v1/crawl/tasks/{task_id}
   "update_time": "2024-01-01T00:00:00"
 }
 ```
+
+### 错误
+
+- **401**: 未提供认证凭证或 Token 无效
+- **403**: 无权访问该任务
+- **404**: 任务不存在
 
 ---
 

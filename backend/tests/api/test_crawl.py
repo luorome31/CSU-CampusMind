@@ -28,7 +28,7 @@ class TestCrawlAPI:
             mock.upload_content = lambda key, content: f"https://oss.example.com/{key}"
             yield mock
 
-    def test_crawl_url(self, mock_crawl_service, mock_storage):
+    def test_crawl_url(self, mock_crawl_service, mock_storage, mock_auth):
         """Test POST /api/v1/crawl/create"""
         from app.main import app
         client = TestClient(app)
@@ -45,7 +45,7 @@ class TestCrawlAPI:
         data = response.json()
         assert data["success"] is True
 
-    def test_crawl_url_no_storage(self, mock_crawl_service):
+    def test_crawl_url_no_storage(self, mock_crawl_service, mock_auth):
         """Test crawl without OSS storage"""
         from app.main import app
         client = TestClient(app)
@@ -60,7 +60,7 @@ class TestCrawlAPI:
 
         assert response.status_code == 200
 
-    def test_crawl_and_index(self, mock_crawl_service, mock_storage):
+    def test_crawl_and_index(self, mock_crawl_service, mock_storage, mock_auth):
         """Test POST /api/v1/crawl/create-and-index"""
         from app.main import app
         client = TestClient(app)
@@ -70,7 +70,6 @@ class TestCrawlAPI:
             json={
                 "url": "https://example.com",
                 "knowledge_id": "test_kb_1",
-                "user_id": "test_user",
                 "enable_vector": True,
                 "enable_keyword": True
             }
@@ -78,7 +77,7 @@ class TestCrawlAPI:
 
         assert response.status_code == 200
 
-    def test_crawl_batch(self, mock_crawl_service, mock_storage):
+    def test_crawl_batch(self, mock_crawl_service, mock_storage, mock_auth):
         """Test POST /api/v1/crawl/batch"""
         from app.main import app
         client = TestClient(app)

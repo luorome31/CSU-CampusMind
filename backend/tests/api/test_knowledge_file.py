@@ -42,7 +42,7 @@ class TestKnowledgeFileAPI:
 
             yield mock
 
-    def test_create_knowledge_file(self, mock_service):
+    def test_create_knowledge_file(self, mock_service, mock_auth):
         """Test POST /api/v1/knowledge_file/create"""
         from app.main import app
         client = TestClient(app)
@@ -52,7 +52,6 @@ class TestKnowledgeFileAPI:
             json={
                 "file_name": "test.txt",
                 "knowledge_id": "test_kb_1",
-                "user_id": "test_user",
                 "oss_url": "https://oss.example.com/test.txt",
                 "file_size": 1024
             }
@@ -63,7 +62,7 @@ class TestKnowledgeFileAPI:
         assert data["id"] == "file_123"
         assert data["file_name"] == "test.txt"
 
-    def test_get_knowledge_file(self, mock_service):
+    def test_get_knowledge_file(self, mock_service, mock_auth):
         """Test GET /api/v1/knowledge_file/{file_id}"""
         from app.main import app
         client = TestClient(app)
@@ -74,7 +73,7 @@ class TestKnowledgeFileAPI:
         data = response.json()
         assert data["id"] == "file_123"
 
-    def test_get_knowledge_file_not_found(self, mock_service):
+    def test_get_knowledge_file_not_found(self, mock_service, mock_auth):
         """Test GET /api/v1/knowledge_file/{file_id} - not found"""
         from app.main import app
         client = TestClient(app)
@@ -85,7 +84,7 @@ class TestKnowledgeFileAPI:
 
         assert response.status_code == 404
 
-    def test_list_knowledge_files(self, mock_service):
+    def test_list_knowledge_files(self, mock_service, mock_auth):
         """Test GET /api/v1/knowledge/{knowledge_id}/files"""
         from app.main import app
         client = TestClient(app)
@@ -97,7 +96,7 @@ class TestKnowledgeFileAPI:
         assert isinstance(data, list)
         assert len(data) == 1
 
-    def test_update_file_status(self, mock_service):
+    def test_update_file_status(self, mock_service, mock_auth):
         """Test PATCH /api/v1/knowledge_file/{file_id}"""
         from app.main import app
         client = TestClient(app)
@@ -113,7 +112,7 @@ class TestKnowledgeFileAPI:
         data = response.json()
         assert data["success"] is True
 
-    def test_delete_knowledge_file(self, mock_service):
+    def test_delete_knowledge_file(self, mock_service, mock_auth):
         """Test DELETE /api/v1/knowledge_file/{file_id}"""
         from app.main import app
         client = TestClient(app)

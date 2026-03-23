@@ -16,6 +16,7 @@ class TestKnowledgeFileVerificationAPI:
             mock_file.status = FileStatus.PENDING_VERIFY
             mock_file.knowledge_id = "test_kb_1"
             mock_file.file_name = "test_file.md"
+            mock_file.user_id = "test_user"
             
             mock.get_knowledge_file.return_value = mock_file
             mock.update_file_status.return_value = True
@@ -41,7 +42,7 @@ class TestKnowledgeFileVerificationAPI:
             mock_session.return_value.__enter__.return_value.exec.return_value.first.return_value = mock_db_file
             yield mock_session
 
-    def test_get_content(self, mock_service, mock_storage):
+    def test_get_content(self, mock_service, mock_storage, mock_auth):
         from app.main import app
         client = TestClient(app)
         response = client.get("/api/v1/knowledge_file/file_123/content")
@@ -51,7 +52,7 @@ class TestKnowledgeFileVerificationAPI:
         # Verify object name parsing
         mock_storage.get_content.assert_called_with("crawl/test_file.md")
 
-    def test_update_content(self, mock_service, mock_storage, mock_db_session):
+    def test_update_content(self, mock_service, mock_storage, mock_db_session, mock_auth):
         from app.main import app
         client = TestClient(app)
         
@@ -64,7 +65,7 @@ class TestKnowledgeFileVerificationAPI:
         # Verify OSS upload
         mock_storage.upload_content.assert_called_with("crawl/test_file.md", b"Updated Output Content")
 
-    def test_trigger_index(self, mock_service, mock_storage, mock_indexer):
+    def test_trigger_index(self, mock_service, mock_storage, mock_indexer, mock_auth):
         from app.main import app
         client = TestClient(app)
         

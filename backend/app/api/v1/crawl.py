@@ -2,9 +2,8 @@
 Crawl API - Web content crawling endpoints
 """
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from pydantic import BaseModel, Field
-
 
 from app.services.crawl.crawler import crawl_service
 from app.services.storage.client import storage_client
@@ -12,6 +11,7 @@ from app.services.knowledge_file import KnowledgeFileService
 from app.services.crawl.task_service import CrawlTaskService
 from app.services.crawl.task_worker import process_batch_crawl, process_batch_crawl_with_knowledge
 from app.database.models.crawl_task import CrawlTask
+from app.api.dependencies import get_current_user
 
 
 router = APIRouter(tags=["Crawl"])
@@ -33,7 +33,6 @@ class CrawlAndIndexRequest(BaseModel):
     """Request model for crawling and indexing in one go"""
     url: str = Field(..., description="URL to crawl")
     knowledge_id: str = Field(..., description="Knowledge base ID to store the crawled content")
-    user_id: str = Field(default="system", description="User ID")
     enable_vector: bool = Field(default=True, description="Enable vector storage")
     enable_keyword: bool = Field(default=True, description="Enable keyword storage")
 
@@ -42,7 +41,6 @@ class CrawlBatchWithKnowledgeRequest(BaseModel):
     """Request model for batch crawling with knowledge base"""
     urls: List[str] = Field(..., description="List of URLs to crawl")
     knowledge_id: str = Field(..., description="Knowledge base ID")
-    user_id: str = Field(default="system", description="User ID")
     enable_vector: bool = Field(default=True, description="Enable vector storage")
     enable_keyword: bool = Field(default=True, description="Enable keyword storage")
 
@@ -65,17 +63,26 @@ class CrawlTaskResponse(BaseModel):
 
 
 @router.get("/crawl/tasks/{task_id}", response_model=CrawlTask)
-async def get_crawl_task(task_id: str):
+async def get_crawl_task(
+    task_id: str,
+    current_user: dict = Depends(get_current_user)
+):
     """Get the progress and status of a batch crawl task"""
     task = CrawlTaskService.get_task(task_id)
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
+    
+    # Ownership check
+    if task.user_id != current_user["user_id"]:
+        raise HTTPException(status_code=403, detail="No permission to access this task")
+
     return task
 
 
 @router.post("/crawl/create", response_model=CrawlResponse)
 async def crawl_url(
     request: CrawlRequest,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Crawl a single URL and optionally store to OSS
@@ -114,12 +121,14 @@ async def crawl_url(
 @router.post("/crawl/create-and-index", response_model=CrawlResponse)
 async def crawl_and_index(
     request: CrawlAndIndexRequest,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Crawl URL, store to OSS, create knowledge_file record, and index to vector/keyword DB
 
     End-to-end flow: crawl -> OSS -> knowledge_file -> index
     """
+    user_id = current_user["user_id"]
     try:
         # Step 1: Crawl the URL
         crawl_result = await crawl_service.crawl_and_prepare_for_storage(request.url)
@@ -141,7 +150,7 @@ async def crawl_and_index(
         knowledge_file = KnowledgeFileService.create_knowledge_file(
             file_name=file_name,
             knowledge_id=request.knowledge_id,
-            user_id=request.user_id,
+            user_id=user_id,
             oss_url=oss_url,
             file_size=len(content),
         )
@@ -181,6 +190,7 @@ async def crawl_and_index(
 async def crawl_batch(
     request: CrawlBatchRequest,
     background_tasks: BackgroundTasks,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Crawl multiple URLs asynchronously using BackgroundTasks
@@ -188,8 +198,7 @@ async def crawl_batch(
     Returns a task ID that can be polled for progress.
     """
     try:
-        # We need a user_id, use "system" or extract from request if available later
-        user_id = "system"
+        user_id = current_user["user_id"]
         task = CrawlTaskService.create_task(
             user_id=user_id,
             total_urls=len(request.urls),
@@ -216,6 +225,7 @@ async def crawl_batch(
 async def crawl_batch_with_knowledge(
     request: CrawlBatchWithKnowledgeRequest,
     background_tasks: BackgroundTasks,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Crawl multiple URLs and create knowledge_file records for each asynchronously
@@ -223,8 +233,9 @@ async def crawl_batch_with_knowledge(
     File records will be created with status PENDING_VERIFY allowing manual verification.
     """
     try:
+        user_id = current_user["user_id"]
         task = CrawlTaskService.create_task(
-            user_id=request.user_id,
+            user_id=user_id,
             total_urls=len(request.urls),
             knowledge_id=request.knowledge_id,
         )
@@ -234,7 +245,7 @@ async def crawl_batch_with_knowledge(
             task_id=task.id,
             urls=request.urls,
             knowledge_id=request.knowledge_id,
-            user_id=request.user_id,
+            user_id=user_id,
         )
 
         return CrawlTaskResponse(
