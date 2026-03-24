@@ -1,5 +1,11 @@
 import { apiClient } from '../../../api/client';
 
+export interface FailedUrl {
+  url: string;
+  error: string;
+  timestamp: string;
+}
+
 export interface CrawlTask {
   id: string;
   knowledge_id: string;
@@ -8,7 +14,8 @@ export interface CrawlTask {
   completed_urls: number;
   success_count: number;
   fail_count: number;
-  status: 'pending' | 'processing' | 'SUCCESS' | 'FAILED' | 'completed';
+  status: 'pending' | 'processing' | 'SUCCESS' | 'FAILED' | 'completed' | 'failed';
+  failed_urls?: FailedUrl[];
   create_time: string;
   update_time: string;
 }
@@ -34,6 +41,14 @@ class CrawlApi {
 
   async fetchTaskProgress(taskId: string): Promise<CrawlTask> {
     return apiClient.get<CrawlTask>(`/crawl/tasks/${taskId}`);
+  }
+
+  async deleteTask(taskId: string): Promise<void> {
+    await apiClient.delete(`/crawl/tasks/${taskId}`);
+  }
+
+  async retryFailed(taskId: string): Promise<{ task_id: string; retry_count: number }> {
+    return apiClient.post(`/crawl/tasks/${taskId}/retry-failed`, {});
   }
 }
 
