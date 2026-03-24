@@ -2,6 +2,7 @@
 Crawl Task Service - CRUD operations for background crawl tasks
 """
 import uuid
+import json
 from typing import Optional
 from datetime import datetime
 from sqlmodel import Session, select
@@ -45,6 +46,8 @@ class CrawlTaskService:
     def update_task_progress(
         task_id: str,
         success: bool,
+        url: Optional[str] = None,
+        error: Optional[str] = None,
     ) -> Optional[CrawlTask]:
         """Atomically increment completed_urls and success/fail counts"""
         with Session(engine) as session:
@@ -58,9 +61,25 @@ class CrawlTaskService:
                 task.success_count += 1
             else:
                 task.fail_count += 1
+                # Record failed URL details
+                if url:
+                    failed_list = json.loads(task.failed_urls_json) if task.failed_urls_json else []
+                    failed_list.append({
+                        "url": url,
+                        "error": error or "Unknown error",
+                        "timestamp": datetime.now().isoformat()
+                    })
+                    task.failed_urls_json = json.dumps(failed_list)
 
             if task.completed_urls >= task.total_urls:
-                task.status = CrawlTaskStatus.COMPLETED
+                # Set terminal status based on results
+                if task.success_count == 0:
+                    task.status = CrawlTaskStatus.FAILED
+                elif task.fail_count == 0:
+                    task.status = CrawlTaskStatus.COMPLETED
+                else:
+                    # Partial success - keep as completed but with failures
+                    task.status = CrawlTaskStatus.COMPLETED
 
             task.update_time = datetime.now()
             session.commit()
