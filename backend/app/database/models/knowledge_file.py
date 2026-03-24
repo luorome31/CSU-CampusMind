@@ -26,7 +26,7 @@ class KnowledgeFile(SQLModel, table=True):
     user_id: str = Field(index=True, description="Uploader user ID")
     status: str = Field(default=FileStatus.PROCESS, description="Processing status: success/process/fail")
     oss_url: str = Field(description="OSS/MinIO storage URL")
-    object_name: str = Field(description="Stable storage key/path in bucket")
+    object_name: str | None = Field(default=None, description="Stable storage key/path in bucket")
     file_size: int = Field(default=0, description="File size in bytes")
     create_time: datetime = Field(default_factory=datetime.now, description="Create time")
     update_time: datetime = Field(default_factory=datetime.now, description="Update time")

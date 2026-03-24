@@ -164,13 +164,28 @@ export const chatStore = create<ChatStore>((set) => ({
   },
 
   loadDialog: (dialogId, dbMessages) => {
-    const messages: ChatMessage[] = dbMessages.map((m) => ({
-      id: m.id,
-      role: m.role as 'user' | 'assistant',
-      content: m.content,
-      events: m.events ? JSON.parse(m.events) : [],
-      createdAt: new Date(m.created_at),
-    }));
+    const messages: ChatMessage[] = dbMessages.map((m) => {
+      let events: ToolEvent[] = [];
+      if (m.events) {
+        const parsed = JSON.parse(m.events) as ToolEvent[];
+        // Merge events with same id (same as addToolEvent logic)
+        for (const event of parsed) {
+          const existingIdx = events.findIndex((e) => e.id === event.id);
+          if (existingIdx >= 0) {
+            events[existingIdx] = { ...events[existingIdx], ...event };
+          } else {
+            events.push(event);
+          }
+        }
+      }
+      return {
+        id: m.id,
+        role: m.role as 'user' | 'assistant',
+        content: m.content,
+        events,
+        createdAt: new Date(m.created_at),
+      };
+    });
     set({ currentDialogId: dialogId, messages, toolEvents: [] });
   },
 }));

@@ -35,7 +35,7 @@ class KnowledgeFileResponse(BaseModel):
     user_id: str
     status: str
     oss_url: str
-    object_name: str
+    object_name: Optional[str] = None
     file_size: int
     create_time: Optional[str] = None
     update_time: Optional[str] = None
@@ -165,10 +165,13 @@ async def get_knowledge_file_content(
     knowledge_file = KnowledgeFileService.get_knowledge_file(file_id)
     if not knowledge_file:
         raise HTTPException(status_code=404, detail="Knowledge file not found")
-        
+
     if knowledge_file.user_id != current_user["user_id"]:
         raise HTTPException(status_code=403, detail="No permission to view this file content")
-        
+
+    if not knowledge_file.object_name:
+        raise HTTPException(status_code=404, detail="文件内容不存在或已被删除")
+
     try:
         content = storage_client.get_content(knowledge_file.object_name)
         return content.decode("utf-8")
@@ -186,12 +189,15 @@ async def update_knowledge_file_content(
     knowledge_file = KnowledgeFileService.get_knowledge_file(file_id)
     if not knowledge_file:
         raise HTTPException(status_code=404, detail="Knowledge file not found")
-        
+
     if knowledge_file.user_id != current_user["user_id"]:
         raise HTTPException(status_code=403, detail="No permission to update this file content")
-        
+
+    if not knowledge_file.object_name:
+        raise HTTPException(status_code=404, detail="文件内容不存在或已被删除")
+
     content_bytes = request.content.encode("utf-8")
-    
+
     try:
         storage_client.upload_content(knowledge_file.object_name, content_bytes)
     except Exception as e:
