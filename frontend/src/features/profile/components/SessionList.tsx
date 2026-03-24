@@ -1,9 +1,9 @@
-import { Monitor, Smartphone, LogOut } from 'lucide-react';
+import { Monitor, Smartphone } from 'lucide-react';
 import { profileStore } from '../profileStore';
 import './SessionList.css';
 
 export function SessionList() {
-  const { sessions, revokeSession } = profileStore();
+  const { sessions } = profileStore();
 
   const getDeviceIcon = (device: string) => {
     const d = device.toLowerCase();
@@ -47,16 +47,6 @@ export function SessionList() {
                   <span className="session-time">{formatTime(session.created_at)}</span>
                   {session.is_current && <span className="session-current-badge">当前</span>}
                 </div>
-                {!session.is_current && (
-                  <button
-                    className="session-revoke"
-                    onClick={() => revokeSession(session.session_id)}
-                    aria-label="退出此会话"
-                  >
-                    <LogOut size={16} />
-                    登出
-                  </button>
-                )}
               </div>
             );
           })

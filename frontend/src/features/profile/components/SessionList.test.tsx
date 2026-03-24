@@ -20,7 +20,6 @@ vi.mock('../profileStore', () => ({
         is_current: false,
       },
     ],
-    revokeSession: vi.fn(),
   })),
 }));
 
@@ -39,12 +38,6 @@ describe('SessionList', () => {
   it('renders session title', () => {
     render(<SessionList />);
     expect(screen.getByText('活跃会话')).toBeInTheDocument();
-  });
-
-  it('shows revoke button for non-current sessions', () => {
-    render(<SessionList />);
-    const revokeButtons = screen.getAllByText('登出');
-    expect(revokeButtons).toHaveLength(1);
   });
 
   it('shows location for sessions', () => {
