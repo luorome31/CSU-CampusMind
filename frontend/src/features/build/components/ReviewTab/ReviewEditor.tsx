@@ -1,58 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Save, Play, Eye, Edit3, Bold, Italic, List, ListOrdered, Heading } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Button } from '../../../../components/ui/Button';
 import { buildStore } from '../../buildStore';
 import { useToast } from './Toast';
 import styles from './ReviewEditor.module.css';
-
-// Simple markdown to HTML converter
-function parseMarkdown(text: string): string {
-  if (!text) return '';
-
-  let html = text
-    // Escape HTML
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-
-    // Headers
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-
-    // Bold and Italic
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/__(.+?)__/g, '<strong>$1</strong>')
-    .replace(/_(.+?)_/g, '<em>$1</em>')
-
-    // Lists
-    .replace(/^\s*[-*]\s+(.+)$/gm, '<li>$1</li>')
-    .replace(/^\s*\d+\.\s+(.+)$/gm, '<li>$1</li>')
-
-    // Code blocks
-    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
-    .replace(/`(.+?)`/g, '<code>$1</code>')
-
-    // Links
-    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
-
-    // Paragraphs
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g, '<br />');
-
-  // Wrap in paragraphs
-  html = '<p>' + html + '</p>';
-
-  // Clean up empty paragraphs
-  html = html.replace(/<p><\/p>/g, '');
-
-  // Wrap list items in ul/ol
-  html = html.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
-  html = html.replace(/<\/ul>\s*<ul>/g, '');
-
-  return html;
-}
 
 export const ReviewEditor: React.FC = () => {
   const selectedFile = buildStore((s) => s.selectedFile);
@@ -207,10 +160,9 @@ export const ReviewEditor: React.FC = () => {
 
       <div className={styles.editorWrapper}>
         {isPreview ? (
-          <div
-            className={styles.preview}
-            dangerouslySetInnerHTML={{ __html: parseMarkdown(editedContent) }}
-          />
+          <div className={styles.preview}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{editedContent}</ReactMarkdown>
+          </div>
         ) : (
           <textarea
             className={styles.editor}
