@@ -81,8 +81,8 @@ async def create_session(user_id: str, user_agent: str = "", ip: str = "") -> Se
     redis = get_redis()
     key = f"user_sessions:{user_id}"
     await redis.hset(key, session_id, json.dumps(session.to_dict()))
-    # Set expiry to 7 days
-    await redis.expire(key, 7 * 24 * 3600)
+    # Set expiry to 4 hours
+    await redis.expire(key, 4 * 3600)
 
     return session
 
@@ -97,7 +97,7 @@ async def get_user_sessions(user_id: str) -> List[SessionInfo]:
     for session_id, data in sessions_data.items():
         session_data = json.loads(data)
         # Check if session is still valid (7 days)
-        if time.time() - session_data.get("created_at", 0) < 7 * 24 * 3600:
+        if time.time() - session_data.get("created_at", 0) < 4 * 3600:
             sessions.append(SessionInfo.from_dict(session_data))
 
     return sessions

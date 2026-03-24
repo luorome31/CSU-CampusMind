@@ -142,26 +142,27 @@ async def login(request: LoginRequest, http_request: Request):
 
 @router.post("/logout")
 async def logout(
-    request: LogoutRequest,
+    request: Request,
     current_user: dict = Depends(get_current_user)
 ):
     """
     用户登出接口
 
-    清除用户的 CASTGC 和所有子系统 session
+    清除用户的 CASTGC 和当前 session
     """
-    # 验证权限：只能登出自己的账号
-    if current_user.get("user_id") != request.user_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="无权限操作"
-        )
+    user_id = current_user["user_id"]
+
+    # 获取当前 session ID 并从 Redis 删除
+    session_id = request.headers.get("X-Session-ID", "")
+    if session_id:
+        from app.core.session.session_tracker import delete_session
+        await delete_session(user_id, session_id)
 
     # 清除 session（包括 CASTGC）
     session_manager = get_session_manager()
-    session_manager.invalidate_session(request.user_id)
+    session_manager.invalidate_session(user_id)
 
-    logger.info(f"User {request.user_id} logged out")
+    logger.info(f"User {user_id} logged out, session {session_id} revoked")
 
     return {"message": "登出成功"}
 
