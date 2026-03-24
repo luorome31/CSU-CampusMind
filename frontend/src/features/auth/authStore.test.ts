@@ -16,6 +16,7 @@ describe('authStore', () => {
     authStore.setState({
       user: null,
       token: null,
+      sessionId: null,
       isAuthenticated: false,
       isLoading: false,
     });
@@ -51,6 +52,7 @@ describe('authStore', () => {
       vi.mocked(authApi.authApi.login).mockResolvedValue({
         token: 'test-token',
         user_id: 'user-1',
+        session_id: 'session-1',
         expires_in: 3600,
       });
 
@@ -63,6 +65,7 @@ describe('authStore', () => {
       vi.mocked(authApi.authApi.login).mockResolvedValue({
         token: 'test-token',
         user_id: 'user-1',
+        session_id: 'session-1',
         expires_in: 3600,
       });
 
@@ -81,6 +84,7 @@ describe('authStore', () => {
       vi.mocked(authApi.authApi.login).mockResolvedValue({
         token: 'test-token',
         user_id: 'user-1',
+        session_id: 'session-1',
         expires_in: 3600,
       });
 
@@ -93,6 +97,7 @@ describe('authStore', () => {
       vi.mocked(authApi.authApi.login).mockResolvedValue({
         token: 'test-token',
         user_id: 'user-1',
+        session_id: 'session-1',
         expires_in: 3600,
       });
 
@@ -125,6 +130,7 @@ describe('authStore', () => {
       vi.mocked(authApi.authApi.login).mockResolvedValue({
         token: 'test-token',
         user_id: 'user-1',
+        session_id: 'session-1',
         expires_in: 3600,
       });
       await authStore.getState().login('user', 'pass');

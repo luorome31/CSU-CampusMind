@@ -17,6 +17,7 @@ describe('LoginPage', () => {
     authStore.setState({
       user: null,
       token: null,
+      sessionId: null,
       isAuthenticated: false,
       isLoading: false,
     });
@@ -49,6 +50,7 @@ describe('LoginPage', () => {
     vi.mocked(authApi.login).mockResolvedValue({
       token: 'test-token',
       user_id: 'user-1',
+      session_id: 'session-1',
       expires_in: 3600,
     });
 

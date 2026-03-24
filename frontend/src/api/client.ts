@@ -5,17 +5,23 @@ function getToken(): string | null {
   return sessionStorage.getItem('token');
 }
 
+function getSessionId(): string | null {
+  return sessionStorage.getItem('sessionId');
+}
+
 class ApiClient {
   private baseUrl = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const token = getToken();
+    const sessionId = getSessionId();
 
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(sessionId ? { 'X-Session-ID': sessionId } : {}),
         ...options.headers,
       },
     });
@@ -24,6 +30,7 @@ class ApiClient {
       // Clear session and reload to trigger auth re-init
       sessionStorage.removeItem('token');
       sessionStorage.removeItem('user');
+      sessionStorage.removeItem('sessionId');
       window.location.href = '/login';
       throw new ApiError(401, 'Unauthorized');
     }

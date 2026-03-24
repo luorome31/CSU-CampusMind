@@ -17,5 +17,6 @@ export class ApiError extends Error {
 export interface LoginResponse {
   token: string;
   user_id: string;
+  session_id: string;
   expires_in: number;
 }
