@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { FileSearch, Download } from 'lucide-react';
 import { buildStore } from './buildStore';
-import { CrawlPanel } from './components/CrawlTab/CrawlPanel';
-import { TaskList } from './components/CrawlTab/TaskList';
-import { UrlImportModal } from './components/CrawlTab/UrlImportModal';
-import { ReviewInbox } from './components/ReviewTab/ReviewInbox';
-import { ReviewEditor } from './components/ReviewTab/ReviewEditor';
+import { CrawlPanel } from '../../components/knowledge_build/CrawlTab/CrawlPanel';
+import { TaskList } from '../../components/knowledge_build/CrawlTab/TaskList';
+import { UrlImportModal } from '../../components/knowledge_build/CrawlTab/UrlImportModal';
+import { ReviewInbox } from '../../components/knowledge_build/ReviewTab/ReviewInbox';
+import { ReviewEditor } from '../../components/knowledge_build/ReviewTab/ReviewEditor';
 import styles from './KnowledgeBuildPage.module.css';
 
 export function KnowledgeBuildPage() {

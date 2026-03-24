@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TaskCard } from './TaskCard';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
-import { CrawlTask } from '../../api/crawl';
+import { CrawlTask } from '../../../api/crawl';
 import styles from './TaskList.module.css';
 
 interface TaskListProps {

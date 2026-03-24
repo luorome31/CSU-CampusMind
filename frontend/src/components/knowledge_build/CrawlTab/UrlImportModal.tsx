@@ -1,8 +1,8 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { Upload, X, FileText, Check } from 'lucide-react';
-import { Modal } from '../../../../components/ui/Modal';
-import { Button } from '../../../../components/ui/Button';
-import { buildStore } from '../../buildStore';
+import { Modal } from '../../ui/Modal';
+import { Button } from '../../ui/Button';
+import { buildStore } from '../../../features/build/buildStore';
 import styles from './UrlImportModal.module.css';
 
 const MAX_FILE_SIZE = 1024 * 1024; // 1MB

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { TaskList } from './TaskList';
-import { CrawlTask } from '../../api/crawl';
+import { CrawlTask } from '../../../api/crawl';
 
 const mockTasks: CrawlTask[] = [
   {

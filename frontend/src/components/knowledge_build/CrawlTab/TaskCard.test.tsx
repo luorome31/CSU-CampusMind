@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { TaskCard } from './TaskCard';
-import { CrawlTask } from '../../api/crawl';
+import { CrawlTask } from '../../../api/crawl';
 
 const mockTask: CrawlTask = {
   id: 'task_xyz',

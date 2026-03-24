@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { crawlApi, CrawlTask } from './crawl';
+import { crawlApi, CrawlTask } from '../api/crawl';
 
 // Mock fetch
 const mockFetch = vi.fn();

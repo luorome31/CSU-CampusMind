@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ReviewEditor } from './ReviewEditor';
-import { buildStore } from '../../buildStore';
+import { buildStore } from '../../../features/build/buildStore';
 
 const mockFile = {
   id: 'file_1',

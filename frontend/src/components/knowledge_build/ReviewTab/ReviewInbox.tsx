@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { FileText, PanelLeftClose, PanelLeft } from 'lucide-react';
-import { buildStore } from '../../buildStore';
+import { buildStore } from '../../../features/build/buildStore';
 import styles from './ReviewInbox.module.css';
 
 interface ReviewInboxProps {

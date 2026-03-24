@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { buildStore } from './buildStore';
-import { crawlApi } from './api/crawl';
+import { crawlApi } from '../../api/crawl';
 
-vi.mock('./api/crawl');
+vi.mock('../../api/crawl');
 
 describe('buildStore', () => {
   beforeEach(() => {

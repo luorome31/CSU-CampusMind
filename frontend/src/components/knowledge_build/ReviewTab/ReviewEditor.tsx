@@ -2,8 +2,8 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Save, Play, Eye, Edit3, Bold, Italic, List, ListOrdered, Heading } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Button } from '../../../../components/ui/Button';
-import { buildStore } from '../../buildStore';
+import { Button } from '../../ui/Button';
+import { buildStore } from '../../../features/build/buildStore';
 import { useToast, ToastContainer } from './Toast';
 import styles from './ReviewEditor.module.css';
 

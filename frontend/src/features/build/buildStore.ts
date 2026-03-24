@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { crawlApi, CrawlTask } from './api/crawl';
+import { crawlApi, CrawlTask } from '../../api/crawl';
 import { KnowledgeFile } from '../../api/knowledge';
 
 const POLL_INTERVAL = 3000;

@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useCallback } from 'react';
 import { Play, Upload, Trash2 } from 'lucide-react';
-import { Button } from '../../../../components/ui/Button';
-import { Select } from '../../../../components/ui/Select';
-import { buildStore } from '../../buildStore';
-import { knowledgeListStore } from '../../../knowledge/knowledgeListStore';
+import { Button } from '../../ui/Button';
+import { Select } from '../../ui/Select';
+import { buildStore } from '../../../features/build/buildStore';
+import { knowledgeListStore } from '../../../features/knowledge/knowledgeListStore';
 import styles from './CrawlPanel.module.css';
 
 export const CrawlPanel: React.FC = () => {

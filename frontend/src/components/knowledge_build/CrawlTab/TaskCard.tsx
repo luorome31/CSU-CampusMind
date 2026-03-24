@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Check, X, Loader2, Trash2, RotateCw, ChevronDown, ChevronUp } from 'lucide-react';
-import { CrawlTask } from '../../api/crawl';
+import { CrawlTask } from '../../../api/crawl';
 import styles from './TaskCard.module.css';
 
 interface TaskCardProps {
