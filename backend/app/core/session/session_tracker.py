@@ -62,7 +62,7 @@ def parse_device_from_user_agent(user_agent: str) -> str:
     return "Unknown Device"
 
 
-def create_session(user_id: str, user_agent: str = "", ip: str = "") -> SessionInfo:
+async def create_session(user_id: str, user_agent: str = "", ip: str = "") -> SessionInfo:
     """Create a new session for a user"""
     session_id = str(uuid.uuid4())
     device = parse_device_from_user_agent(user_agent)
@@ -78,16 +78,11 @@ def create_session(user_id: str, user_agent: str = "", ip: str = "") -> SessionI
     )
 
     # Store in Redis
-    import asyncio
     redis = get_redis()
     key = f"user_sessions:{user_id}"
-    asyncio.get_event_loop().run_until_complete(
-        redis.hset(key, session_id, json.dumps(session.to_dict()))
-    )
+    await redis.hset(key, session_id, json.dumps(session.to_dict()))
     # Set expiry to 7 days
-    asyncio.get_event_loop().run_until_complete(
-        redis.expire(key, 7 * 24 * 3600)
-    )
+    await redis.expire(key, 7 * 24 * 3600)
 
     return session
 

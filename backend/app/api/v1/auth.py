@@ -123,7 +123,7 @@ async def login(request: LoginRequest):
     token = jwt_manager.create_token({"user_id": request.username})
 
     # 5. 创建会话记录
-    session = create_session(request.username)
+    session = await create_session(request.username)
 
     logger.info(f"User {request.username} logged in successfully")
 
