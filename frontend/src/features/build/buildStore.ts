@@ -42,6 +42,9 @@ interface BuildState {
   startPolling: (taskId: string) => void;
   stopPolling: () => void;
   fetchTaskProgress: (taskId: string) => Promise<void>;
+  removeTask: (taskId: string) => Promise<void>;
+  retryFailedUrls: (taskId: string) => Promise<string | null>;
+  clearCompletedTasks: () => Promise<void>;
   fetchPendingFiles: () => Promise<void>;
   fetchFileContent: (fileId: string) => Promise<void>;
   updateFileContent: (fileId: string, content: string) => Promise<void>;
@@ -166,6 +169,42 @@ export const buildStore = create<BuildState>((set, get) => ({
       }));
     } catch (error) {
       console.error('Failed to fetch task progress:', error);
+    }
+  },
+
+  removeTask: async (taskId) => {
+    try {
+      await crawlApi.deleteTask(taskId);
+      set((state) => ({
+        tasks: state.tasks.filter((t) => t.id !== taskId),
+      }));
+    } catch (error) {
+      console.error('Failed to remove task:', error);
+    }
+  },
+
+  retryFailedUrls: async (taskId) => {
+    const task = get().tasks.find((t) => t.id === taskId);
+    if (!task?.knowledge_id || !task.failed_urls?.length) return null;
+
+    try {
+      const failedUrls = task.failed_urls.map((f) => f.url);
+      const newTaskId = await get().submitBatchCrawl(failedUrls);
+      return newTaskId;
+    } catch (error) {
+      console.error('Failed to retry failed URLs:', error);
+      return null;
+    }
+  },
+
+  clearCompletedTasks: async () => {
+    const { tasks, removeTask } = get();
+    const terminalTasks = tasks.filter((t) =>
+      TERMINAL_STATES.includes(t.status)
+    );
+
+    for (const task of terminalTasks) {
+      await removeTask(task.id);
     }
   },
 
