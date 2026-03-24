@@ -1,6 +1,6 @@
 # CSU-CampusMind
 
-融合检索增强 (RAG) 与工具调用的中南大学 (CSU) 校园智能体助手。
+融合检索增强生成与工具调用的CSU校园智能体助手。
 
 ---
 
@@ -20,8 +20,8 @@
 
 - **智能问答** — 基于 LLM 的校园信息深度咨询，支持流式 (SSE) 输出。
 - **RAG 知识库** — 支持个人/公共知识库构建，通过向量检索增强回答准确性。
-- **系统集成** — 深度对接教务 (JWC)、图书馆、就业中心、OA 办公系统。
-- **多轮会话** — 完善的上下文管理，支持会话历史持久化、重命名与导出。
+- **系统集成** — 对接教务 (JWC)、图书馆、就业中心、OA 办公系统。
+- **多轮会话** — 完善的上下文管理，支持会话历史持久化
 - **自动化采集** — 集成网页抓取工具，支持在线向量化索引校园新闻与公告。
 
 ---
@@ -37,10 +37,13 @@
 | :---: | :---: |
 | ![登入界面](./assets/登入界面.png) | ![个人RAG知识库查看](./assets/个人RAG知识库查看.png) |
 
-| | | |
-| :---: | :---: | :---: |
-| **构建知识库** | **对话示例 1** | **对话示例 2** |
-| ![构建RAG知识库](./assets/构建RAG知识库.png) | ![对话示例](./assets/对话示例_1.png) | ![对话示例](./assets/对话示例_2.png) |
+| 构建知识库 | 在线爬取 |
+| :---: | :---: |
+| ![构建RAG知识库](./assets/构建RAG知识库.png) | ![在线爬取](./assets/在线爬取.png) |
+
+| 对话示例 1 | 对话示例 2 |
+| :---: | :---: |
+| ![对话示例](./assets/对话示例_1.png) | ![对话示例](./assets/对话示例_2.png) |
 
 </details>
 
@@ -53,7 +56,7 @@
 | **核心框架** | React 18 + Vite | FastAPI |
 | **编程语言** | TypeScript 5.x | Python 3.11+ |
 | **状态/路由** | Zustand 5.x + React Router 6 | LangGraph (Agentic Workflow) |
-| **数据库** | — | PostgreSQL / SQLite |
+| **数据库** | — | PostgreSQL / SQLite(测试环境) |
 | **缓存/知识库存储** | — | Redis + ChromaDB / Elasticsearch |
 | **文件存储** | — | MinIO |
 | **字体** | [LXGW WenKai](https://github.com/chawyehsu/lxgw-wenkai-webfont) | — |
@@ -70,8 +73,8 @@ cd CampusMind
 ```
 
 - **前端**: `cd frontend && cp .env.example .env.local` (配置 `VITE_API_BASE_URL`)
-- **后端**: `cd backend && cp .env.example .env` (配置 DB, Redis, 以及 LLM API Key等内容)
-
+- **后端**: `cd backend && cp .env.example .env` (需配置 DB, Redis, 以及 LLM API Key等内容)
+- **后端依赖脚本**: `./scripts/manage_deps.sh start`(依赖docker环境配置DB/Redis/MinIO/Elasticsearch)
 ### 2. 环境搭建
 
 ```bash
@@ -104,7 +107,6 @@ CampusMind/
 │   │   ├── components/        # UI 组件 (ui/, layout/, chat/)
 │   │   ├── features/          # 功能模块 (auth/, chat/, knowledge/, build/)
 │   │   └── styles/            # 设计令牌
-│   └── docs/                  # 前端文档
 │
 ├── backend/                    # FastAPI + Python 后端
 │   ├── app/
@@ -120,6 +122,7 @@ CampusMind/
 │   └── tests/                # pytest 测试
 │
 ├── assets/                    # 项目截图
+├── docs/                      # 项目文档
 └── scripts/                   # 运维与自动化脚本
     └── manage_deps.sh         # 依赖环境管理脚本(需要docker环境)
 ```
@@ -128,11 +131,11 @@ CampusMind/
 
 ## 🤖 Agent 工具
 
-- **教务系统 (JWC)**: 成绩查询、课表拉取、排名分析。
-- **数字图书馆**: 馆藏图书检索、个人借阅状态。
-- **就业指导中心**: 实时抓取宣讲会与招聘信息。
-- **校内 OA**: 校内通知、公文汇总。
-
+- **教务系统**: 成绩查询、课表拉取、排名分析
+- **图书馆**: 馆藏图书检索、图书状态查询
+- **就业指导中心**: 宣讲会与招聘信息查询
+- **校内 OA**: 校内通知
+- **个人知识库RAG**: 基于知识库的检索服务
 ---
 
 ## 📝 开发与规范
