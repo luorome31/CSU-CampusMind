@@ -7,6 +7,7 @@ import { KnowledgeListPage } from './features/knowledge/KnowledgeListPage';
 import { KnowledgeFileListPage } from './features/knowledge/KnowledgeFileListPage';
 import { KnowledgeFileDetailPage } from './features/knowledge/KnowledgeFileDetailPage';
 import { KnowledgeBuildPage } from './features/build/KnowledgeBuildPage';
+import { ProfilePage } from './features/profile/ProfilePage';
 import { Sidebar } from './components/layout/Sidebar/Sidebar';
 
 function LayoutWithSidebar() {
@@ -18,21 +19,6 @@ function LayoutWithSidebar() {
       </main>
     </div>
   );
-}
-
-// Placeholder pages (empty for Phase 1, filled in later phases)
-function PlaceholderPage({ title }: { title: string }) {
-  return (
-    <div className="placeholder-page">
-      <h2 className="placeholder-title">{title}</h2>
-      <p className="placeholder-body">Component coming in a later phase.</p>
-    </div>
-  );
-}
-
-// ProfilePage placeholder (filled in Phase 2+)
-function ProfilePage() {
-  return <PlaceholderPage title="Profile" />;
 }
 
 export const router = createBrowserRouter([
