@@ -12,6 +12,7 @@ from app.core.security import jwt_manager
 from app.core.session.factory import get_session_manager
 from app.core.session.rate_limiter import LoginRateLimiter
 from app.core.session.cas_login import AccountLockedError, CASLoginError
+from app.core.session.session_tracker import create_session
 from app.api.dependencies import get_current_user
 from app.database.session import async_session_maker
 from app.database.models import User
@@ -58,6 +59,7 @@ class LoginResponse(BaseModel):
     """登录响应"""
     token: str
     user_id: str
+    session_id: str
     expires_in: int  # 秒
 
 
@@ -120,11 +122,15 @@ async def login(request: LoginRequest):
     # 4. 生成 JWT
     token = jwt_manager.create_token({"user_id": request.username})
 
+    # 5. 创建会话记录
+    session = create_session(request.username)
+
     logger.info(f"User {request.username} logged in successfully")
 
     return LoginResponse(
         token=token,
         user_id=request.username,
+        session_id=session.session_id,
         expires_in=settings.jwt_expire_hours * 3600
     )
 
