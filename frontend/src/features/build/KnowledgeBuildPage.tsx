@@ -14,6 +14,9 @@ export function KnowledgeBuildPage() {
   const pendingReviewCount = buildStore((s) => s.pendingReviewCount);
   const fetchPendingFiles = buildStore((s) => s.fetchPendingFiles);
   const tasks = buildStore((s) => s.tasks);
+  const removeTask = buildStore((s) => s.removeTask);
+  const retryFailedUrls = buildStore((s) => s.retryFailedUrls);
+  const clearCompletedTasks = buildStore((s) => s.clearCompletedTasks);
 
   // Fetch initial data
   useEffect(() => {
@@ -61,7 +64,12 @@ export function KnowledgeBuildPage() {
         {activeTab === 'crawl' ? (
           <>
             <CrawlPanel />
-            <TaskList tasks={tasks} />
+            <TaskList
+              tasks={tasks}
+              onDelete={removeTask}
+              onRetry={retryFailedUrls}
+              onClearCompleted={clearCompletedTasks}
+            />
           </>
         ) : (
           <div className={styles.reviewLayout}>
