@@ -1,7 +1,6 @@
 /* src/components/chat/ChatInput/ChatInput.css */
 
 .chat-input-form {
-  padding: var(--space-4);
   background: transparent;
   border-top: none;
   display: flex;
