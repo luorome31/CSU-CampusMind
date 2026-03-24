@@ -38,7 +38,7 @@ async def process_batch_crawl(
                 try:
                     result = await crawler.arun(url=url, config=run_config, session_id="batch")
                     if not result.success:
-                        CrawlTaskService.update_task_progress(task_id, success=False)
+                        CrawlTaskService.update_task_progress(task_id, success=False, url=url, error=result.error_message)
                         return
 
                     if store_to_oss:
@@ -46,10 +46,10 @@ async def process_batch_crawl(
                         content = result.markdown.raw_markdown.encode("utf-8")
                         storage_client.upload_content(storage_key, content)
 
-                    CrawlTaskService.update_task_progress(task_id, success=True)
+                    CrawlTaskService.update_task_progress(task_id, success=True, url=url)
                 except Exception as e:
                     logger.error(f"Error crawling {url}: {e}")
-                    CrawlTaskService.update_task_progress(task_id, success=False)
+                    CrawlTaskService.update_task_progress(task_id, success=False, url=url, error=str(e))
 
             # Limit concurrency
             sem = asyncio.Semaphore(5)
@@ -88,7 +88,7 @@ async def process_batch_crawl_with_knowledge(
                 try:
                     result = await crawler.arun(url=url, config=run_config, session_id="batch_k")
                     if not result.success:
-                        CrawlTaskService.update_task_progress(task_id, success=False)
+                        CrawlTaskService.update_task_progress(task_id, success=False, url=url, error=result.error_message)
                         return
 
                     storage_key = crawl_service.generate_storage_key(url)
@@ -107,10 +107,10 @@ async def process_batch_crawl_with_knowledge(
 
                     # Update status to PENDING_VERIFY instead of indexing right away
                     KnowledgeFileService.update_file_status(knowledge_file.id, FileStatus.PENDING_VERIFY)
-                    CrawlTaskService.update_task_progress(task_id, success=True)
+                    CrawlTaskService.update_task_progress(task_id, success=True, url=url)
                 except Exception as e:
                     logger.error(f"Error crawling {url}: {e}")
-                    CrawlTaskService.update_task_progress(task_id, success=False)
+                    CrawlTaskService.update_task_progress(task_id, success=False, url=url, error=str(e))
 
             sem = asyncio.Semaphore(5)
 
