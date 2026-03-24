@@ -108,3 +108,16 @@ class CrawlTaskService:
             session.commit()
             session.refresh(task)
             return task
+
+    @staticmethod
+    def delete_task(task_id: str) -> bool:
+        """Delete a crawl task by ID (does not cascade to KnowledgeFile records)"""
+        with Session(engine) as session:
+            statement = select(CrawlTask).where(CrawlTask.id == task_id)
+            task = session.exec(statement).first()
+            if not task:
+                return False
+
+            session.delete(task)
+            session.commit()
+            return True

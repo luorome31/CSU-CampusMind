@@ -265,3 +265,77 @@ async def crawl_batch_with_knowledge(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+class RetryFailedResponse(BaseModel):
+    """Response model for retry failed URLs"""
+    task_id: str
+    status: str
+    message: str
+    retry_count: int
+
+
+@router.delete("/crawl/tasks/{task_id}")
+async def delete_crawl_task(
+    task_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete a crawl task (only deletes task record, not KnowledgeFile records)"""
+    task = CrawlTaskService.get_task(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    # Ownership check
+    if task.user_id != current_user["user_id"]:
+        raise HTTPException(status_code=403, detail="No permission to delete this task")
+
+    CrawlTaskService.delete_task(task_id)
+    return {"success": True, "message": "Task deleted"}
+
+
+@router.post("/crawl/tasks/{task_id}/retry-failed", response_model=RetryFailedResponse)
+async def retry_failed_urls(
+    task_id: str,
+    background_tasks: BackgroundTasks,
+    current_user: dict = Depends(get_current_user)
+):
+    """Retry failed URLs from an existing task"""
+    task = CrawlTaskService.get_task(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    # Ownership check
+    if task.user_id != current_user["user_id"]:
+        raise HTTPException(status_code=403, detail="No permission to retry this task")
+
+    # Check if task has failed_urls
+    if not task.failed_urls:
+        raise HTTPException(status_code=400, detail="No failed URLs to retry")
+
+    # Extract URLs from failed_urls
+    failed_url_list = [f["url"] for f in task.failed_urls if "url" in f]
+    if not failed_url_list:
+        raise HTTPException(status_code=400, detail="No valid URLs to retry")
+
+    # Create new task with failed URLs
+    new_task = CrawlTaskService.create_task(
+        user_id=current_user["user_id"],
+        total_urls=len(failed_url_list),
+        knowledge_id=task.knowledge_id,
+    )
+
+    # Schedule background processing
+    background_tasks.add_task(
+        process_batch_crawl_with_knowledge,
+        task_id=new_task.id,
+        urls=failed_url_list,
+        knowledge_id=task.knowledge_id or "",
+        user_id=current_user["user_id"],
+    )
+
+    return RetryFailedResponse(
+        task_id=new_task.id,
+        status=new_task.status,
+        message=f"Retry task created for {len(failed_url_list)} URLs",
+        retry_count=len(failed_url_list),
+    )
