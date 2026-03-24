@@ -1,5 +1,7 @@
 // frontend/src/routes.tsx
+import { useState } from 'react';
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
+import { PanelLeft } from 'lucide-react';
 import { ProtectedRoute } from './features/auth/ProtectedRoute';
 import { LoginPage } from './features/auth/LoginPage';
 import { ChatPage } from './features/chat/ChatPage';
@@ -9,12 +11,27 @@ import { KnowledgeFileDetailPage } from './features/knowledge/KnowledgeFileDetai
 import { KnowledgeBuildPage } from './features/build/KnowledgeBuildPage';
 import { ProfilePage } from './features/profile/ProfilePage';
 import { Sidebar } from './components/layout/Sidebar/Sidebar';
+import './routes.css';
 
 function LayoutWithSidebar() {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
   return (
-    <div className="layout-sidebar">
-      <Sidebar />
+    <div className={`layout-sidebar${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
+      <Sidebar
+        isCollapsed={sidebarCollapsed}
+        onToggle={() => setSidebarCollapsed((v) => !v)}
+      />
       <main className="layout-main">
+        {sidebarCollapsed && (
+          <button
+            className="sidebar-expand-btn"
+            onClick={() => setSidebarCollapsed(false)}
+            aria-label="展开侧边栏"
+          >
+            <PanelLeft size={18} />
+          </button>
+        )}
         <Outlet />
       </main>
     </div>

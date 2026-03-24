@@ -923,3 +923,45 @@ if (isLoading) {
 | 测试 | 结果 |
 |------|------|
 | 单元测试 (261) | ✅ 全部通过 |
+
+---
+
+## 2026-03-24 交互增强：侧边栏收起 + 霞鹜文楷字体
+
+### 目标
+
+- 侧边栏支持收起/展开（完全隐藏模式）
+- 全局字体替换为霞鹜文楷屏幕阅读版 (LXGW WenKai Screen)
+
+### 完成的功能
+
+#### 侧边栏收起/展开
+
+**行为**: 完全隐藏模式 — 侧边栏滑出主内容区左侧，主内容区无缝扩展。
+
+**文件变更**:
+- `src/routes.tsx` — `LayoutWithSidebar` 添加 `sidebarCollapsed` state，注入 `sidebar-collapsed` class
+- `src/routes.css` — 新增浮动展开按钮 `.sidebar-expand-btn`（fixed 定位，glassmorphism 风格）
+- `src/index.css` — `.layout-main` 根据 collapsed 状态动态调整 `margin-left` 和 `max-width`
+- `src/components/layout/Sidebar/Sidebar.tsx` — 添加 `isCollapsed` / `onToggle` props，内嵌收起按钮
+- `src/components/layout/Sidebar/Sidebar.css` — 添加 `.sidebar.collapsed { transform: translateX(-100%) }` + 过渡动画
+
+**动画**:
+- 收起：`transform: translateX(-100%)`，0.3s spring curve `cubic-bezier(0.16, 1, 0.3, 1)`
+- 展开：浮动按钮固定于视口左侧边缘，居中于视口高度，hover 时微微放大
+
+#### 字体替换
+
+**字体**: 霞鹜文楷屏幕阅读版 (`lxgw-wenkai-screen-webfont`)
+
+**实现**:
+- 由于 Vite 6 无法直接 resolve npm 包 CSS，复制字体文件到 `src/styles/fonts/` 供 Vite bundling
+- `src/main.tsx` 导入 `./styles/fonts/style.css`
+- `--font-sans` 更新为 `"LXGW WenKai Screen", "DS-Project", sans-serif`
+
+### 测试结果
+
+| 测试 | 结果 |
+|------|------|
+| 构建 | ✅ 通过 |
+| 单元测试 (261) | ✅ 全部通过 |

@@ -1,12 +1,17 @@
 // frontend/src/components/layout/Sidebar/Sidebar.tsx
 import { useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { MessageSquare, BookOpen, Wrench, User, LogIn } from 'lucide-react';
+import { MessageSquare, BookOpen, Wrench, User, LogIn, PanelLeft, PanelLeftClose } from 'lucide-react';
 import { authStore } from '../../../features/auth/authStore';
 import { chatStore } from '../../../features/chat/chatStore';
 import { listDialogs, getDialogMessages, deleteDialog } from '../../../api/dialog';
 import { HistoryItem } from './HistoryItem';
 import './Sidebar.css';
+
+interface SidebarProps {
+  isCollapsed: boolean;
+  onToggle: () => void;
+}
 
 const navItems = [
   { to: '/', icon: MessageSquare, label: '聊天', end: true },
@@ -15,7 +20,7 @@ const navItems = [
   { to: '/profile', icon: User, label: '个人中心', requiresAuth: true },
 ];
 
-export function Sidebar() {
+export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const navigate = useNavigate();
   const isAuthenticated = authStore((s) => s.isAuthenticated);
   const {
@@ -68,9 +73,16 @@ export function Sidebar() {
   const showLoginPrompt = !isAuthenticated;
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${isCollapsed ? ' collapsed' : ''}`}>
       <div className="sidebar-header">
         <span className="sidebar-logo">CampusMind</span>
+        <button
+          className="sidebar-collapse-btn"
+          onClick={onToggle}
+          aria-label={isCollapsed ? '展开侧边栏' : '收起侧边栏'}
+        >
+          {isCollapsed ? <PanelLeft size={18} /> : <PanelLeftClose size={18} />}
+        </button>
       </div>
 
       <nav className="sidebar-nav">

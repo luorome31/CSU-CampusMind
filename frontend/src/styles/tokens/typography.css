@@ -6,7 +6,7 @@
 
 :root {
   /* === Font Families === */
-  --font-sans: "DS-Project", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: "LXGW WenKai Screen", "DS-Project", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
 
   /* === Type Scale (Fluid) === */

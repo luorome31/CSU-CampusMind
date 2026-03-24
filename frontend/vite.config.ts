@@ -13,6 +13,10 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
+        'lxgwwenkai-screen-webfont': path.resolve(
+          __dirname,
+          'node_modules/lxgw-wenkai-screen-webfont'
+        ),
       },
     },
     build: {
