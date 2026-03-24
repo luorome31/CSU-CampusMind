@@ -44,6 +44,11 @@
   background: rgba(83, 125, 150, 0.1);
 }
 
+.partial {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}
+
 .progress {
   display: flex;
   align-items: center;
@@ -90,4 +95,97 @@
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  padding: var(--space-1, 4px) var(--space-2, 8px);
+  border: none;
+  background: rgba(83, 125, 150, 0.1);
+  color: var(--color-accent, #537d96);
+  border-radius: var(--radius-sm, 4px);
+  font-size: var(--text-xs, 12px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionBtn:hover:not(:disabled) {
+  background: rgba(83, 125, 150, 0.2);
+}
+
+.actionBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.deleteBtn:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-error, #ef4444);
+}
+
+.successStat {
+  color: var(--color-success, #22c55e);
+}
+
+.failStat {
+  color: var(--color-error, #ef4444);
+}
+
+.failedSection {
+  margin-top: var(--space-3, 12px);
+  padding-top: var(--space-3, 12px);
+  border-top: 1px solid var(--color-border, rgba(83, 125, 150, 0.22));
+}
+
+.failedToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  padding: var(--space-1, 4px) var(--space-2, 8px);
+  border: none;
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-error, #ef4444);
+  border-radius: var(--radius-sm, 4px);
+  font-size: var(--text-xs, 12px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.failedToggle:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.failedList {
+  list-style: none;
+  margin: var(--space-2, 8px) 0 0 0;
+  padding: 0;
+}
+
+.failedItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 4px);
+  padding: var(--space-2, 8px);
+  background: rgba(239, 68, 68, 0.05);
+  border-radius: var(--radius-sm, 4px);
+  margin-bottom: var(--space-2, 8px);
+}
+
+.failedUrl {
+  font-size: var(--text-sm, 14px);
+  color: var(--color-text-primary, #3b3d3f);
+  word-break: break-all;
+}
+
+.failedError {
+  font-size: var(--text-xs, 12px);
+  color: var(--color-error, #ef4444);
 }
