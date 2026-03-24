@@ -9,22 +9,22 @@ import { HistoryItem } from './HistoryItem';
 import './Sidebar.css';
 
 const navItems = [
-  { to: '/', icon: MessageSquare, label: 'Chat', end: true },
-  { to: '/knowledge', icon: BookOpen, label: 'Knowledge Base' },
-  { to: '/knowledge/build', icon: Wrench, label: 'Build', requiresAuth: true },
-  { to: '/profile', icon: User, label: 'Profile', requiresAuth: true },
+  { to: '/', icon: MessageSquare, label: '聊天', end: true },
+  { to: '/knowledge', icon: BookOpen, label: '知识库', end: true },
+  { to: '/knowledge/build', icon: Wrench, label: '知识库构建', requiresAuth: true },
+  { to: '/profile', icon: User, label: '个人中心', requiresAuth: true },
 ];
 
 export function Sidebar() {
   const navigate = useNavigate();
   const isAuthenticated = authStore((s) => s.isAuthenticated);
-  const { 
-    dialogs, 
-    setDialogs, 
-    currentDialogId, 
-    loadDialog, 
+  const {
+    dialogs,
+    setDialogs,
+    currentDialogId,
+    loadDialog,
     removeDialog,
-    clearMessages 
+    clearMessages
   } = chatStore();
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export function Sidebar() {
       </div>
 
       <nav className="sidebar-nav">
-        <div className="sidebar-section-label">Navigation</div>
+        <div className="sidebar-section-label">导航</div>
         {visibleItems.map((item) => (
           <NavLink
             key={item.to}
@@ -90,7 +90,7 @@ export function Sidebar() {
         {isAuthenticated && dialogs.length > 0 && (
           <>
             <div className="sidebar-divider" />
-            <div className="sidebar-section-label">History</div>
+            <div className="sidebar-section-label">历史会话</div>
             <div className="sidebar-history-list">
               {dialogs.map((dialog) => (
                 <HistoryItem
@@ -111,7 +111,7 @@ export function Sidebar() {
       <div className="sidebar-footer">
         <button className="new-chat-btn" onClick={handleNewChat}>
           <MessageSquare size={16} />
-          New Chat
+          新建对话
         </button>
       </div>
     </aside>
