@@ -1,7 +1,7 @@
 // frontend/src/components/layout/Sidebar/Sidebar.tsx
 import { useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { MessageSquare, BookOpen, Wrench, User } from 'lucide-react';
+import { MessageSquare, BookOpen, Wrench, User, LogIn } from 'lucide-react';
 import { authStore } from '../../../features/auth/authStore';
 import { chatStore } from '../../../features/chat/chatStore';
 import { listDialogs, getDialogMessages, deleteDialog } from '../../../api/dialog';
@@ -10,7 +10,7 @@ import './Sidebar.css';
 
 const navItems = [
   { to: '/', icon: MessageSquare, label: '聊天', end: true },
-  { to: '/knowledge', icon: BookOpen, label: '知识库', end: true },
+  { to: '/knowledge', icon: BookOpen, label: '知识库', end: true, requiresAuth: true },
   { to: '/knowledge/build', icon: Wrench, label: '知识库构建', requiresAuth: true },
   { to: '/profile', icon: User, label: '个人中心', requiresAuth: true },
 ];
@@ -65,6 +65,8 @@ export function Sidebar() {
     return true;
   });
 
+  const showLoginPrompt = !isAuthenticated;
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -73,19 +75,31 @@ export function Sidebar() {
 
       <nav className="sidebar-nav">
         <div className="sidebar-section-label">导航</div>
-        {visibleItems.map((item) => (
+        {showLoginPrompt ? (
           <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.end}
+            to="/login"
             className={({ isActive }) =>
               `sidebar-nav-item${isActive ? ' active' : ''}`
             }
           >
-            <item.icon />
-            {item.label}
+            <LogIn size={18} />
+            登录
           </NavLink>
-        ))}
+        ) : (
+          visibleItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) =>
+                `sidebar-nav-item${isActive ? ' active' : ''}`
+              }
+            >
+              <item.icon />
+              {item.label}
+            </NavLink>
+          ))
+        )}
 
         {isAuthenticated && dialogs.length > 0 && (
           <>

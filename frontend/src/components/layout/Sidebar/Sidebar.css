@@ -126,7 +126,7 @@
   flex-direction: column;
   gap: 2px;
   overflow-y: auto;
-  max-height: 45vh;
+  max-height: none;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }

@@ -31,9 +31,30 @@ export const router = createBrowserRouter([
     element: <LayoutWithSidebar />,
     children: [
       { index: true, element: <ChatPage /> },
-      { path: 'knowledge', element: <KnowledgeListPage /> },
-      { path: 'knowledge/:kbId', element: <KnowledgeFileListPage /> },
-      { path: 'knowledge/:kbId/files/:fileId', element: <KnowledgeFileDetailPage /> },
+      {
+        path: 'knowledge',
+        element: (
+          <ProtectedRoute>
+            <KnowledgeListPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'knowledge/:kbId',
+        element: (
+          <ProtectedRoute>
+            <KnowledgeFileListPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'knowledge/:kbId/files/:fileId',
+        element: (
+          <ProtectedRoute>
+            <KnowledgeFileDetailPage />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: 'knowledge/build',
         element: (
