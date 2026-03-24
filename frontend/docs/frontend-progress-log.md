@@ -630,3 +630,5 @@ def clean_error_message(error_msg: str, url: str = "") -> str:
 | `c9d48f9` | feat(build): implement KnowledgeBuildPage with tab-based layout |
 | `1c3a476` | feat(build): add ReviewEditor component for content verification |
 | `1430d33` | feat(build): add ReviewInbox component for pending verification files |
+| `87cd02a` | fix(build): 美化URL显示和知识库下拉框样式 |
+| `a31c228` | feat(ui): 添加自定义Select组件替代原生下拉框 |
