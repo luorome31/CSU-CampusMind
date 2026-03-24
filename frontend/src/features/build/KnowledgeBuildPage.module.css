@@ -101,10 +101,20 @@
   grid-template-columns: 350px 1fr;
   gap: var(--space-6, 24px);
   min-height: 500px;
+  transition: grid-template-columns 0.3s ease-out;
+}
+
+.reviewLayoutCollapsed {
+  grid-template-columns: 48px 1fr;
 }
 
 .reviewSidebar {
   min-width: 0;
+  transition: min-width 0.3s ease-out;
+}
+
+.reviewSidebarCollapsed {
+  min-width: 48px;
 }
 
 .reviewMain {
@@ -112,7 +122,13 @@
 }
 
 @media (max-width: 768px) {
-  .reviewLayout {
+  .reviewLayout,
+  .reviewLayoutCollapsed {
     grid-template-columns: 1fr;
+  }
+
+  .reviewSidebar,
+  .reviewSidebarCollapsed {
+    min-width: 0;
   }
 }

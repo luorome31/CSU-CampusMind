@@ -1,15 +1,22 @@
 import React, { useEffect } from 'react';
-import { FileText } from 'lucide-react';
+import { FileText, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { buildStore } from '../../buildStore';
 import styles from './ReviewInbox.module.css';
 
-export const ReviewInbox: React.FC = () => {
+interface ReviewInboxProps {
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+}
+
+export const ReviewInbox: React.FC<ReviewInboxProps> = ({
+  isCollapsed,
+  onToggleCollapse,
+}) => {
   const pendingFiles = buildStore((s) => s.pendingFiles);
   const selectedFile = buildStore((s) => s.selectedFile);
   const fetchPendingFiles = buildStore((s) => s.fetchPendingFiles);
   const fetchFileContent = buildStore((s) => s.fetchFileContent);
 
-  // Fetch pending files on mount
   useEffect(() => {
     fetchPendingFiles();
   }, [fetchPendingFiles]);
@@ -26,11 +33,37 @@ export const ReviewInbox: React.FC = () => {
     fetchFileContent(fileId);
   };
 
+  if (isCollapsed) {
+    return (
+      <div className={styles.collapsed}>
+        <button
+          className={styles.collapseBtn}
+          onClick={onToggleCollapse}
+          title="展开文件列表"
+        >
+          <PanelLeft size={18} />
+        </button>
+      </div>
+    );
+  }
+
   if (pendingFiles.length === 0) {
     return (
-      <div className={styles.empty}>
-        <FileText size={48} className={styles.emptyIcon} />
-        <p>暂无待审核文件</p>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <span>共 {pendingFiles.length} 个文件</span>
+          <button
+            className={styles.collapseBtn}
+            onClick={onToggleCollapse}
+            title="收起文件列表"
+          >
+            <PanelLeftClose size={16} />
+          </button>
+        </div>
+        <div className={styles.empty}>
+          <FileText size={48} className={styles.emptyIcon} />
+          <p>暂无待审核文件</p>
+        </div>
       </div>
     );
   }
@@ -39,6 +72,13 @@ export const ReviewInbox: React.FC = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <span>共 {pendingFiles.length} 个文件</span>
+        <button
+          className={styles.collapseBtn}
+          onClick={onToggleCollapse}
+          title="收起文件列表"
+        >
+          <PanelLeftClose size={16} />
+        </button>
       </div>
       <ul className={styles.list}>
         {pendingFiles.map((file) => (

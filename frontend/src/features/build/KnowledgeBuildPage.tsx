@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { FileSearch, Download } from 'lucide-react';
 import { buildStore } from './buildStore';
 import { CrawlPanel } from './components/CrawlTab/CrawlPanel';
@@ -18,6 +18,8 @@ export function KnowledgeBuildPage() {
   const retryFailedUrls = buildStore((s) => s.retryFailedUrls);
   const clearCompletedTasks = buildStore((s) => s.clearCompletedTasks);
 
+  const [isReviewSidebarCollapsed, setIsReviewSidebarCollapsed] = useState(false);
+
   // Fetch initial data
   useEffect(() => {
     fetchPendingFiles();
@@ -25,6 +27,7 @@ export function KnowledgeBuildPage() {
 
   const handleTabChange = (tab: 'crawl' | 'review') => {
     setActiveTab(tab);
+    setIsReviewSidebarCollapsed(false); // Reset sidebar state when switching tabs
     if (tab === 'review') {
       fetchPendingFiles();
     }
@@ -72,9 +75,12 @@ export function KnowledgeBuildPage() {
             />
           </div>
         ) : (
-          <div className={styles.reviewLayout}>
-            <div className={styles.reviewSidebar}>
-              <ReviewInbox />
+          <div className={`${styles.reviewLayout} ${isReviewSidebarCollapsed ? styles.reviewLayoutCollapsed : ''}`}>
+            <div className={`${styles.reviewSidebar} ${isReviewSidebarCollapsed ? styles.reviewSidebarCollapsed : ''}`}>
+              <ReviewInbox
+                isCollapsed={isReviewSidebarCollapsed}
+                onToggleCollapse={() => setIsReviewSidebarCollapsed(!isReviewSidebarCollapsed)}
+              />
             </div>
             <div className={styles.reviewMain}>
               <ReviewEditor />
