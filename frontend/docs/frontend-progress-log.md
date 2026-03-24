@@ -702,3 +702,112 @@ def clean_error_message(error_msg: str, url: str = "") -> str:
 - 预览区添加细滚动条样式，与设计风格一致
 
 **提交**: `53fd325`
+
+---
+
+## 2026-03-24 Phase 5：个人中心 (Personal Center)
+
+### 5.1 目标
+
+实现个人中心页面，包含：
+- 用户信息展示与编辑（显示名称、邮箱、手机号）
+- 使用统计（对话数、消息数、知识库数、注册时间）
+- 活跃会话管理（多设备登录管理）
+- 退出登录功能
+
+### 5.2 完成的功能
+
+#### Backend 改动
+
+**UserRepository** (`backend/app/repositories/user_repository.py`):
+- `get_by_id()` - 根据 user_id 获取用户信息
+- `update()` - 更新用户资料（display_name, email, phone）
+
+**User API** (`backend/app/api/v1/user.py`):
+- `GET /api/v1/users/me` - 获取当前用户资料
+- `PATCH /api/v1/users/me` - 更新用户资料
+
+**SessionTracker** (`backend/app/core/session/session_tracker.py`):
+- `SessionInfo` - 会话信息数据类
+- `create_session()` - 创建新会话
+- `get_user_sessions()` - 获取用户所有活跃会话
+- `delete_session()` - 删除指定会话
+
+**Session API** (`backend/app/api/v1/session.py`):
+- `GET /api/v1/auth/sessions` - 获取活跃会话列表
+- `GET /api/v1/auth/sessions/current` - 获取当前会话信息
+- `DELETE /api/v1/auth/sessions/{session_id}` - 登出指定会话
+
+**登录响应更新**:
+- `LoginResponse` 新增 `session_id` 字段
+
+#### Frontend 改动
+
+**API Client** (`src/api/client.ts`):
+- 新增 `X-Session-ID` header 支持
+- 401 处理时清除 `sessionId`
+
+**AuthStore** (`src/features/auth/authStore.ts`):
+- 新增 `sessionId` 状态
+- 登录时存储 `sessionId` 到 sessionStorage
+- 登出时清除 `sessionId`
+
+**Profile Feature** (`src/features/profile/`):
+```
+profile/
+├── ProfilePage.tsx           # 个人中心主页面
+├── ProfilePage.css
+├── profileStore.ts           # Zustand 状态管理
+├── profileStore.test.ts
+├── types.ts                 # TypeScript 类型定义
+├── api/
+│   └── profile.ts           # API 客户端
+└── components/
+    ├── ProfileCard.tsx      # 用户信息卡片
+    ├── ProfileCard.css
+    ├── StatsGrid.tsx        # 使用统计卡片组
+    ├── StatsGrid.css
+    ├── SessionList.tsx      # 活跃会话列表
+    └── SessionList.css
+```
+
+**ProfileCard 组件**:
+- 头像展示（支持上传按钮占位）
+- 可编辑字段：显示名称、邮箱、手机号
+- 用户名只读
+- 点击编辑模式（输入框 + 保存/取消按钮）
+
+**StatsGrid 组件**:
+- 4 个统计卡片：对话数、消息数、知识库数、注册时间
+- 使用 lucide-react 图标
+
+**SessionList 组件**:
+- 活跃会话列表展示
+- 设备图标（PC 显示 Monitor，移动设备显示 Smartphone）
+- 相对时间显示（"5分钟前"）
+- 当前会话标记"当前"badge
+- 非当前会话显示"登出"按钮
+
+#### 路由更新
+
+`src/routes.tsx`:
+- `/profile` 路由使用真正的 `ProfilePage` 组件
+- `ProtectedRoute` 保护
+
+### 5.3 测试结果
+
+| 测试 | 结果 |
+|------|------|
+| 构建 | ✅ 通过 |
+| 单元测试 (262) | ✅ 全部通过 |
+| TypeScript类型 | ✅ 通过 |
+
+### 5.4 Git 提交记录
+
+| 提交 | 描述 |
+|------|------|
+| `74ea751` | feat(backend): add user profile API endpoints |
+| `132f671` | feat(backend): add session management API |
+| `cf0a62b` | feat(profile): add profile API client, types, and store |
+| `ede086e` | feat(profile): add ProfilePage with routing |
+| `8794fd6` | test(profile): add unit tests for profile components |
