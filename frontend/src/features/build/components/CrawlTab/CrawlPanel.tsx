@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useCallback } from 'react';
 import { Play, Upload, Trash2 } from 'lucide-react';
 import { Button } from '../../../../components/ui/Button';
+import { Select } from '../../../../components/ui/Select';
 import { buildStore } from '../../buildStore';
 import { knowledgeListStore } from '../../../knowledge/knowledgeListStore';
 import styles from './CrawlPanel.module.css';
@@ -39,8 +40,7 @@ export const CrawlPanel: React.FC = () => {
     setCrawlUrls('');
   }, [setCrawlUrls]);
 
-  const handleKnowledgeChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
+  const handleKnowledgeChange = useCallback((value: string) => {
     setSelectedKnowledgeId(value || null);
   }, [setSelectedKnowledgeId]);
 
@@ -58,18 +58,16 @@ export const CrawlPanel: React.FC = () => {
       <div className={styles.form}>
         <div className={styles.field}>
           <label className={styles.label}>选择知识库</label>
-          <select
-            className={styles.select}
+          <Select
             value={selectedKnowledgeId || ''}
+            options={knowledgeBases.map((kb) => ({
+              value: kb.id,
+              label: kb.name,
+              description: `${kb.file_count} 个文件`,
+            }))}
             onChange={handleKnowledgeChange}
-          >
-            <option value="">请选择知识库</option>
-            {knowledgeBases.map((kb) => (
-              <option key={kb.id} value={kb.id}>
-                {kb.name} ({kb.file_count} 个文件)
-              </option>
-            ))}
-          </select>
+            placeholder="请选择知识库"
+          />
         </div>
 
         <div className={styles.field}>

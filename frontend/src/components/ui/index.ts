@@ -13,3 +13,6 @@ export type { BadgeProps, BadgeVariant, BadgeSize } from './Badge/types';
 
 export { Chip } from './Chip';
 export type { ChipProps, ChipVariant, ChipSize } from './Chip/types';
+
+export { Select } from './Select';
+export type { SelectProps, SelectOption } from './Select/types';
