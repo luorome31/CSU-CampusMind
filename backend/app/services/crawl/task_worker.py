@@ -13,7 +13,7 @@ from crawl4ai import (
 )
 from loguru import logger
 
-from app.services.crawl.crawler import crawl_service
+from app.services.crawl.crawler import crawl_service, clean_error_message
 from app.services.storage.client import storage_client
 from app.services.knowledge_file import KnowledgeFileService
 from app.services.crawl.task_service import CrawlTaskService
@@ -38,7 +38,8 @@ async def process_batch_crawl(
                 try:
                     result = await crawler.arun(url=url, config=run_config, session_id="batch")
                     if not result.success:
-                        CrawlTaskService.update_task_progress(task_id, success=False, url=url, error=result.error_message)
+                        clean_error = clean_error_message(result.error_message, url)
+                        CrawlTaskService.update_task_progress(task_id, success=False, url=url, error=clean_error)
                         return
 
                     if store_to_oss:
@@ -88,7 +89,8 @@ async def process_batch_crawl_with_knowledge(
                 try:
                     result = await crawler.arun(url=url, config=run_config, session_id="batch_k")
                     if not result.success:
-                        CrawlTaskService.update_task_progress(task_id, success=False, url=url, error=result.error_message)
+                        clean_error = clean_error_message(result.error_message, url)
+                        CrawlTaskService.update_task_progress(task_id, success=False, url=url, error=clean_error)
                         return
 
                     storage_key = crawl_service.generate_storage_key(url)

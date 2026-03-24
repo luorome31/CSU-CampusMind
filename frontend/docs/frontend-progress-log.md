@@ -483,3 +483,150 @@ src/features/build/
 | `0cbabee` | style(colors): 应用 Warm Paper 蓝灰色调主题 Phase 1 |
 | `e1d34e8` | docs(frontend): 添加前端样式重设计实施计划 |
 | `b099226` | docs(frontend): 添加前端样式重设计规范文档 |
+
+---
+
+## 2026-03-24 Phase 4.1：爬取任务改进
+
+### 4.1.1 目标
+
+修复爬取任务（知识库构建）Tab 的三个问题：
+1. 任务列表无法滚动，新任务会顶掉旧任务
+2. 完成任务没有删除按钮（需要确认对话框）
+3. 任务状态显示不正确（部分成功时显示"成功"）
+
+### 4.1.2 完成的功能
+
+#### Backend 改动
+
+**CrawlTask 模型** (`backend/app/database/models/crawl_task.py`):
+- 新增 `failed_urls_json` 字段（TEXT 类型，存储 JSON 序列化的失败 URL）
+- 新增 `failed_urls` 属性，自动解析 JSON 为列表
+- `to_dict()` 方法包含 `failed_urls` 字段
+
+**TaskService** (`backend/app/services/crawl/task_service.py`):
+- `update_task_progress` 新增 `url` 和 `error` 参数
+- 新增 `delete_task` 方法（只删除 CrawlTask，不级联删除 KnowledgeFile）
+- 失败 URL 详情记录到 `failed_urls_json`
+
+**TaskWorker** (`backend/app/services/crawl/task_worker.py`):
+- `_crawl_one` 和 `_crawl_one_with_knowledge` 失败时传递 URL 和 error
+
+**API 端点** (`backend/app/api/v1/crawl.py`):
+- `DELETE /crawl/tasks/{task_id}` - 删除任务
+- `POST /crawl/tasks/{task_id}/retry-failed` - 重试失败 URL
+
+#### Frontend 改动
+
+**ConfirmDialog 组件** (`src/features/build/components/ui/ConfirmDialog.tsx`):
+- 通用确认对话框组件，支持危险操作高亮
+
+**API Client** (`src/features/build/api/crawl.ts`):
+- 新增 `FailedUrl` 接口
+- `CrawlTask` 接口新增 `failed_urls` 字段
+- 新增 `deleteTask` 和 `retryFailed` 方法
+
+**buildStore** (`src/features/build/buildStore.ts`):
+- `removeTask` - 调用 DELETE API
+- `retryFailedUrls` - 调用 retry-failed API
+- `clearCompletedTasks` - 批量删除已完成任务
+
+**TaskList 组件** (`src/features/build/components/CrawlTab/TaskList.tsx`):
+- 使用 flex 布局填充可用空间 (`flex: 1; min-height: 0`)
+- 列表区域 `overflow-y: auto` 实现滚动
+- 添加"清空已完成"按钮和确认对话框
+
+**TaskCard 组件** (`src/features/build/components/CrawlTab/TaskCard.tsx`):
+- 状态显示逻辑改进：正确显示"成功"/"部分成功"/"失败"
+- 新增"重试失败链接"按钮
+- 新增"删除任务"按钮
+- 新增展开失败详情的可折叠区域
+
+### 4.1.3 状态判断逻辑
+
+```typescript
+// 状态判断（TaskCard.tsx）
+if (status === 'completed' || status === 'SUCCESS') {
+  if (fail_count === 0) return '成功';
+  if (success_count === 0) return '失败';
+  return '部分成功';
+}
+```
+
+### 4.1.4 测试结果
+
+- 前端：244 tests passed
+- 后端：302 tests passed (excluding e2e)
+- 修复了 `conftest.py` 中模型未导入导致 `failed_urls_json` 列缺失的问题
+
+#### 滚动问题修复 (2026-03-24 后续)
+
+**问题**: 任务列表无法滚动，新任务会顶掉旧任务
+
+**解决方案**: 使用 flex 布局约束空间
+- `.page`: 添加 `height: 100%; display: flex; flex-direction: column`
+- `.content`: 添加 `flex: 1; display: flex; flex-direction: column`
+- `.crawlContent`: 新增包装容器，使用 `display: flex; flex-direction: column; flex: 1; min-height: 0`
+- 整个爬取区域（表单+任务列表）作为一个整体滚动
+
+**关键**: `min-height: 0` 是 flex 子元素能够收缩到低于内容尺寸的必要属性
+
+#### failed_urls 序列化修复
+
+**问题**: `failed_urls` 属性未被 API 返回
+
+**解决方案**: 使用 `@computed_field` 装饰器使 Pydantic 正确序列化
+```python
+@computed_field
+@property
+def failed_urls(self) -> list:
+    """Parse failed_urls_json to list - computed field for Pydantic serialization"""
+```
+
+#### 状态显示修复
+
+**问题**: `success_count=0, fail_count>0` 时显示"等待中"而非"失败"
+
+**解决方案**: 优先判断全部失败情况
+```typescript
+if (task.success_count === 0 && task.fail_count > 0) {
+  return { icon: <X size={16} />, text: '失败', className: styles.failed };
+}
+```
+
+#### 错误信息清理
+
+**问题**: 失败详情显示 Python traceback，包含技术细节
+
+**解决方案**: 新增 `clean_error_message()` 函数清理错误
+```python
+def clean_error_message(error_msg: str, url: str = "") -> str:
+    """Clean up error message to remove technical details"""
+    # 映射常见错误为用户友好的中文提示
+    # ERR_NAME_NOT_RESOLVED → "DNS解析失败"
+    # 404 / Not Found → "页面不存在 (404)"
+    # ...
+```
+
+#### 样式符合设计标准
+
+**问题**: TaskCard 使用硬编码颜色，不符合 Warm Paper 设计系统
+
+**解决方案**:
+- 状态颜色改用 CSS 变量：`--color-success`、`--color-error`、`--color-warning`
+- 背景色使用：`--color-success-bg`、`--color-error-bg`、`--color-warning-bg`
+- 动画使用 `var(--ease-spring, ease)` 弹簧曲线
+- 状态颜色更新为柔和风格：
+  - `--color-success: #4a8c5e`（柔和绿）
+  - `--color-error: #b85c5c`（柔和红）
+  - `--color-warning: #c4935a`（柔和橙）
+
+### 4.1.5 Git 提交记录
+
+| 提交 | 描述 |
+|------|------|
+| `4607113` | fix(storage): wrap bytes in BytesIO for MinIO put_object |
+| `525af97` | docs(frontend): update progress log for Phase 4 completion |
+| `c9d48f9` | feat(build): implement KnowledgeBuildPage with tab-based layout |
+| `1c3a476` | feat(build): add ReviewEditor component for content verification |
+| `1430d33` | feat(build): add ReviewInbox component for pending verification files |

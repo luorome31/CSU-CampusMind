@@ -3,6 +3,7 @@ Crawl Service - Web content crawling and storage
 """
 import asyncio
 import hashlib
+import re
 from datetime import datetime
 from typing import List
 from urllib.parse import urlparse
@@ -15,6 +16,65 @@ from crawl4ai import (
     PruningContentFilter,
 )
 from loguru import logger
+
+
+def clean_error_message(error_msg: str, url: str = "") -> str:
+    """
+    Clean up error message to remove technical details like Python tracebacks.
+    Returns a user-friendly error message.
+    """
+    if not error_msg:
+        return "未知错误"
+
+    # Extract the URL from error message if not provided
+    if not url:
+        url_match = re.search(r'https?://[^\s]+', error_msg)
+        if url_match:
+            url = url_match.group(0).rstrip('.,;:')
+
+    # Map common errors to user-friendly messages
+    error_mappings = [
+        # DNS/Network errors
+        (r'ERR_NAME_NOT_RESOLVED|DNS.*not resolved', 'DNS解析失败'),
+        (r'ERR_CONNECTION_REFUSED|Connection refused', '连接被拒绝'),
+        (r'ERR_CONNECTION_TIMED_OUT|Connection timed out', '连接超时'),
+        (r'ERR_CONNECTION_RESET|Connection reset', '连接被重置'),
+        (r'net::ERR_|Error:\s*', ''),  # Clean up remaining net::ERR_ prefixes
+
+        # HTTP errors
+        (r'HTTP\s*error\s*(\d+)', r'HTTP错误 \1'),
+        (r'404|Not Found', '页面不存在 (404)'),
+        (r'403|Forbidden', '访问被拒绝 (403)'),
+        (r'500|Internal Server Error', '服务器内部错误'),
+
+        # Browser/crawl errors
+        (r'Timeout|timeout', '加载超时'),
+        (r'SSL|ssl', 'SSL证书错误'),
+        (r'Invalid URL|url.*invalid', '无效的URL'),
+    ]
+
+    # Check for known error patterns
+    for pattern, replacement in error_mappings:
+        if re.search(pattern, error_msg, re.IGNORECASE):
+            # Extract the key error info
+            for match in re.finditer(pattern, error_msg, re.IGNORECASE):
+                return f"{replacement}" if replacement else match.group(0)
+
+    # If no pattern matched, truncate long tracebacks
+    # Find the first line that looks like an actual error
+    lines = error_msg.split('\n')
+    for line in lines:
+        line = line.strip()
+        if line and not line.startswith(('File ', '  ', 'at ', 'Call log:', 'Code context:')):
+            # Clean up the line
+            clean_line = re.sub(r'\s+', ' ', line)
+            # Truncate if too long
+            if len(clean_line) > 100:
+                clean_line = clean_line[:100] + '...'
+            return clean_line
+
+    # Fallback: just return the first meaningful line
+    return lines[0][:100] if lines else "未知错误"
 
 
 class CrawlService:

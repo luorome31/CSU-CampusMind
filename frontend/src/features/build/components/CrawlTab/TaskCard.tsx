@@ -23,12 +23,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onDelete, onRetry }) =
   const canRetry = isTerminal && hasFailedUrls && task.knowledge_id;
 
   const getStatusDisplay = () => {
+    // If all results are failures, show failed regardless of status
+    if (task.success_count === 0 && task.fail_count > 0) {
+      return { icon: <X size={16} />, text: '失败', className: styles.failed };
+    }
+
     // For completed status, determine exact state
     if (task.status === 'completed' || task.status === 'SUCCESS') {
       if (task.fail_count === 0) {
         return { icon: <Check size={16} />, text: '成功', className: styles.success };
-      } else if (task.success_count === 0) {
-        return { icon: <X size={16} />, text: '失败', className: styles.failed };
       } else {
         return { icon: <X size={16} />, text: '部分成功', className: styles.partial };
       }

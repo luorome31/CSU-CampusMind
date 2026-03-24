@@ -62,7 +62,7 @@ export function KnowledgeBuildPage() {
 
       <div className={styles.content}>
         {activeTab === 'crawl' ? (
-          <>
+          <div className={styles.crawlContent}>
             <CrawlPanel />
             <TaskList
               tasks={tasks}
@@ -70,7 +70,7 @@ export function KnowledgeBuildPage() {
               onRetry={retryFailedUrls}
               onClearCompleted={clearCompletedTasks}
             />
-          </>
+          </div>
         ) : (
           <div className={styles.reviewLayout}>
             <div className={styles.reviewSidebar}>

@@ -5,6 +5,7 @@ from datetime import datetime
 import json
 from typing import Optional
 from sqlmodel import Field, SQLModel
+from pydantic import computed_field
 
 
 class CrawlTaskStatus:
@@ -33,25 +34,11 @@ class CrawlTask(SQLModel, table=True):
     create_time: datetime = Field(default_factory=datetime.now, description="Task creation time")
     update_time: datetime = Field(default_factory=datetime.now, description="Task last update time")
 
+    @computed_field
     @property
     def failed_urls(self) -> list:
-        """Parse failed_urls_json to list"""
+        """Parse failed_urls_json to list - computed field for Pydantic serialization"""
         try:
             return json.loads(self.failed_urls_json) if self.failed_urls_json else []
         except (json.JSONDecodeError, TypeError):
             return []
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "knowledge_id": self.knowledge_id,
-            "user_id": self.user_id,
-            "total_urls": self.total_urls,
-            "completed_urls": self.completed_urls,
-            "success_count": self.success_count,
-            "fail_count": self.fail_count,
-            "status": self.status,
-            "failed_urls": self.failed_urls,
-            "create_time": self.create_time.isoformat() if self.create_time else None,
-            "update_time": self.update_time.isoformat() if self.update_time else None,
-        }

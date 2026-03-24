@@ -103,16 +103,16 @@
   --border-default: var(--border);
   --accent-default: var(--accent);
 
-  /* === Status Colors (for Badge, Input error states) === */
-  --color-success: #1a7f37;
-  --color-success-bg: rgba(26, 127, 55, 0.1);
-  --color-success-border: rgba(26, 127, 55, 0.2);
-  --color-error: #cf222e;
-  --color-error-bg: rgba(207, 34, 46, 0.1);
-  --color-error-border: rgba(207, 34, 46, 0.2);
-  --color-warning: #d29922;
-  --color-warning-bg: rgba(210, 153, 34, 0.1);
-  --color-info: #0969da;
+  /* === Status Colors (for Badge, Input error states) - Warm Paper Theme === */
+  --color-success: #4a8c5e;
+  --color-success-bg: rgba(74, 140, 94, 0.12);
+  --color-success-border: rgba(74, 140, 94, 0.25);
+  --color-error: #b85c5c;
+  --color-error-bg: rgba(184, 92, 92, 0.12);
+  --color-error-border: rgba(184, 92, 92, 0.25);
+  --color-warning: #c4935a;
+  --color-warning-bg: rgba(196, 147, 90, 0.12);
+  --color-info: #6b8fa3;
 
   /* === Select Arrow === */
   --select-arrow: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239B9793' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");

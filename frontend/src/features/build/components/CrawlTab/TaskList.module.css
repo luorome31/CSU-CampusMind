@@ -7,52 +7,31 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--space-3, 12px);
+  margin-bottom: var(--space-3);
 }
 
 .count {
-  font-size: var(--text-sm, 14px);
-  color: var(--color-text-secondary, #666);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 
 .clearBtn {
-  padding: var(--space-1, 4px) var(--space-3, 12px);
-  border: 1px solid var(--color-border, rgba(83, 125, 150, 0.22));
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
   background: none;
-  color: var(--color-text-secondary, #666);
-  border-radius: var(--radius-sm, 4px);
-  font-size: var(--text-sm, 14px);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--ease-spring, ease) 0.2s;
 }
 
 .clearBtn:hover {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: var(--color-error, #ef4444);
-  color: var(--color-error, #ef4444);
+  background: var(--color-error-bg);
+  border-color: var(--color-error);
+  color: var(--color-error);
 }
 
 .list {
-  max-height: 500px;
-  overflow-y: auto;
-  padding-right: var(--space-2, 8px);
-}
-
-/* Custom scrollbar */
-.list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.list::-webkit-scrollbar-track {
-  background: var(--color-border, rgba(83, 125, 150, 0.1));
-  border-radius: 3px;
-}
-
-.list::-webkit-scrollbar-thumb {
-  background: var(--color-border, rgba(83, 125, 150, 0.3));
-  border-radius: 3px;
-}
-
-.list::-webkit-scrollbar-thumb:hover {
-  background: var(--color-border, rgba(83, 125, 150, 0.5));
+  padding-right: var(--space-2);
 }

@@ -1,87 +1,87 @@
 .card {
-  background: var(--color-bg-surface, #fff);
-  border: 1px solid var(--color-border, rgba(83, 125, 150, 0.22));
-  border-radius: var(--radius-md, 8px);
-  padding: var(--space-4, 16px);
-  margin-bottom: var(--space-3, 12px);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--space-3, 12px);
+  margin-bottom: var(--space-3);
 }
 
 .taskId {
-  font-size: var(--text-sm, 14px);
-  color: var(--color-text-secondary, #666);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
   font-family: monospace;
 }
 
 .status {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1, 4px);
-  font-size: var(--text-sm, 14px);
-  padding: var(--space-1, 4px) var(--space-2, 8px);
-  border-radius: var(--radius-sm, 4px);
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
 }
 
 .success {
-  color: var(--color-success, #22c55e);
-  background: rgba(34, 197, 94, 0.1);
+  color: var(--color-success);
+  background: var(--color-success-bg);
 }
 
 .failed {
-  color: var(--color-error, #ef4444);
-  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-error);
+  background: var(--color-error-bg);
 }
 
 .processing,
 .pending {
-  color: var(--color-accent, #537d96);
-  background: rgba(83, 125, 150, 0.1);
+  color: var(--color-accent);
+  background: var(--color-accent-bg);
 }
 
 .partial {
-  color: #f59e0b;
-  background: rgba(245, 158, 11, 0.1);
+  color: var(--color-warning);
+  background: var(--color-warning-bg);
 }
 
 .progress {
   display: flex;
   align-items: center;
-  gap: var(--space-3, 12px);
-  margin-bottom: var(--space-2, 8px);
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
 }
 
 .progressBar {
   flex: 1;
   height: 8px;
-  background: var(--color-border, rgba(83, 125, 150, 0.22));
-  border-radius: 4px;
+  background: var(--color-border);
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
 .progressFill {
   height: 100%;
-  background: var(--color-accent, #537d96);
-  transition: width 0.3s ease;
+  background: var(--color-accent);
+  transition: width 0.3s var(--ease-spring, ease);
 }
 
 .progressText {
-  font-size: var(--text-sm, 14px);
-  color: var(--color-text-secondary, #666);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
   min-width: 50px;
   text-align: right;
 }
 
 .stats {
   display: flex;
-  gap: var(--space-4, 16px);
-  font-size: var(--text-sm, 14px);
-  color: var(--color-text-secondary, #666);
+  gap: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 
 .date {
@@ -100,25 +100,25 @@
 .actions {
   display: flex;
   align-items: center;
-  gap: var(--space-2, 8px);
+  gap: var(--space-2);
 }
 
 .actionBtn {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1, 4px);
-  padding: var(--space-1, 4px) var(--space-2, 8px);
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
   border: none;
-  background: rgba(83, 125, 150, 0.1);
-  color: var(--color-accent, #537d96);
-  border-radius: var(--radius-sm, 4px);
-  font-size: var(--text-xs, 12px);
+  background: var(--color-accent-bg);
+  color: var(--color-accent);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color var(--ease-spring, ease) 0.2s;
 }
 
 .actionBtn:hover:not(:disabled) {
-  background: rgba(83, 125, 150, 0.2);
+  background: var(--color-accent-bg-hover);
 }
 
 .actionBtn:disabled {
@@ -127,65 +127,65 @@
 }
 
 .deleteBtn:hover:not(:disabled) {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--color-error, #ef4444);
+  background: var(--color-error-bg);
+  color: var(--color-error);
 }
 
 .successStat {
-  color: var(--color-success, #22c55e);
+  color: var(--color-success);
 }
 
 .failStat {
-  color: var(--color-error, #ef4444);
+  color: var(--color-error);
 }
 
 .failedSection {
-  margin-top: var(--space-3, 12px);
-  padding-top: var(--space-3, 12px);
-  border-top: 1px solid var(--color-border, rgba(83, 125, 150, 0.22));
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
 }
 
 .failedToggle {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1, 4px);
-  padding: var(--space-1, 4px) var(--space-2, 8px);
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
   border: none;
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--color-error, #ef4444);
-  border-radius: var(--radius-sm, 4px);
-  font-size: var(--text-xs, 12px);
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color var(--ease-spring, ease) 0.2s;
 }
 
 .failedToggle:hover {
-  background: rgba(239, 68, 68, 0.2);
+  background: rgba(207, 34, 46, 0.2);
 }
 
 .failedList {
   list-style: none;
-  margin: var(--space-2, 8px) 0 0 0;
+  margin: var(--space-2) 0 0 0;
   padding: 0;
 }
 
 .failedItem {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1, 4px);
-  padding: var(--space-2, 8px);
-  background: rgba(239, 68, 68, 0.05);
-  border-radius: var(--radius-sm, 4px);
-  margin-bottom: var(--space-2, 8px);
+  gap: var(--space-1);
+  padding: var(--space-2);
+  background: rgba(207, 34, 46, 0.05);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-2);
 }
 
 .failedUrl {
-  font-size: var(--text-sm, 14px);
-  color: var(--color-text-primary, #3b3d3f);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
   word-break: break-all;
 }
 
 .failedError {
-  font-size: var(--text-xs, 12px);
-  color: var(--color-error, #ef4444);
+  font-size: var(--text-xs);
+  color: var(--color-error);
 }

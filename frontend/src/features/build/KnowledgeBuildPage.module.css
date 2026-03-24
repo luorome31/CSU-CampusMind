@@ -2,6 +2,10 @@
   padding: var(--space-6, 24px);
   max-width: 1200px;
   margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .header {
@@ -71,7 +75,25 @@
 }
 
 .content {
+  flex: 1;
   min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.content > .crawlContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+/* Hide scrollbar but keep scrolling capability */
+.content > .crawlContent::-webkit-scrollbar {
+  display: none;
 }
 
 .reviewLayout {

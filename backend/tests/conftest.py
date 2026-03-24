@@ -18,6 +18,14 @@ def setup_test_db():
     """Initialize test database tables"""
     from app.database.session import create_db_and_tables
     # Import models to ensure they are registered with SQLModel
+    from app.database.models.crawl_task import CrawlTask  # noqa: F401
+    from app.database.models.knowledge import KnowledgeBase  # noqa: F401
+    from app.database.models.knowledge_file import KnowledgeFile  # noqa: F401
+    from app.database.models.dialog import Dialog  # noqa: F401
+    from app.database.models.chat_history import ChatHistory  # noqa: F401
+    from app.database.models.user import User  # noqa: F401
+    from app.database.models.tool_definition import ToolDefinition  # noqa: F401
+    from app.database.models.tool_call_log import ToolCallLog  # noqa: F401
     create_db_and_tables()
 
 
