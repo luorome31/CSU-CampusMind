@@ -298,12 +298,10 @@ export const buildStore = create<BuildState>((set, get) => ({
       });
 
       if (response.ok) {
-        // Remove from pending list
+        // Remove from pending list (don't clear selectedFile yet, let component handle toast first)
         set((state) => ({
           pendingFiles: state.pendingFiles.filter((f) => f.id !== fileId),
           pendingReviewCount: Math.max(0, state.pendingReviewCount - 1),
-          selectedFile: null,
-          fileContent: '',
           isIndexing: false,
         }));
       } else {

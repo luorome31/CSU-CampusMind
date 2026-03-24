@@ -16,15 +16,18 @@ interface ToastProps {
 }
 
 const Toast: React.FC<ToastProps> = ({ toast, onDismiss }) => {
+  const [isFading, setIsFading] = useState(false);
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      onDismiss(toast.id);
-    }, 3000);
+      setIsFading(true);
+      setTimeout(() => onDismiss(toast.id), 200);
+    }, 2800);
     return () => clearTimeout(timer);
   }, [toast.id, onDismiss]);
 
   return (
-    <div className={`${styles.toast} ${styles[toast.type]}`}>
+    <div className={`${styles.toast} ${styles[toast.type]} ${isFading ? styles.fadeOut : ''}`}>
       <span className={styles.icon}>
         {toast.type === 'success' ? (
           <CheckCircle size={18} />

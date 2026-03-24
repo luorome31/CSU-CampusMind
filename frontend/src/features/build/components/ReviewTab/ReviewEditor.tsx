@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Button } from '../../../../components/ui/Button';
 import { buildStore } from '../../buildStore';
-import { useToast } from './Toast';
+import { useToast, ToastContainer } from './Toast';
 import styles from './ReviewEditor.module.css';
 
 export const ReviewEditor: React.FC = () => {
@@ -14,6 +14,7 @@ export const ReviewEditor: React.FC = () => {
   const isIndexing = buildStore((s) => s.isIndexing);
   const updateFileContent = buildStore((s) => s.updateFileContent);
   const triggerIndex = buildStore((s) => s.triggerIndex);
+  const clearSelectedFile = buildStore((s) => s.clearSelectedFile);
 
   const [editedContent, setEditedContent] = useState(fileContent);
   const [isPreview, setIsPreview] = useState(false);
@@ -39,10 +40,14 @@ export const ReviewEditor: React.FC = () => {
     try {
       await triggerIndex(selectedFile.id);
       addToast('success', '索引创建成功');
+      // Delay clearing file until after toast animation completes
+      setTimeout(() => {
+        clearSelectedFile();
+      }, 3000);
     } catch {
       addToast('error', '索引创建失败，请重试');
     }
-  }, [selectedFile, triggerIndex, addToast]);
+  }, [selectedFile, triggerIndex, addToast, clearSelectedFile]);
 
   // Insert markdown formatting at cursor
   const insertFormatting = useCallback((prefix: string, suffix: string = prefix) => {
@@ -173,25 +178,7 @@ export const ReviewEditor: React.FC = () => {
         )}
       </div>
 
-      {/* Toast container */}
-      {toasts.length > 0 && (
-        <div className={styles.toastContainer}>
-          {toasts.map((toast) => (
-            <div
-              key={toast.id}
-              className={`${styles.toast} ${styles[toast.type]}`}
-              onClick={() => dismissToast(toast.id)}
-            >
-              {toast.type === 'success' ? (
-                <span className={styles.toastIcon}>✓</span>
-              ) : (
-                <span className={styles.toastIcon}>✕</span>
-              )}
-              <span>{toast.message}</span>
-            </div>
-          ))}
-        </div>
-      )}
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </div>
   );
 };
