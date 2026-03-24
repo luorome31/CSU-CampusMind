@@ -1,5 +1,5 @@
 import { apiClient } from '../../../api/client';
-import { User, Session, UpdateProfileData } from '../types';
+import { User, Session, UpdateProfileData, UsageStats } from '../types';
 
 export const profileApi = {
   getProfile: () =>
@@ -7,6 +7,9 @@ export const profileApi = {
 
   updateProfile: (data: UpdateProfileData) =>
     apiClient.patch<User>('/users/me', data),
+
+  getStats: () =>
+    apiClient.get<UsageStats>('/users/me/stats'),
 
   getSessions: () =>
     apiClient.get<Session[]>('/auth/sessions'),

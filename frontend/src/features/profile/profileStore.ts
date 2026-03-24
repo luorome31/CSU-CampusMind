@@ -49,9 +49,13 @@ export const profileStore = create<ProfileStore>((set) => ({
   },
 
   loadStats: async () => {
-    // Stats will be populated when backend provides stats endpoint
-    // For now, use user created_at as join_date
-    set({ stats: { conversation_count: 0, message_count: 0, knowledge_base_count: 0, join_date: '' } });
+    set({ isLoading: true, error: null });
+    try {
+      const stats = await profileApi.getStats();
+      set({ stats, isLoading: false });
+    } catch (err) {
+      set({ error: (err as Error).message, isLoading: false });
+    }
   },
 
   loadSessions: async () => {

@@ -5,6 +5,7 @@ vi.mock('./api/profile', () => ({
   profileApi: {
     getProfile: vi.fn(),
     updateProfile: vi.fn(),
+    getStats: vi.fn(),
     getSessions: vi.fn(),
     revokeSession: vi.fn(),
   },
