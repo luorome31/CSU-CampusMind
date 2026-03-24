@@ -93,10 +93,10 @@
   flex: 1;
   font-size: var(--text-sm, 14px);
   color: var(--color-text-primary, #3b3d3f);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-word;
   font-family: monospace;
+  line-height: 1.5;
+  padding: var(--space-1, 4px) 0;
 }
 
 .removeBtn {
