@@ -27,22 +27,22 @@ describe('LoginPage', () => {
 
   it('renders login form', () => {
     render(<MemoryRouter><LoginPage /></MemoryRouter>);
-    expect(screen.getByText('Welcome back to CampusMind')).toBeInTheDocument();
+    expect(screen.getByText('CampusMind')).toBeInTheDocument();
   });
 
   it('renders username input', () => {
     render(<MemoryRouter><LoginPage /></MemoryRouter>);
-    expect(screen.getByLabelText('Username')).toBeInTheDocument();
+    expect(screen.getByLabelText('学号')).toBeInTheDocument();
   });
 
   it('renders password input', () => {
     render(<MemoryRouter><LoginPage /></MemoryRouter>);
-    expect(screen.getByLabelText('Password')).toBeInTheDocument();
+    expect(screen.getByLabelText('密码')).toBeInTheDocument();
   });
 
-  it('renders submit button with Sign In text', () => {
+  it('renders submit button with 登录 text', () => {
     render(<MemoryRouter><LoginPage /></MemoryRouter>);
-    expect(screen.getByRole('button', { name: 'Sign In' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '登录' })).toBeInTheDocument();
   });
 
   it('calls login with form values on submit', async () => {
@@ -56,8 +56,8 @@ describe('LoginPage', () => {
 
     render(<MemoryRouter><LoginPage /></MemoryRouter>);
 
-    fireEvent.change(screen.getByLabelText('Username'), { target: { value: 'testuser' } });
-    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password123' } });
+    fireEvent.change(screen.getByLabelText('学号'), { target: { value: 'testuser' } });
+    fireEvent.change(screen.getByLabelText('密码'), { target: { value: 'password123' } });
 
     const form = document.querySelector('form');
     fireEvent.submit(form!);
@@ -69,18 +69,18 @@ describe('LoginPage', () => {
 
   it('displays error message on login failure', async () => {
     const { authApi } = await import('../../api/auth');
-    vi.mocked(authApi.login).mockRejectedValue(new Error('Invalid credentials'));
+    vi.mocked(authApi.login).mockRejectedValue(new Error('登录失败，请检查学号和密码'));
 
     render(<MemoryRouter><LoginPage /></MemoryRouter>);
 
-    fireEvent.change(screen.getByLabelText('Username'), { target: { value: 'testuser' } });
-    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'wrong' } });
+    fireEvent.change(screen.getByLabelText('学号'), { target: { value: 'testuser' } });
+    fireEvent.change(screen.getByLabelText('密码'), { target: { value: 'password' } });
 
     const form = document.querySelector('form');
     fireEvent.submit(form!);
 
     await waitFor(() => {
-      expect(screen.getByText('Invalid credentials')).toBeInTheDocument();
+      expect(screen.getByText('登录失败，请检查学号和密码')).toBeInTheDocument();
     });
   });
 
@@ -90,14 +90,14 @@ describe('LoginPage', () => {
 
     render(<MemoryRouter><LoginPage /></MemoryRouter>);
 
-    fireEvent.change(screen.getByLabelText('Username'), { target: { value: 'testuser' } });
-    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password' } });
+    fireEvent.change(screen.getByLabelText('学号'), { target: { value: 'testuser' } });
+    fireEvent.change(screen.getByLabelText('密码'), { target: { value: 'password' } });
 
     const form = document.querySelector('form');
     fireEvent.submit(form!);
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Signing in...' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '登录中...' })).toBeInTheDocument();
     });
   });
 
@@ -107,14 +107,14 @@ describe('LoginPage', () => {
 
     render(<MemoryRouter><LoginPage /></MemoryRouter>);
 
-    fireEvent.change(screen.getByLabelText('Username'), { target: { value: 'testuser' } });
-    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password' } });
+    fireEvent.change(screen.getByLabelText('学号'), { target: { value: 'testuser' } });
+    fireEvent.change(screen.getByLabelText('密码'), { target: { value: 'password' } });
 
     const form = document.querySelector('form');
     fireEvent.submit(form!);
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Signing in...' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: '登录中...' })).toBeDisabled();
     });
   });
 });
