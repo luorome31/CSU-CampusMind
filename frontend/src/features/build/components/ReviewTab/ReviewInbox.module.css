@@ -2,10 +2,11 @@
   background: var(--color-bg-surface, #fff);
   border: 1px solid var(--color-border, rgba(83, 125, 150, 0.22));
   border-radius: var(--radius-lg, 12px);
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .header {
@@ -25,13 +26,13 @@
   margin: 0;
   overflow-y: auto;
   flex: 1;
-  /* Hide scrollbar but keep scrolling */
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
 }
 
 .list::-webkit-scrollbar {
-  display: none;
+  width: 3px;
+  opacity: 0;
 }
 
 .item {
