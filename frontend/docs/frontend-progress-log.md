@@ -632,3 +632,62 @@ def clean_error_message(error_msg: str, url: str = "") -> str:
 | `1430d33` | feat(build): add ReviewInbox component for pending verification files |
 | `87cd02a` | fix(build): 美化URL显示和知识库下拉框样式 |
 | `a31c228` | feat(ui): 添加自定义Select组件替代原生下拉框 |
+| `f03cc29` | feat(build): 改进审核队列Tab用户体验 |
+
+## 2026-03-24 Phase 4.2：审核队列Tab改进
+
+### 4.2.1 目标
+
+- 文件列表可折叠，最大化预览区域
+- 文件列表隐藏滚动条保持美观
+- 保存/索引操作添加Toast用户反馈
+- Markdown原文改为格式化预览，支持编辑
+
+### 4.2.2 完成的功能
+
+#### 可折叠文件列表
+
+**实现**: ReviewInbox 添加 `isCollapsed` 和 `onToggleCollapse` props，切换侧边栏折叠状态
+
+**文件**:
+- `ReviewInbox.tsx`: 支持折叠/展开模式
+- `ReviewInbox.module.css`: 折叠状态仅显示展开按钮
+- `KnowledgeBuildPage.tsx`: 管理折叠状态
+- `KnowledgeBuildPage.module.css`: 折叠时使用 `grid-template-columns: 48px 1fr`
+
+**效果**: 点击收起按钮，侧边栏宽度从 350px 收缩到 48px，网格布局平滑过渡
+
+#### 隐藏滚动条
+
+**实现**: CSS `scrollbar-width: none` + `::-webkit-scrollbar { display: none }`
+
+**文件**: `ReviewInbox.module.css`
+
+#### Toast用户反馈
+
+**实现**: 新增可复用Toast组件，保存/索引操作后显示成功/失败提示
+
+**文件**:
+- `Toast.tsx`: Toast组件 + useToast hook
+- `Toast.module.css`: Toast样式（slide-in动画）
+- `ReviewEditor.tsx`: 操作后调用 `addToast()`
+
+#### Markdown预览与编辑
+
+**实现**: ReviewEditor 添加模式切换，支持编辑/预览切换
+
+**功能**:
+- `parseMarkdown()`: 简单Markdown解析（标题/粗体/斜体/列表/代码）
+- 工具栏: 粗体/斜体/标题/列表快捷按钮
+- 编辑模式: textarea with 格式化工具栏
+- 预览模式: 格式化HTML渲染
+
+**文件**: `ReviewEditor.tsx`, `ReviewEditor.module.css`
+
+### 4.2.3 测试结果
+
+| 测试 | 结果 |
+|------|------|
+| 构建 | ✅ 通过 |
+| 单元测试 (245) | ✅ 全部通过 |
+| TypeScript类型 | ✅ 通过 |
