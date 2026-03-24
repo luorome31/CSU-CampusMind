@@ -3,7 +3,7 @@
 """
 import logging
 
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Request
 from pydantic import BaseModel
 from sqlalchemy.exc import IntegrityError
 
@@ -76,7 +76,7 @@ _rate_limiter = LoginRateLimiter()
 # ============ API Endpoints ============
 
 @router.post("/login", response_model=LoginResponse)
-async def login(request: LoginRequest):
+async def login(request: LoginRequest, http_request: Request):
     """
     用户登录接口
 
@@ -123,7 +123,9 @@ async def login(request: LoginRequest):
     token = jwt_manager.create_token({"user_id": request.username})
 
     # 5. 创建会话记录
-    session = await create_session(request.username)
+    user_agent = http_request.headers.get("user-agent", "")
+    client_ip = http_request.client.host if http_request.client else ""
+    session = await create_session(request.username, user_agent=user_agent, ip=client_ip)
 
     logger.info(f"User {request.username} logged in successfully")
 
