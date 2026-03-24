@@ -1,0 +1,58 @@
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3, 12px);
+}
+
+.count {
+  font-size: var(--text-sm, 14px);
+  color: var(--color-text-secondary, #666);
+}
+
+.clearBtn {
+  padding: var(--space-1, 4px) var(--space-3, 12px);
+  border: 1px solid var(--color-border, rgba(83, 125, 150, 0.22));
+  background: none;
+  color: var(--color-text-secondary, #666);
+  border-radius: var(--radius-sm, 4px);
+  font-size: var(--text-sm, 14px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clearBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: var(--color-error, #ef4444);
+  color: var(--color-error, #ef4444);
+}
+
+.list {
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: var(--space-2, 8px);
+}
+
+/* Custom scrollbar */
+.list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.list::-webkit-scrollbar-track {
+  background: var(--color-border, rgba(83, 125, 150, 0.1));
+  border-radius: 3px;
+}
+
+.list::-webkit-scrollbar-thumb {
+  background: var(--color-border, rgba(83, 125, 150, 0.3));
+  border-radius: 3px;
+}
+
+.list::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border, rgba(83, 125, 150, 0.5));
+}
