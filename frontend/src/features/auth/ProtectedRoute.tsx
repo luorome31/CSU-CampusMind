@@ -9,6 +9,11 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const location = useLocation();
   const isAuthenticated = authStore((s) => s.isAuthenticated);
+  const isLoading = authStore((s) => s.isLoading);
+
+  if (isLoading) {
+    return null;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;

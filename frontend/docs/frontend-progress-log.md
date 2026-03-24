@@ -847,3 +847,40 @@ for (const event of parsed) {
 | 测试 | 结果 |
 |------|------|
 | 单元测试 (245) | ✅ 全部通过 |
+
+---
+
+## 2026-03-24 Bug Fix：页面刷新后跳转登录页
+
+### 问题
+
+登录成功后刷新页面，会跳转到登录页。
+
+### 根因
+
+`ProtectedRoute` 在 `initAuth` 完成前就检查了 `isAuthenticated`（初始为 `false`），导致提前重定向。
+
+### 解决方案
+
+1. `authStore.ts` 的 `initAuth` 添加 `isLoading` 状态管理
+2. `ProtectedRoute.tsx` 检查 `isLoading`，为 `true` 时等待初始化完成
+
+```typescript
+// authStore.ts
+initAuth: async () => {
+  set({ isLoading: true });
+  // ... restore from sessionStorage
+  set({ isLoading: false });
+}
+
+// ProtectedRoute.tsx
+if (isLoading) {
+  return null;  // 等待初始化
+}
+```
+
+### 测试结果
+
+| 测试 | 结果 |
+|------|------|
+| 单元测试 (261) | ✅ 全部通过 |

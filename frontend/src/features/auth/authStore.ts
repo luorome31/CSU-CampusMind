@@ -58,6 +58,7 @@ export const authStore = create<AuthStore>((set) => ({
   },
 
   initAuth: async () => {
+    set({ isLoading: true });
     const token = sessionStorage.getItem('token');
     const userStr = sessionStorage.getItem('user');
     const sessionId = sessionStorage.getItem('sessionId');
@@ -65,12 +66,15 @@ export const authStore = create<AuthStore>((set) => ({
     if (token && userStr) {
       try {
         const user = JSON.parse(userStr) as User;
-        set({ user, token, sessionId, isAuthenticated: true });
+        set({ user, token, sessionId, isAuthenticated: true, isLoading: false });
       } catch {
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('user');
         sessionStorage.removeItem('sessionId');
+        set({ isLoading: false });
       }
+    } else {
+      set({ isLoading: false });
     }
   },
 }));
