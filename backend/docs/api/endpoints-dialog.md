@@ -85,8 +85,26 @@ GET /api/v1/dialogs/{dialog_id}/messages
 | role | string | 角色 (user/assistant) |
 | content | string | 消息内容 |
 | file_url | string | 文件 URL（可选） |
-| events | string | JSON 序列化的工具事件数组（可选） |
+| events | string | JSON 序列化的工具事件数组（可选），格式见下方 |
 | created_at | string | ISO 格式创建时间 |
+
+### events 字段格式
+
+`events` 是一个 JSON 字符串，解析后为工具事件数组。每个工具调用会产生多个事件（START → END 或 START → ERROR），它们共享相同的 `id`（tool_call_id）：
+
+```json
+[
+  {"id": "call_function_xxx", "status": "START", "title": "rag_search", "message": "{'query': '...'}"},
+  {"id": "call_function_xxx", "status": "END", "title": "rag_search", "message": "执行完成"}
+]
+```
+
+| 字段 | 类型 | 描述 |
+|------|------|------|
+| id | string | 工具调用 ID（START 和 END 事件共享） |
+| status | string | 状态：START / END / ERROR |
+| title | string | 工具名称 |
+| message | string | 状态消息（START 时为参数，END 时为"执行完成"，ERROR 时为错误信息） |
 
 ---
 

@@ -23,6 +23,7 @@ POST /api/v1/auth/login
 {
   "token": "eyJhbGciOiJIUzI1NiIs...",
   "user_id": "2020123456",
+  "session_id": "sess_abc123xyz",
   "expires_in": 86400
 }
 ```
@@ -31,6 +32,7 @@ POST /api/v1/auth/login
 |------|------|------|
 | token | string | JWT 访问令牌 |
 | user_id | string | 用户学号 |
+| session_id | string | 会话 ID（用于多设备管理） |
 | expires_in | int | 有效期（秒），默认 24 小时 |
 
 ### 错误响应

@@ -811,3 +811,39 @@ profile/
 | `cf0a62b` | feat(profile): add profile API client, types, and store |
 | `ede086e` | feat(profile): add ProfilePage with routing |
 | `8794fd6` | test(profile): add unit tests for profile components |
+
+---
+
+## 2026-03-24 Bug Fix：历史会话工具调用重复
+
+### 问题
+
+点击历史会话时，工具调用显示"重复"：
+- 状态图标显示 ○ 和 ✓
+- 工具名称出现两次
+- 参数显示在不应该的位置
+
+### 根因
+
+`loadDialog` 解析数据库 events 时未合并相同 id 的事件，与 `addToolEvent` 逻辑不一致。
+
+### 解决方案
+
+在 `chatStore.ts` 的 `loadDialog` 中添加去重合并逻辑：
+
+```typescript
+for (const event of parsed) {
+  const existingIdx = events.findIndex((e) => e.id === event.id);
+  if (existingIdx >= 0) {
+    events[existingIdx] = { ...events[existingIdx], ...event };
+  } else {
+    events.push(event);
+  }
+}
+```
+
+### 测试结果
+
+| 测试 | 结果 |
+|------|------|
+| 单元测试 (245) | ✅ 全部通过 |

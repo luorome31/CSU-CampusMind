@@ -380,11 +380,81 @@ Phase 3 实现中，前端从 sessionStorage 获取 user_id 并传入 `GET /api/
 
 ---
 
+## 问题 14：加载历史会话时工具调用显示重复
+
+### 问题描述
+
+点击历史会话中的某一个 session，工具调用部分会"重复"显示，例如：
+```
+正在调用工具 (1/2)...▾
+○rag_search
+{'query': '中南大学 邝砾 老师 简介', 'knowledge_ids': ['t_07ec6dbd792d436c']}
+✓rag_search
+```
+但在和模型对话的运行过程中出现的工具调用不会重复。
+
+### 根因分析
+
+**数据库存储**：后端存储的 events 数组中，START 和 END 事件使用相同的 `id`（tool_call_id）：
+```json
+[
+  {"id": "call_function_xxx", "status": "START", ...},
+  {"id": "call_function_xxx", "status": "END", ...}
+]
+```
+
+**实时对话**：`addToolEvent` 中有去重逻辑，相同 id 的事件会合并更新：
+```typescript
+const existingIdx = events.findIndex((e) => e.id === event.id);
+if (existingIdx >= 0) {
+  events[existingIdx] = { ...events[existingIdx], ...event };
+} else {
+  events.push(event);
+}
+```
+
+**加载历史**：`loadDialog` 直接解析 JSON，不做任何合并处理，导致数组中保留了两个相同 id 的事件。React 使用 `event.id` 作为 key 渲染时，相同 key 导致 diff 算法出错。
+
+### 解决方案
+
+在 `loadDialog` 中添加与 `addToolEvent` 相同的去重合并逻辑：
+
+```typescript
+loadDialog: (dialogId, dbMessages) => {
+  const messages: ChatMessage[] = dbMessages.map((m) => {
+    let events: ToolEvent[] = [];
+    if (m.events) {
+      const parsed = JSON.parse(m.events) as ToolEvent[];
+      // Merge events with same id (same as addToolEvent logic)
+      for (const event of parsed) {
+        const existingIdx = events.findIndex((e) => e.id === event.id);
+        if (existingIdx >= 0) {
+          events[existingIdx] = { ...events[existingIdx], ...event };
+        } else {
+          events.push(event);
+        }
+      }
+    }
+    return { ... };
+  });
+  set({ currentDialogId: dialogId, messages, toolEvents: [] });
+},
+```
+
+### 教训
+
+- 相同数据结构在不同场景（实时 vs 历史加载）的处理逻辑必须一致
+- 状态管理函数（addToolEvent）和数据初始化函数（loadDialog）应使用相同的合并/去重策略
+
+---
+
 ## 更新日志
 
 | 日期 | 版本 | 更新内容 |
 |------|------|---------|
-| 2026-03-23 | 1.3.1 | 修复 API 安全隐患，前端不再传入 user_id |
+| 2026-03-24 | 1.4.1 | 修复历史会话工具调用重复问题（问题14） |
+| 2026-03-24 | 1.4.0 | 完成 Phase 5 个人中心功能 |
+| 2026-03-24 | 1.3.1 | 修复 API 安全隐患，前端不再传入 user_id |
 | 2026-03-23 | 1.3.0 | 完成 Phase 3 知识库浏览功能 |
 | 2026-03-22 | 1.2.0 | 添加 Phase 3 样式重设计，记录问题 7-12 |
 | 2026-03-22 | 1.1.0 | 添加 Phase 2.5 测试相关内容，记录测试问题 5、6 |

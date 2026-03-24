@@ -40,13 +40,15 @@ POST /api/v1/completion/stream
 
 **工具执行开始事件:**
 ```
-data: {"type": "event", "timestamp": 1234567890, "data": {"status": "START", "title": "成绩查询", "message": "正在查询教务系统..."}}
+data: {"type": "event", "timestamp": 1234567890, "data": {"id": "call_001", "status": "START", "title": "成绩查询", "message": "正在查询教务系统..."}}
 ```
 
 **工具执行结束事件:**
 ```
-data: {"type": "event", "timestamp": 1234567890, "data": {"status": "END", "title": "成绩查询", "message": "查询完成"}}
+data: {"type": "event", "timestamp": 1234567890, "data": {"id": "call_001", "status": "END", "title": "成绩查询", "message": "查询完成"}}
 ```
+
+> **注意**: START 和 END 事件共享相同的 `id`（tool_call_id），用于前端关联同一工具调用的状态变化。
 
 **LLM 文本块事件:**
 ```
@@ -65,7 +67,7 @@ data: {"type": "title_update", "data": {"title": "成绩查询"}}
 
 **错误事件:**
 ```
-data: {"type": "event", "timestamp": 1234567890, "data": {"status": "ERROR", "title": "错误", "message": "处理请求时发生错误"}}
+data: {"type": "event", "timestamp": 1234567890, "data": {"id": "call_001", "status": "ERROR", "title": "成绩查询", "message": "查询失败: 无权限"}}
 ```
 
 ### 响应头
@@ -142,9 +144,25 @@ POST /api/v1/completion
 | dialog_id | string | 对话 ID |
 | role | string | 角色 (user/assistant) |
 | content | string | 消息内容 |
-| events | json | 工具调用事件记录 |
+| events | json | 工具调用事件记录数组，每个工具调用产生多条记录（START → END/ERROR），共享相同 id |
 | extra | json | 额外信息（模型、耗时等） |
 | created_at | datetime | 创建时间 |
+
+#### events 字段格式
+
+```json
+[
+  {"id": "call_001", "status": "START", "title": "rag_search", "message": "{'query': '...'}"},
+  {"id": "call_001", "status": "END", "title": "rag_search", "message": "执行完成"}
+]
+```
+
+| 字段 | 类型 | 描述 |
+|------|------|------|
+| id | string | 工具调用 ID（START 和 END 事件共享） |
+| status | string | 状态：START / END / ERROR |
+| title | string | 工具名称 |
+| message | string | 状态消息 |
 
 ### Dialog 数据结构
 

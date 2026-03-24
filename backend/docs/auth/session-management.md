@@ -116,3 +116,59 @@ ratelimit:login:{username} -> [timestamp1, timestamp2, ...]
 ### 超时处理
 
 当用户 Session 过期或 CASTGC 失效时，抛出 `NeedReLoginError`，前端需引导用户重新登录。
+
+---
+
+## 多设备会话追踪
+
+### SessionTracker
+
+用于管理用户的多设备登录会话，支持：
+- 追踪用户的活跃会话列表
+- 识别当前会话
+- 登出指定设备
+
+### Redis Key 格式
+
+```
+sessions:{user_id} -> List[SessionInfo]
+```
+
+### SessionInfo 数据结构
+
+```python
+@dataclass
+class SessionInfo:
+    session_id: str      # 唯一会话 ID
+    user_agent: str      # User-Agent 原始字符串
+    device: str          # 解析后的设备描述
+    location: str         # 位置（Localhost/Mobile）
+    created_at: float    # 创建时间戳
+```
+
+### 设备解析规则
+
+| User-Agent 关键词 | device 值 |
+|-------------------|-----------|
+| Mobile/iPhone | Safari on iPhone |
+| Mobile/Android | Chrome on Android |
+| Windows | Chrome on Windows |
+| Mac | Safari on Mac |
+| Linux | Chrome on Linux |
+| 其他 | Chrome on Unknown |
+
+### 位置判断
+
+| 设备类型 | location 值 |
+|----------|-------------|
+| 移动设备 | Mobile |
+| 桌面设备 | Localhost |
+
+### API 端点
+
+| 端点 | 方法 | 描述 |
+|------|------|------|
+| `/api/v1/auth/sessions` | GET | 获取活跃会话列表 |
+| `/api/v1/auth/sessions/current` | GET | 获取当前会话信息 |
+| `/api/v1/auth/sessions/{session_id}` | DELETE | 登出指定会话 |
+| `/api/v1/auth/sessions` | DELETE | 登出所有其他会话 |

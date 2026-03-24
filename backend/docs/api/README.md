@@ -36,6 +36,8 @@ Authorization: Bearer <your_jwt_token>
 ## 目录结构
 
 - [认证接口](./endpoints-auth.md) - 登录/登出/刷新 Token
+- [会话管理](./endpoints-session.md) - 多设备登录管理
+- [用户资料](./endpoints-user.md) - 个人资料查看与更新
 - [知识库 CRUD](./endpoints-knowledge.md) - 知识库管理
 - [知识文件管理](./endpoints-knowledge-file.md) - 知识文件操作
 - [网页爬取](./endpoints-crawl.md) - 内容爬取与索引
