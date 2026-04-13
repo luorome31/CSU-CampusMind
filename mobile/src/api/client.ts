@@ -7,6 +7,13 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { storage } from '../utils/storage';
 import { ApiError } from '../types/api';
 
+// 401 回调机制
+let onUnauthorizedCallback: (() => void) | null = null;
+
+export const setUnauthorizedCallback = (callback: () => void) => {
+  onUnauthorizedCallback = callback;
+};
+
 // 创建 Axios 实例
 const createApiClient = () => {
   const client = axios.create({
@@ -42,8 +49,7 @@ const createApiClient = () => {
       if (error.response?.status === 401) {
         // 清除存储并触发登出
         await storage.clear();
-        // 注意：实际重定向到登录页由 navigation 处理
-        // 这里抛出错误让调用方处理
+        onUnauthorizedCallback?.();
         throw new ApiError(401, 'Unauthorized');
       }
 
