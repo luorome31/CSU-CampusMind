@@ -40,31 +40,34 @@ src/styles/tokens/
 
 | Token | 值 | 说明 |
 |-------|-----|------|
-| `--color-bg-base` | `#f7f2ea` | 页面主背景色，温暖的米色调 |
-| `--color-bg-surface` | `rgba(255,255,255,0.82)` | 卡片表面色，半透明 |
-| `--color-bg-elevated` | `rgba(255,255,255,0.92)` | 悬浮元素背景色 |
-| `--color-bg-inset` | `#eee6dc` | 凹陷元素背景色，如输入框 |
-| `--color-bg-overlay` | `rgba(255,255,255,0.6)` | 遮罩层背景 |
-| `--color-bg-overlay-strong` | `rgba(255,255,255,0.72)` | 强遮罩背景 |
+| `--bg` | `#F8F5ED` | 页面主背景色，温暖的奶油色调 |
+| `--bg-card` | `#FCFAF5` | 卡片、对话气泡、弹出层底色 |
+| `--bg-glass` | `rgba(250, 248, 242, 0.92)` | 毛玻璃/头部遮罩底色 |
+| `--sidebar-bg` | `#F4F2EA` | 侧边栏背景，比主背景稍暗以区分 |
+| `--bg-inset` | `#E8E5DD` | 凹陷元素背景色，如输入框 |
 
 **使用场景**：
 
 ```css
 /* 页面背景 */
 .page {
-  background-color: var(--color-bg-base);
+  background-color: var(--bg);
 }
 
 /* 卡片 */
 .card {
-  background-color: var(--color-bg-surface);
+  background-color: var(--bg-card);
+}
+
+/* 玻璃态效果 */
+.glass-effect {
+  background-color: var(--bg-glass);
   backdrop-filter: blur(24px);
 }
 
-/* 输入框内凹效果 */
-.input {
-  background-color: var(--color-bg-inset);
-  box-shadow: var(--shadow-inset);
+/* 侧边栏 */
+.sidebar {
+  background-color: var(--sidebar-bg);
 }
 ```
 
@@ -72,10 +75,9 @@ src/styles/tokens/
 
 | Token | 值 | 说明 |
 |-------|-----|------|
-| `--color-text-primary` | `#2d2a26` | 主要文本，深棕色，高对比度 |
-| `--color-text-secondary` | `#5d5a55` | 次要文本 |
-| `--color-text-tertiary` | `#7e8b97` | 占位符、提示文本 |
-| `--color-text-muted` | `rgba(93,90,85,0.7)` | 弱化文本（带透明度） |
+| `--text` | `#3B3D3F` | 正文高对比度文字 |
+| `--text-light` | `#6B6F73` | 辅助文字/副标题 |
+| `--text-muted` | `#8E9196` | 提示文本、时间戳、禁用状态 |
 
 **对比度要求**：
 - 主要文本与背景对比度 ≥ 4.5:1 (WCAG AA)
@@ -84,18 +86,18 @@ src/styles/tokens/
 ```css
 /* 标题 */
 h1, h2, h3 {
-  color: var(--color-text-primary);
+  color: var(--text);
 }
 
 /* 正文 */
 p {
-  color: var(--color-text-secondary);
+  color: var(--text-light);
   line-height: 1.6;
 }
 
 /* 提示文字 */
 .placeholder {
-  color: var(--color-text-tertiary);
+  color: var(--text-muted);
 }
 ```
 
@@ -103,29 +105,28 @@ p {
 
 | Token | 值 | 说明 |
 |-------|-----|------|
-| `--color-accent` | `#9fb1c2` | 主强调色，蓝灰色调 |
-| `--color-accent-light` | `#c7ad96` | 浅强调色，暖米色 |
-| `--color-accent-hover` | `#d7c6ae` | 悬停状态强调色 |
-| `--color-accent-bg` | `rgba(159,177,194,0.2)` | 强调色背景（20% 透明度） |
+| `--accent` | `#537D96` | 主强调色，蓝灰色调 |
+| `--accent-hover` | `#456A80` | 悬停状态强调色 |
+| `--accent-light` | `rgba(83, 125, 150, 0.08)` | 浅色强调背景 |
 
 **使用指南**：
-- `--color-accent` 用于链接、重点强调、可点击元素
-- `--color-accent-bg` 用于标签背景、选中态背景
+- `--accent` 用于链接、重点强调、可点击元素
+- `--accent-light` 用于标签背景、选中态背景
 
 ```css
 /* 链接 */
 a {
-  color: var(--color-accent);
+  color: var(--accent);
 }
 
 a:hover {
-  color: var(--color-accent-hover);
+  color: var(--accent-hover);
 }
 
 /* 选中标签 */
 .tag-selected {
-  background-color: var(--color-accent-bg);
-  color: var(--color-accent);
+  background-color: var(--accent-light);
+  color: var(--accent);
 }
 ```
 
@@ -133,19 +134,18 @@ a:hover {
 
 | Token | 值 | 说明 |
 |-------|-----|------|
-| `--color-border` | `rgba(45,42,38,0.12)` | 默认边框，12% 透明度 |
-| `--color-border-hover` | `rgba(159,177,194,0.5)` | 悬停边框 |
-| `--color-border-subtle` | `rgba(45,42,38,0.08)` | 极淡边框 |
+| `--border` | `rgba(83, 125, 150, 0.22)` | 全局统一细边框，基于 accent 色 |
+| `--shadow` | `rgba(59, 61, 63, 0.09)` | 弥散阴影色 |
 
 ```css
 /* 默认边框 */
 .card {
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--border);
 }
 
 /* 悬停边框 */
 .interactive:hover {
-  border-color: var(--color-border-hover);
+  border-color: var(--accent);
 }
 ```
 
@@ -153,10 +153,8 @@ a:hover {
 
 | Token | 值 | 用途 |
 |-------|-----|------|
-| `--color-success` | `#1a7f37` | 成功状态 |
-| `--color-error` | `#cf222e` | 错误状态 |
-| `--color-warning` | `#d29922` | 警告状态 |
-| `--color-info` | `#0969da` | 信息提示 |
+| `--green` | `#7BAE7F` | 成功状态 |
+| `--coral` | `#EC8F8D` | 醒目/警告/红色系提示 |
 
 ---
 
@@ -298,7 +296,7 @@ a:hover {
 .body-text {
   font-size: var(--text-base);
   line-height: var(--leading-normal);
-  color: var(--color-text-secondary);
+  color: var(--text-light);
 }
 
 /* 标签徽章 */
@@ -318,21 +316,22 @@ a:hover {
 
 | Token | 值 | 说明 |
 |-------|-----|------|
-| `--shadow-card` | `0 1px 3px rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)` | 默认卡片阴影 |
-| `--shadow-card-hover` | `0 8px 18px rgba(45,42,38,0.12)` | 卡片悬停阴影 |
-| `--shadow-elevated` | `0 12px 28px -14px rgba(45,42,38,0.55)` | 浮动元素阴影 |
-| `--shadow-inset` | `inset 2px 2px 6px rgba(150,140,128,0.15), inset -2px -2px 6px rgba(255,255,255,0.6)` | 内凹阴影（输入框） |
-| `--shadow-inset-focus` | `inset 2px 2px 6px rgba(150,140,128,0.18), inset -2px -2px 6px rgba(255,255,255,0.7), 0 0 0 2px rgba(159,177,194,0.35)` | 内凹聚焦阴影 |
+| `--shadow-card` | `0 4px 24px var(--shadow)` | 默认卡片阴影，弥散投影 |
+| `--shadow-card-hover` | `0 8px 32px var(--shadow)` | 卡片悬停阴影 |
+| `--shadow-elevated` | `0 8px 32px var(--shadow)` | 浮动元素阴影（毛玻璃效果） |
+| `--shadow-inset` | `inset 0 2px 4px rgba(59,61,63,0.08)` | 内凹阴影（输入框） |
+| `--shadow-inset-focus` | `inset 0 2px 4px rgba(59,61,63,0.08), 0 0 0 2px var(--accent)` | 内凹聚焦阴影 |
+
+**注意**：弃用生硬的重阴影，采用环境弥散投影。
 
 ### 5.2 圆角
 
 | Token | 值 | 使用场景 |
 |-------|-----|----------|
 | `--radius-sm` | `6px` | 小按钮、标签 |
-| `--radius-md` | `8px` | 输入框、默认按钮 |
-| `--radius-lg` | `12px` | 卡片、面板 |
-| `--radius-xl` | `16px` | 模态框 |
-| `--radius-2xl` | `18px` | Auth 卡片 |
+| `--radius-md` | `10px` | 输入框、默认按钮、卡片标题 |
+| `--radius-lg` | `16px` | 卡片、面板、模态框 |
+| `--radius-xl` | `18px` | Auth 卡片 |
 | `--radius-full` | `9999px` | 药丸形徽章、头像 |
 
 ### 5.3 使用示例
@@ -340,10 +339,10 @@ a:hover {
 ```css
 /* 卡片阴影 */
 .card {
-  background: var(--color-bg-surface);
+  background: var(--bg-card);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-  transition: box-shadow var(--duration-normal) var(--ease-default);
+  transition: box-shadow var(--duration-base) var(--ease-spring);
 }
 
 .card:hover {
@@ -352,7 +351,7 @@ a:hover {
 
 /* 输入框内凹效果 */
 .input {
-  background: var(--color-bg-inset);
+  background: var(--bg-inset);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-inset);
 }
@@ -371,16 +370,16 @@ a:hover {
 | Token | 值 | 用途 |
 |-------|-----|------|
 | `--duration-fast` | `150ms` | 微交互、状态切换 |
-| `--duration-normal` | `200ms` | 默认过渡 |
-| `--duration-slow` | `300ms` | 大元素移动、页面过渡 |
+| `--duration-base` | `300ms` | 默认过渡，所有交互动画基准 |
+| `--duration-slow` | `400ms` | 大元素移动、页面过渡 |
 
 ### 6.2 缓动函数
 
 | Token | 值 | 用途 |
 |-------|-----|------|
+| `--ease-spring` | `cubic-bezier(0.16, 1, 0.3, 1)` | 物理弹簧曲线，悬停/展开等交互动画 |
 | `--ease-default` | `cubic-bezier(0.4, 0, 0.2, 1)` | 标准缓动，大多数场景 |
 | `--ease-soft` | `cubic-bezier(0.25, 0.1, 0.25, 1)` | 柔和过渡 |
-| `--ease-bounce` | `cubic-bezier(0.34, 1.56, 0.64, 1)` | 弹跳效果（谨慎使用） |
 
 ### 6.3 使用原则
 
@@ -389,15 +388,16 @@ a:hover {
 3. **尊重系统设置**：支持 `prefers-reduced-motion`
 
 ```css
-/* 标准过渡 */
+/* 标准交互动画 */
 .element {
-  transition: all var(--duration-normal) var(--ease-default);
+  transition: all var(--duration-base) var(--ease-spring);
 }
 
 /* 悬停提升效果 */
 .interactive {
-  transition: transform var(--duration-normal) var(--ease-default),
-              box-shadow var(--duration-normal) var(--ease-default);
+  transition: transform var(--duration-base) var(--ease-spring),
+              box-shadow var(--duration-base) var(--ease-spring),
+              background-color var(--duration-base) var(--ease-spring);
 }
 
 .interactive:hover {
@@ -468,32 +468,33 @@ a:hover {
 ```css
 :root {
   /* === Colors === */
-  --color-bg-base: #f7f2ea;
-  --color-bg-surface: rgba(255, 255, 255, 0.82);
-  --color-bg-elevated: rgba(255, 255, 255, 0.92);
-  --color-bg-inset: #eee6dc;
-  --color-bg-overlay: rgba(255, 255, 255, 0.6);
-  --color-bg-overlay-strong: rgba(255, 255, 255, 0.72);
+  --bg: #F8F5ED;
+  --bg-card: #FCFAF5;
+  --bg-glass: rgba(250, 248, 242, 0.92);
+  --sidebar-bg: #F4F2EA;
+  --bg-inset: #E8E5DD;
 
-  --color-text-primary: #2d2a26;
-  --color-text-secondary: #5d5a55;
-  --color-text-tertiary: #7e8b97;
+  --text: #3B3D3F;
+  --text-light: #6B6F73;
+  --text-muted: #8E9196;
 
-  --color-accent: #9fb1c2;
-  --color-accent-light: #c7ad96;
-  --color-accent-hover: #d7c6ae;
-  --color-accent-bg: rgba(159, 177, 194, 0.2);
+  --accent: #537D96;
+  --accent-hover: #456A80;
+  --accent-light: rgba(83, 125, 150, 0.08);
 
-  --color-border: rgba(45, 42, 38, 0.12);
-  --color-border-hover: rgba(159, 177, 194, 0.5);
-  --color-border-subtle: rgba(45, 42, 38, 0.08);
+  --border: rgba(83, 125, 150, 0.22);
+  --shadow: rgba(59, 61, 63, 0.09);
 
-  --color-success: #1a7f37;
-  --color-error: #cf222e;
-  --color-warning: #d29922;
-  --color-info: #0969da;
+  --green: #7BAE7F;
+  --coral: #EC8F8D;
+
+  /* Chat-specific */
+  --user-bg: rgba(83, 125, 150, 0.08);
+  --tool-bg: rgba(83, 125, 150, 0.06);
+  --tool-text: #6B6F73;
 
   /* === Spacing === */
+  --space-0: 0;
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -548,24 +549,30 @@ a:hover {
   --font-bold: 700;
 
   /* === Elevation === */
+  --shadow-card: 0 4px 24px var(--shadow);
+  --shadow-card-hover: 0 8px 32px var(--shadow);
+  --shadow-elevated: 0 8px 32px var(--shadow);
+  --shadow-inset: inset 0 2px 4px rgba(59,61,63,0.08);
+  --shadow-inset-focus: inset 0 2px 4px rgba(59,61,63,0.08), 0 0 0 2px var(--accent);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 18px;
+  --radius-full: 9999px;
+
+  --duration-fast: 150ms;
+  --duration-base: 300ms;
+  --duration-slow: 400ms;
+
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-soft: cubic-bezier(0.25, 0.1, 0.25, 1);
+
   --z-dropdown: 10;
   --z-sticky: 20;
   --z-overlay: 30;
   --z-modal: 40;
   --z-toast: 50;
-
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 18px;
-  --radius-full: 9999px;
-
-  --duration-fast: 150ms;
-  --duration-normal: 200ms;
-  --duration-slow: 300ms;
-  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-soft: cubic-bezier(0.25, 0.1, 0.25, 1);
-  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 ```

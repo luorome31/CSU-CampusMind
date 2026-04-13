@@ -2,16 +2,17 @@
 
 ## 1. Design Philosophy
 
-**Aesthetic Name**: Warm Minimal / Soft Luxury
+**Aesthetic Name**: Warm Paper + Blue-Grey Accent (温柔文具 Gentle Stationery)
 
-A refined, editorial aesthetic inspired by high-end research journals. Features warm cream tones with subtle glassmorphism accents and floating gradient orbs. The design conveys trustworthiness and sophistication without feeling cold or corporate.
+A refined, editorial aesthetic inspired by high-end research journals. Features warm cream tones with subtle glassmorphism accents. The design conveys trustworthiness and sophistication without feeling cold or corporate.
 
 **Core Principles**:
-- Warm neutrals over cold grays
-- Soft shadows over harsh edges
-- Restrained motion over decorative animation
-- Glassmorphism accents for depth
-- Paper-like texture through subtle gradients
+- Warm cream backgrounds over cold grays and pure white
+- Soft diffused shadows over harsh edges
+- Low-contrast harmony (no pure #000000 or #FFFFFF in text)
+- Blue-gray accent (#537D96) for emphasis
+- Physical spring animations for interactions
+- Paper-like texture through subtle warmth
 
 ---
 
@@ -21,23 +22,28 @@ A refined, editorial aesthetic inspired by high-end research journals. Features 
 
 | Token | Hex | Usage |
 |-------|-----|-------|
-| `--color-bg-base` | `#f7f2ea` | Page background |
-| `--color-bg-surface` | `rgba(255,255,255,0.82)` | Card surfaces |
-| `--color-bg-elevated` | `rgba(255,255,255,0.92)` | Elevated elements |
-| `--color-bg-inset` | `#eee6dc` | Inset/input backgrounds |
-| `--color-text-primary` | `#2d2a26` | Headings, body text |
-| `--color-text-secondary` | `#5d5a55` | Secondary text |
-| `--color-text-tertiary` | `#7e8b97` | Placeholder, hints |
-| `--color-accent` | `#9fb1c2` | Cool accent (blue-gray) |
-| `--color-accent-light` | `#c7ad96` | Warm accent (tan) |
-| `--color-border` | `rgba(45,42,38,0.12)` | Subtle borders |
+| `--bg` | `#F8F5ED` | Page background, warm cream |
+| `--bg-card` | `#FCFAF5` | Card, bubble, popup surfaces |
+| `--bg-glass` | `rgba(250,248,242,0.92)` | Glassmorphism/header overlay |
+| `--sidebar-bg` | `#F4F2EA` | Sidebar background, slightly darker than content |
+| `--bg-inset` | `#E8E5DD` | Inset/input backgrounds |
+| `--text` | `#3B3D3F` | Primary text, high contrast |
+| `--text-light` | `#6B6F73` | Secondary text |
+| `--text-muted` | `#8E9196` | Placeholder, hints, timestamps |
+| `--accent` | `#537D96` | Primary accent, blue-gray |
+| `--accent-hover` | `#456A80` | Accent hover state |
+| `--accent-light` | `rgba(83,125,150,0.08)` | Light accent background |
+| `--border` | `rgba(83,125,150,0.22)` | Global unified border |
+| `--shadow` | `rgba(59,61,63,0.09)` | Diffused shadow color |
+| `--green` | `#7BAE7F` | Success state |
+| `--coral` | `#EC8F8D` | Warning/alert/attention |
 
 ### Typography
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--font-sans` | `DS-Project, system-ui` | Primary font |
-| `--font-mono` | `IBM Plex Mono, monospace` | Code/mono |
+| `--font-sans` | `"DS-Project", system-ui` | Primary font |
+| `--font-mono` | `"IBM Plex Mono", monospace` | Code/mono |
 | `--text-xs` | `0.75rem (12px)` | Labels, badges |
 | `--text-sm` | `0.875rem (14px)` | Secondary text |
 | `--text-base` | `1rem (16px)` | Body text |
@@ -61,30 +67,32 @@ A refined, editorial aesthetic inspired by high-end research journals. Features 
 
 | Token | Description |
 |-------|-------------|
-| `--shadow-card` | `0 1px 3px rgba(0,0,0,0.1)` - Default cards |
-| `--shadow-elevated` | `0 12px 28px -14px rgba(45,42,38,0.55)` - Floating |
-| `--shadow-inset` | `inset 2px 2px 6px rgba(150,140,128,0.15)` - Inputs |
+| `--shadow-card` | `0 4px 24px var(--shadow)` - Default cards |
+| `--shadow-card-hover` | `0 8px 32px var(--shadow)` - Card hover |
+| `--shadow-elevated` | `0 8px 32px var(--shadow)` - Floating elements |
+| `--shadow-inset` | `inset 0 2px 4px rgba(59,61,63,0.08)` - Inputs |
 | `--shadow-inset-focus` | Inset + 2px accent glow ring |
 
 ### Border Radius
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--radius-md` | `8px` | Buttons, inputs |
-| `--radius-lg` | `12px` | Cards |
-| `--radius-xl` | `16px` | Modals |
-| `--radius-2xl` | `18px` | Auth cards |
+| `--radius-sm` | `6px` | Buttons, tags |
+| `--radius-md` | `10px` | Inputs, card titles |
+| `--radius-lg` | `16px` | Cards, panels, modals |
+| `--radius-xl` | `18px` | Auth cards |
 | `--radius-full` | `9999px` | Pills, badges |
 
 ### Motion
 
-| Token | Value |
-|-------|-------|
-| `--duration-fast` | `150ms` |
-| `--duration-normal` | `200ms` |
-| `--duration-slow` | `300ms` |
-| `--ease-default` | `cubic-bezier(0.4, 0, 0.2, 1)` |
-| `--ease-soft` | `cubic-bezier(0.25, 0.1, 0.25, 1)` |
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--duration-fast` | `150ms` | Micro-interactions |
+| `--duration-base` | `300ms` | Default transition, all interactive animations |
+| `--duration-slow` | `400ms` | Large element transitions |
+| `--ease-spring` | `cubic-bezier(0.16, 1, 0.3, 1)` | Physical spring, hover/expand |
+| `--ease-default` | `cubic-bezier(0.4, 0, 0.2, 1)` | Standard easing |
+| `--ease-soft` | `cubic-bezier(0.25, 0.1, 0.25, 1)` | Soft transition |
 
 ---
 
@@ -99,12 +107,20 @@ A refined, editorial aesthetic inspired by high-end research journals. Features 
 | `lg` | `1024px+` | Laptops |
 | `xl` | `1280px+` | Desktops |
 
+### Layout Widths
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--sidebar-width` | `240px` | Left sidebar width |
+| `--preview-panel-width` | `580px` | Right context/preview panel |
+| `--chat-min-width` | `400px` | Min width before sidebar collapse |
+
 ### Mobile-First Strategy
 
 1. Design for 375px first
 2. Use `min-width` media queries for larger screens
 3. Stack layouts on mobile, side-by-side on desktop
-4. Hide non-essential elements on mobile
+4. Sidebar becomes drawer on mobile
 5. Use `100svh` for full-height sections
 
 ### Navigation Patterns
@@ -128,33 +144,36 @@ A refined, editorial aesthetic inspired by high-end research journals. Features 
 
 **Style Summary for Future AI Generation**:
 
-You are building components for CampusMind, a scientific productivity platform. The design aesthetic is "Warm Minimal" — refined and editorial like a high-end research journal, but approachable.
+You are building components for CampusMind, a scientific productivity platform. The design aesthetic is "Warm Paper + Blue-Grey Accent" — refined and editorial like a high-end research journal, but approachable.
 
-**Color Direction**: Warm cream backgrounds (#f7f2ea) with near-black warm text (#2d2a26). The primary accent is a muted blue-gray (#9fb1c2) that feels scientific yet soft. Secondary warm tan accent (#c7ad96). Avoid cold grays and pure blacks.
+**Color Direction**: Warm cream backgrounds (#F8F5ED) with warm gray text (#3B3D3F). The primary accent is a muted blue-gray (#537D96) that feels scientific yet soft. Avoid pure white (#fff) backgrounds and pure black (#000) text. The overall feel should be like quality stationery — warm, restrained, and tactile.
 
-**Typography**: Use DS-Project font family with system-ui fallback. Font sizes follow a fluid scale from 12px to 36px (mobile) / 56px (desktop). Tight letter-spacing (-0.025em) for headings. Wide letter-spacing (0.16em) for labels/badges.
+**Typography**: Use DS-Project font family with system-ui fallback. Font sizes follow a fluid scale from 12px to 36px (mobile) / 56px (desktop). Tight letter-spacing for headings. Wide letter-spacing for labels/badges.
 
 **Spatial System**: 4px base unit. Standard gaps are 8px, 12px, 16px, 24px. Component padding is typically 12px-16px. Section spacing is 32px-48px. Always ensure 44px minimum for touch targets.
 
-**Shadows & Depth**: Prefer soft, warm shadows with blur (e.g., `0 12px 28px -14px rgba(45,42,38,0.55)`). Use inset shadows for inputs. Consider glassmorphism (backdrop-blur + semi-transparent white) for overlays.
+**Shadows & Depth**: Prefer soft, diffused shadows (e.g., `0 4px 24px rgba(59,61,63,0.09)`). Use inset shadows for inputs. Consider glassmorphism (backdrop-blur + semi-transparent white) for overlays.
 
-**Borders**: Very subtle — typically `rgba(45,42,38,0.12)`. Rounded corners: 8px for inputs/buttons, 12-18px for cards.
+**Borders**: Very subtle — typically `rgba(83,125,150,0.22)`. Rounded corners: 6px for buttons/tags, 10px for inputs, 16px for cards/modals.
 
-**Motion**: Short and purposeful. 150-200ms for micro-interactions, 300ms for larger transitions. Use `cubic-bezier(0.4, 0, 0.2, 1)` for default easing. Avoid bounce or overshoot unless specifically needed.
+**Motion**: Use physical spring easing `cubic-bezier(0.16, 1, 0.3, 1)` for all interactive animations. Duration is 300ms base. Avoid bounce or overshoot unless specifically needed. Respect `prefers-reduced-motion`.
 
 **Component Patterns**:
-- Buttons: Warm white backgrounds, subtle shadow, lift on hover
+- Buttons: Warm white/card backgrounds, subtle shadow, lift on hover with spring animation
 - Inputs: Inset shadow effect, focus ring with accent color
-- Cards: Semi-transparent white or glass effect, soft shadow
+- Cards: Card background (#FCFAF5), soft shadow, 16px radius
 - Badges: Pill-shaped, uppercase text, muted colors
+- Session items: Hover with subtle overlay, streaming dot indicator
+- Chat bubbles: User uses accent-light background, AI uses card background
 
 **What to Avoid**:
-- Pure white (#fff) backgrounds
-- Hard black text (#000)
+- Pure white (#fff) or pure black (#000) backgrounds
+- High contrast text colors
 - Blue/purple gradients
 - Inter, Roboto, or system default fonts
 - Square corners or heavy borders
 - Decorative motion or animations
+- Linear easing (avoid `ease-in`, `ease-out` alone)
 
 ---
 
@@ -210,3 +229,4 @@ Before shipping any component, verify:
 - [ ] Responsive at 375px and 1440px
 - [ ] Reduced motion respected (`prefers-reduced-motion`)
 - [ ] Loading/disabled/error states handled
+- [ ] Interactive animations use `--ease-spring` with `--duration-base` (300ms)

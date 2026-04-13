@@ -179,7 +179,7 @@ export interface ButtonProps {
   padding: var(--space-2) var(--space-4);
   font-family: var(--font-sans);
   border-radius: var(--radius-md);
-  transition: all var(--duration-normal) var(--ease-default);
+  transition: all var(--duration-base) var(--ease-spring);
 }
 
 /* 2. 变体样式 */
