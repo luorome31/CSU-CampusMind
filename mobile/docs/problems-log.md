@@ -19,3 +19,4 @@
 | 5 | 2026-04-13 | eslint.config.mjs 初始为空导致 pre-commit hook 失败 | 添加基础 ESLint 规则配置 | 153b260 |
 | 6 | 2026-04-13 | 多个 barrel 文件 (types/index.ts, hooks/index.ts, navigation/index.ts) 为空导出 | 填充正确的 re-export 语句 | 054ca26 |
 | 7 | 2026-04-13 | app.json 引用了未安装的 expo-router 插件导致启动失败 | 移除 expo-router 插件配置；移除不存在的 icon/splash/adaptive-icon 资源引用 | - |
+| 8 | 2026-04-13 | Expo 无法找到 App 入口，期望根目录有 App.tsx | 创建根目录 App.tsx re-export src/App | - |
