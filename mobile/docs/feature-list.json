@@ -6,20 +6,27 @@
       "id": "F-001",
       "module": "foundation",
       "description": "项目初始化：Expo + React Native 0.76+ + TypeScript + Zustand + React Navigation 7",
-      "status": "pending",
-      "referenceCode": [],
+      "status": "completed",
+      "referenceCode": [
+        "mobile/package.json",
+        "mobile/tsconfig.json",
+        "mobile/app.json",
+        "mobile/babel.config.js",
+        "mobile/metro.config.js"
+      ],
       "dependsOn": []
     },
     {
       "id": "F-002",
       "module": "foundation",
       "description": "设计系统 Tokens：颜色（#F8F5ED 暖纸主题）、字体、间距、阴影",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
-        "frontend/src/styles/tokens/colors.css",
-        "frontend/src/styles/tokens/typography.css",
-        "frontend/src/styles/tokens/spacing.css",
-        "frontend/src/styles/tokens/elevation.css"
+        "mobile/src/styles/tokens/colors.ts",
+        "mobile/src/styles/tokens/typography.ts",
+        "mobile/src/styles/tokens/spacing.ts",
+        "mobile/src/styles/tokens/elevation.ts",
+        "mobile/src/styles/index.ts"
       ],
       "dependsOn": ["F-001"]
     },
@@ -27,13 +34,13 @@
       "id": "F-003",
       "module": "foundation",
       "description": "TypeScript 类型定义：ChatMessage, Dialog, KnowledgeBase, KnowledgeFile, User, UsageStats, Session, ToolEvent",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
-        "frontend/src/api/types.ts",
-        "frontend/src/api/chat.ts",
-        "frontend/src/api/dialog.ts",
-        "frontend/src/api/knowledge.ts",
-        "frontend/src/features/profile/types.ts"
+        "mobile/src/types/api.ts",
+        "mobile/src/types/chat.ts",
+        "mobile/src/types/knowledge.ts",
+        "mobile/src/types/user.ts",
+        "mobile/src/types/index.ts"
       ],
       "dependsOn": ["F-001"]
     },
@@ -41,9 +48,10 @@
       "id": "F-004",
       "module": "foundation",
       "description": "API 客户端：Axios 实例 + token 注入 + 401 自动登出拦截器",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
-        "frontend/src/api/client.ts"
+        "mobile/src/api/client.ts",
+        "mobile/src/api/types.ts"
       ],
       "dependsOn": ["F-001", "F-003"]
     },
@@ -51,9 +59,9 @@
       "id": "F-005",
       "module": "foundation",
       "description": "安全存储封装：react-native-keychain 替代 sessionStorage",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
-        "frontend/src/features/auth/authStore.ts"
+        "mobile/src/utils/storage.ts"
       ],
       "dependsOn": ["F-001"]
     },
@@ -61,9 +69,12 @@
       "id": "F-006",
       "module": "foundation",
       "description": "路由架构：Bottom Tab Navigator（4 Tab） + 各 Tab 内部导航栈",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
-        "frontend/src/routes.tsx"
+        "mobile/src/navigation/types.ts",
+        "mobile/src/navigation/RootNavigator.tsx",
+        "mobile/src/navigation/TabNavigator.tsx",
+        "mobile/src/App.tsx"
       ],
       "dependsOn": ["F-001"]
     },
@@ -356,7 +367,7 @@
     {
       "id": "F-035",
       "module": "profile",
-      "description": "ProfileStore：用户信息、用量统计、会话列表状态管理",
+      "description": "ProfileStore：用户信息，用量统计、会话列表状态管理",
       "status": "pending",
       "referenceCode": [
         "frontend/src/features/profile/profileStore.ts"
@@ -417,8 +428,11 @@
       "id": "F-041",
       "module": "foundation",
       "description": "网络状态处理：Toast 提示弱网/断网",
-      "status": "pending",
-      "referenceCode": [],
+      "status": "completed",
+      "referenceCode": [
+        "mobile/src/utils/network.ts",
+        "mobile/src/hooks/useNetworkStatus.ts"
+      ],
       "dependsOn": ["F-001"]
     },
     {
@@ -450,42 +464,50 @@
     {
       "name": "foundation",
       "description": "基础设施：项目初始化、设计系统、类型、API 客户端、路由",
-      "features": ["F-001", "F-002", "F-003", "F-004", "F-005", "F-006", "F-041"]
+      "features": ["F-001", "F-002", "F-003", "F-004", "F-005", "F-006", "F-041"],
+      "status": "completed"
     },
     {
       "name": "auth",
       "description": "认证：AuthStore、登录页、路由保护",
-      "features": ["F-007", "F-008", "F-009"]
+      "features": ["F-007", "F-008", "F-009"],
+      "status": "pending"
     },
     {
       "name": "home",
       "description": "首页：HeroBanner + FeatureGrid + HistoryList",
-      "features": ["F-010", "F-011", "F-012", "F-013"]
+      "features": ["F-010", "F-011", "F-012", "F-013"],
+      "status": "pending"
     },
     {
       "name": "chat",
       "description": "对话核心：ChatStore、useChatStream、消息渲染组件、ChatsScreen",
-      "features": ["F-014", "F-015", "F-016", "F-017", "F-018", "F-019", "F-020", "F-021", "F-022"]
+      "features": ["F-014", "F-015", "F-016", "F-017", "F-018", "F-019", "F-020", "F-021", "F-022"],
+      "status": "pending"
     },
     {
       "name": "knowledge",
-      "description": "知识库：KnowledgeListStore、KB/文件组件、知识选择器、KnowledgeScreen",
-      "features": ["F-023", "F-024", "F-025", "F-026", "F-027", "F-028", "F-029"]
+      "description": "知识库：KnowledgeListStore、KB/文件组件，知识选择器、KnowledgeScreen",
+      "features": ["F-023", "F-024", "F-025", "F-026", "F-027", "F-028", "F-029"],
+      "status": "pending"
     },
     {
       "name": "build",
       "description": "知识构建：BuildStore、CrawlPanel、TaskList、Review、BuildScreen",
-      "features": ["F-030", "F-031", "F-032", "F-033", "F-034"]
+      "features": ["F-030", "F-031", "F-032", "F-033", "F-034"],
+      "status": "pending"
     },
     {
       "name": "profile",
       "description": "个人中心：ProfileStore、ProfileCard、StatsGrid、SessionList、ProfileScreen",
-      "features": ["F-035", "F-036", "F-037", "F-038", "F-039"]
+      "features": ["F-035", "F-036", "F-037", "F-038", "F-039"],
+      "status": "pending"
     },
     {
       "name": "ui",
       "description": "UI 组件库：基础 UI 组件 + 移动端特权 + Tab Bar 毛玻璃",
-      "features": ["F-040", "F-042", "F-043", "F-044"]
+      "features": ["F-040", "F-042", "F-043", "F-044"],
+      "status": "pending"
     }
   ]
 }
