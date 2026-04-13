@@ -1,13 +1,9 @@
-/**
- * 网络状态 Hook
- */
-
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { network } from '../utils/network';
 
 export function useNetworkStatus() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
-  const [toastShown, setToastShown] = useState(false);
+  const toastShownRef = useRef(false);
 
   useEffect(() => {
     // 初始检查
@@ -18,24 +14,24 @@ export function useNetworkStatus() {
       const connected = state.isConnected ?? false;
       setIsConnected(connected);
 
-      // 显示提示
-      if (!connected && !toastShown) {
+      // 使用 ref 避免 stale closure
+      if (!connected && !toastShownRef.current) {
         console.log('网络不可用');
-        setToastShown(true);
-      } else if (connected && toastShown) {
+        toastShownRef.current = true;
+      } else if (connected && toastShownRef.current) {
         console.log('网络已恢复');
-        setToastShown(false);
+        toastShownRef.current = false;
       }
     });
 
     return unsubscribe;
-  }, [toastShown]);
+  }, []); // 空依赖，监听器持久化，ref 稳定
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     const connected = await network.isConnected();
     setIsConnected(connected);
     return connected;
-  }, []);
+  };
 
   return {
     isConnected,
