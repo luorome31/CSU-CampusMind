@@ -9,7 +9,7 @@ jest.mock('../api/auth', () => ({
   },
 }));
 
-jest.mock('../../utils/storage', () => ({
+jest.mock('../../../utils/storage', () => ({
   storage: {
     setToken: jest.fn(),
     setSessionId: jest.fn(),
@@ -19,12 +19,12 @@ jest.mock('../../utils/storage', () => ({
   },
 }));
 
-jest.mock('../../api/client', () => ({
+jest.mock('../../../api/client', () => ({
   setUnauthorizedCallback: jest.fn(),
 }));
 
 const { authApi } = require('../api/auth');
-const { storage } = require('../../utils/storage');
+const { storage } = require('../../../utils/storage');
 
 describe('useAuthStore', () => {
   beforeEach(() => {
