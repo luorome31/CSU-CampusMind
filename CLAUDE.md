@@ -63,6 +63,74 @@ CampusMind/
 | `refactor(mobile): 抽取通用 Button 组件` | `refactor(mobile): 重构组件` |
 | `docs(backend): 补充登录 API 接口文档` | `docs(backend): 更新文档` |
 
+## Mobile (React Native) Development Workflow
+
+When working on `mobile/` directory, follow this workflow:
+
+### 1. 阅读项目文档
+
+开始任何移动端任务前，先阅读以下文档：
+
+| 文档 | 用途 |
+|------|------|
+| `mobile/docs/campusmind-mobile-prd.md` | 架构设计、Tab 结构、功能模块说明 |
+| `mobile/docs/progress-log.md` | 项目进度、已完成模块追踪 |
+| `mobile/docs/problems-log.md` | 遇到的问题与解决方案，避免重复踩坑 |
+| `mobile/docs/feature-list.json` | 所有功能任务清单及状态 |
+
+### 2. 领取任务模块
+
+从 `feature-list.json` 的 `moduleGroups` 中领取任务：
+
+- 查看 `moduleGroups[].features` 和 `moduleGroups[].status`
+- 选择 `status: "pending"` 的模块领取
+- 领取后在 `feature-list.json` 中将该任务 `status` 改为 `"in_progress"`
+
+### 3. 创建功能分支
+
+```bash
+# 基于 main 创建功能分支，分支名体现功能模块
+git checkout main
+git pull origin main
+git checkout -b feat/mobile/<module-name>
+# 例如：feat/mobile/auth-login-screen
+```
+
+### 4. 使用 Superpowers 工作流开发
+
+遵循以下步骤（顺序不可跳过的环节用 ⚠️ 标注）：
+
+1. ⚠️ **brainstorming** - 理解需求，明确设计决策
+2. **writing-plans** - 制定实现计划
+3. **executing-plans** - 执行开发
+4. ⚠️ **requesting-code-review** - 代码审查
+
+> 详细工作流见 `superpowers:*` 相关 skill
+
+### 5. 开发结束后更新文档
+
+完成模块开发后，必须更新以下文件：
+
+| 文件 | 更新内容 |
+|------|----------|
+| `mobile/docs/problems-log.md` | 记录遇到的新问题及解决方案 |
+| `mobile/docs/progress-log.md` | 记录完成的模块、日期、关键变更 |
+| `mobile/docs/feature-list.json` | 将对应任务 `status` 改为 `"completed"` |
+
+### 6. 合并分支
+
+```bash
+# 确保测试通过后，合并到 main
+git checkout main
+git merge --no-ff feat/mobile/<module-name>
+git push origin main
+
+# 删除已合并的功能分支
+git branch -d feat/mobile/<module-name>
+```
+
+---
+
 ## Compact Instructions
 
 Retention Priorities:
