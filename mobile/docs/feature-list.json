@@ -1,0 +1,491 @@
+{
+  "version": "1.0.0",
+  "description": "CampusMind RN 移动端功能任务清单，基于 PRD 拆解，参考 Web 端实现",
+  "features": [
+    {
+      "id": "F-001",
+      "module": "foundation",
+      "description": "项目初始化：Expo + React Native 0.76+ + TypeScript + Zustand + React Navigation 7",
+      "status": "pending",
+      "referenceCode": [],
+      "dependsOn": []
+    },
+    {
+      "id": "F-002",
+      "module": "foundation",
+      "description": "设计系统 Tokens：颜色（#F8F5ED 暖纸主题）、字体、间距、阴影",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/styles/tokens/colors.css",
+        "frontend/src/styles/tokens/typography.css",
+        "frontend/src/styles/tokens/spacing.css",
+        "frontend/src/styles/tokens/elevation.css"
+      ],
+      "dependsOn": ["F-001"]
+    },
+    {
+      "id": "F-003",
+      "module": "foundation",
+      "description": "TypeScript 类型定义：ChatMessage, Dialog, KnowledgeBase, KnowledgeFile, User, UsageStats, Session, ToolEvent",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/api/types.ts",
+        "frontend/src/api/chat.ts",
+        "frontend/src/api/dialog.ts",
+        "frontend/src/api/knowledge.ts",
+        "frontend/src/features/profile/types.ts"
+      ],
+      "dependsOn": ["F-001"]
+    },
+    {
+      "id": "F-004",
+      "module": "foundation",
+      "description": "API 客户端：Axios 实例 + token 注入 + 401 自动登出拦截器",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/api/client.ts"
+      ],
+      "dependsOn": ["F-001", "F-003"]
+    },
+    {
+      "id": "F-005",
+      "module": "foundation",
+      "description": "安全存储封装：react-native-keychain 替代 sessionStorage",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/features/auth/authStore.ts"
+      ],
+      "dependsOn": ["F-001"]
+    },
+    {
+      "id": "F-006",
+      "module": "foundation",
+      "description": "路由架构：Bottom Tab Navigator（4 Tab） + 各 Tab 内部导航栈",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/routes.tsx"
+      ],
+      "dependsOn": ["F-001"]
+    },
+    {
+      "id": "F-007",
+      "module": "auth",
+      "description": "AuthStore：登录/登出状态管理，initAuth 恢复会话",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/features/auth/authStore.ts"
+      ],
+      "dependsOn": ["F-004", "F-005"]
+    },
+    {
+      "id": "F-008",
+      "module": "auth",
+      "description": "LoginScreen：学号/密码登录表单，调用 authStore.login()",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/features/auth/LoginPage.tsx",
+        "frontend/src/api/auth.ts"
+      ],
+      "dependsOn": ["F-007"]
+    },
+    {
+      "id": "F-009",
+      "module": "auth",
+      "description": "ProtectedRoute：未登录重定向至 LoginScreen",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/features/auth/ProtectedRoute.tsx"
+      ],
+      "dependsOn": ["F-007", "F-006"]
+    },
+    {
+      "id": "F-010",
+      "module": "home",
+      "description": "HeroBanner：品牌介绍 + 水彩 Logo 圆角大卡（radius: 16px）",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/components/chat/EmptyState/index.tsx"
+      ],
+      "dependsOn": ["F-002"]
+    },
+    {
+      "id": "F-011",
+      "module": "home",
+      "description": "FeatureGrid：2 列功能磁贴（新建对话/知识库/知识构建/个人中心）",
+      "status": "pending",
+      "referenceCode": [],
+      "dependsOn": ["F-002", "F-006"]
+    },
+    {
+      "id": "F-012",
+      "module": "home",
+      "description": "HistoryList：对话历史线性列表（时间戳 + 标题），点击跳转 Chats Tab 并加载对话",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/components/layout/Sidebar/Sidebar.tsx",
+        "frontend/src/components/layout/Sidebar/HistoryItem.tsx",
+        "frontend/src/api/dialog.ts"
+      ],
+      "dependsOn": ["F-007", "F-006"]
+    },
+    {
+      "id": "F-013",
+      "module": "home",
+      "description": "HomeScreen：组合 HeroBanner + FeatureGrid + HistoryList",
+      "status": "pending",
+      "referenceCode": [],
+      "dependsOn": ["F-010", "F-011", "F-012"]
+    },
+    {
+      "id": "F-014",
+      "module": "chat",
+      "description": "ChatStore：消息状态管理（messages/streaming/toolEvents/dialogId/knowledgeIds）",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/features/chat/chatStore.ts"
+      ],
+      "dependsOn": ["F-007"]
+    },
+    {
+      "id": "F-015",
+      "module": "chat",
+      "description": "useChatStream：SSE 流式对话 Hook（AbortController + SSE 事件处理）",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/features/chat/useChatStream.ts",
+        "frontend/src/api/chat.ts",
+        "frontend/src/utils/parseSSELines.ts"
+      ],
+      "dependsOn": ["F-004", "F-014"]
+    },
+    {
+      "id": "F-016",
+      "module": "chat",
+      "description": "MessageBubble：用户/助手消息气泡，Markdown 渲染 + 代码高亮",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/components/chat/MessageBubble/index.tsx"
+      ],
+      "dependsOn": ["F-002", "F-014"]
+    },
+    {
+      "id": "F-017",
+      "module": "chat",
+      "description": "MessageList：消息列表容器，自动滚动到底部",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/components/chat/MessageList/index.tsx"
+      ],
+      "dependsOn": ["F-016"]
+    },
+    {
+      "id": "F-018",
+      "module": "chat",
+      "description": "ChatInput：对话输入框，发送时调用 useChatStream.sendMessage()",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/components/chat/ChatInput/index.tsx"
+      ],
+      "dependsOn": ["F-015"]
+    },
+    {
+      "id": "F-019",
+      "module": "chat",
+      "description": "ThinkingBlock：AI 思考过程折叠展示（可折叠单个步骤 + 展开全部）",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/components/chat/ThinkingBlock/index.tsx",
+        "frontend/src/utils/parseThinking.ts"
+      ],
+      "dependsOn": ["F-002", "F-016"]
+    },
+    {
+      "id": "F-020",
+      "module": "chat",
+      "description": "ToolGroup：Tool 调用事件折叠展示（START/END/ERROR 状态 + 进度显示）",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/components/chat/ToolGroup/index.tsx"
+      ],
+      "dependsOn": ["F-016"]
+    },
+    {
+      "id": "F-021",
+      "module": "chat",
+      "description": "EmptyState：空对话时的品牌展示与功能引导",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/components/chat/EmptyState/index.tsx"
+      ],
+      "dependsOn": ["F-010"]
+    },
+    {
+      "id": "F-022",
+      "module": "chat",
+      "description": "ChatsScreen：组合 MessageList + ChatInput + ThinkingBlock + ToolGroup + EmptyState",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/features/chat/ChatPage.tsx"
+      ],
+      "dependsOn": ["F-016", "F-017", "F-018", "F-019", "F-020", "F-021"]
+    },
+    {
+      "id": "F-023",
+      "module": "knowledge",
+      "description": "KnowledgeListStore：KB 列表、文件列表、文件内容状态管理",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/features/knowledge/knowledgeListStore.ts"
+      ],
+      "dependsOn": ["F-007"]
+    },
+    {
+      "id": "F-024",
+      "module": "knowledge",
+      "description": "KnowledgeCard：KB 卡片（名称/描述/文件数）",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/components/knowledge/KnowledgeCard/index.tsx"
+      ],
+      "dependsOn": ["F-002", "F-023"]
+    },
+    {
+      "id": "F-025",
+      "module": "knowledge",
+      "description": "FileTable：文件列表表格（文件名/状态 Badge/创建时间）",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/components/knowledge/FileTable/index.tsx"
+      ],
+      "dependsOn": ["F-002", "F-023"]
+    },
+    {
+      "id": "F-026",
+      "module": "knowledge",
+      "description": "FileContentViewer：文件内容查看（Markdown 渲染）",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/components/knowledge/FileContentViewer/index.tsx"
+      ],
+      "dependsOn": ["F-002"]
+    },
+    {
+      "id": "F-027",
+      "module": "knowledge",
+      "description": "RAG 开关 + KnowledgeSelector：勾选 KB 附加到当前对话（知识选择器）",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/components/chat/KnowledgeSelector/index.tsx",
+        "frontend/src/api/knowledge.ts"
+      ],
+      "dependsOn": ["F-014", "F-023"]
+    },
+    {
+      "id": "F-028",
+      "module": "knowledge",
+      "description": "KnowledgeScreen：KB 列表页（进入 KB 后展示文件列表 + 文件详情）",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/features/knowledge/KnowledgeListPage.tsx",
+        "frontend/src/features/knowledge/KnowledgeFileListPage.tsx",
+        "frontend/src/features/knowledge/KnowledgeFileDetailPage.tsx"
+      ],
+      "dependsOn": ["F-023", "F-024", "F-025", "F-026", "F-027"]
+    },
+    {
+      "id": "F-029",
+      "module": "knowledge",
+      "description": "Build 入口：知识构建跳转按钮（跳转到 Build 模块）",
+      "status": "pending",
+      "referenceCode": [],
+      "dependsOn": ["F-028"]
+    },
+    {
+      "id": "F-030",
+      "module": "build",
+      "description": "BuildStore：爬取任务状态、轮询、Review 队列管理",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/features/build/buildStore.ts"
+      ],
+      "dependsOn": ["F-007"]
+    },
+    {
+      "id": "F-031",
+      "module": "build",
+      "description": "CrawlPanel + UrlImportModal：URL 输入 + 批量导入",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/components/knowledge_build/CrawlTab/CrawlPanel.tsx",
+        "frontend/src/components/knowledge_build/CrawlTab/UrlImportModal.tsx"
+      ],
+      "dependsOn": ["F-002", "F-030"]
+    },
+    {
+      "id": "F-032",
+      "module": "build",
+      "description": "TaskList + TaskCard：爬取任务卡片列表（状态/进度）",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/components/knowledge_build/CrawlTab/TaskList.tsx",
+        "frontend/src/components/knowledge_build/CrawlTab/TaskCard.tsx"
+      ],
+      "dependsOn": ["F-030"]
+    },
+    {
+      "id": "F-033",
+      "module": "build",
+      "description": "ReviewInbox + ReviewEditor：待审核文件列表 + 内容审核编辑",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/components/knowledge_build/ReviewTab/ReviewInbox.tsx",
+        "frontend/src/components/knowledge_build/ReviewTab/ReviewEditor.tsx"
+      ],
+      "dependsOn": ["F-030"]
+    },
+    {
+      "id": "F-034",
+      "module": "build",
+      "description": "BuildScreen：知识构建全流程页面（Crawl 阶段 + Review 阶段 + 3s 轮询）",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/features/build/KnowledgeBuildPage.tsx"
+      ],
+      "dependsOn": ["F-031", "F-032", "F-033"]
+    },
+    {
+      "id": "F-035",
+      "module": "profile",
+      "description": "ProfileStore：用户信息、用量统计、会话列表状态管理",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/features/profile/profileStore.ts"
+      ],
+      "dependsOn": ["F-007"]
+    },
+    {
+      "id": "F-036",
+      "module": "profile",
+      "description": "ProfileCard：信息编辑卡片（昵称/邮箱/电话）",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/features/profile/components/ProfileCard.tsx"
+      ],
+      "dependsOn": ["F-002", "F-035"]
+    },
+    {
+      "id": "F-037",
+      "module": "profile",
+      "description": "StatsGrid：用量统计网格（对话数/消息数/KB 数/加入时间）",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/features/profile/components/StatsGrid.tsx"
+      ],
+      "dependsOn": ["F-002", "F-035"]
+    },
+    {
+      "id": "F-038",
+      "module": "profile",
+      "description": "SessionList：活跃会话列表（设备/位置）+ revocation 支持",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/features/profile/components/SessionList.tsx"
+      ],
+      "dependsOn": ["F-035"]
+    },
+    {
+      "id": "F-039",
+      "module": "profile",
+      "description": "ProfileScreen：个人中心完整页面（ProfileCard + StatsGrid + SessionList + 退出登录）",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/features/profile/ProfilePage.tsx"
+      ],
+      "dependsOn": ["F-036", "F-037", "F-038"]
+    },
+    {
+      "id": "F-040",
+      "module": "ui",
+      "description": "基础 UI 组件：Button / Card / Input / Badge / Modal（暖纸主题）",
+      "status": "pending",
+      "referenceCode": [
+        "frontend/src/components/ui/"
+      ],
+      "dependsOn": ["F-002"]
+    },
+    {
+      "id": "F-041",
+      "module": "foundation",
+      "description": "网络状态处理：Toast 提示弱网/断网",
+      "status": "pending",
+      "referenceCode": [],
+      "dependsOn": ["F-001"]
+    },
+    {
+      "id": "F-042",
+      "module": "mobile",
+      "description": "移动端特权：react-native-image-picker 相机拍照/相册上传",
+      "status": "pending",
+      "referenceCode": [],
+      "dependsOn": ["F-001"]
+    },
+    {
+      "id": "F-043",
+      "module": "mobile",
+      "description": "移动端特权：react-native-document-picker 文件管理器上传",
+      "status": "pending",
+      "referenceCode": [],
+      "dependsOn": ["F-001"]
+    },
+    {
+      "id": "F-044",
+      "module": "mobile",
+      "description": "Tab Bar 毛玻璃效果：@react-native-community/blur",
+      "status": "pending",
+      "referenceCode": [],
+      "dependsOn": ["F-001", "F-006"]
+    }
+  ],
+  "moduleGroups": [
+    {
+      "name": "foundation",
+      "description": "基础设施：项目初始化、设计系统、类型、API 客户端、路由",
+      "features": ["F-001", "F-002", "F-003", "F-004", "F-005", "F-006", "F-041"]
+    },
+    {
+      "name": "auth",
+      "description": "认证：AuthStore、登录页、路由保护",
+      "features": ["F-007", "F-008", "F-009"]
+    },
+    {
+      "name": "home",
+      "description": "首页：HeroBanner + FeatureGrid + HistoryList",
+      "features": ["F-010", "F-011", "F-012", "F-013"]
+    },
+    {
+      "name": "chat",
+      "description": "对话核心：ChatStore、useChatStream、消息渲染组件、ChatsScreen",
+      "features": ["F-014", "F-015", "F-016", "F-017", "F-018", "F-019", "F-020", "F-021", "F-022"]
+    },
+    {
+      "name": "knowledge",
+      "description": "知识库：KnowledgeListStore、KB/文件组件、知识选择器、KnowledgeScreen",
+      "features": ["F-023", "F-024", "F-025", "F-026", "F-027", "F-028", "F-029"]
+    },
+    {
+      "name": "build",
+      "description": "知识构建：BuildStore、CrawlPanel、TaskList、Review、BuildScreen",
+      "features": ["F-030", "F-031", "F-032", "F-033", "F-034"]
+    },
+    {
+      "name": "profile",
+      "description": "个人中心：ProfileStore、ProfileCard、StatsGrid、SessionList、ProfileScreen",
+      "features": ["F-035", "F-036", "F-037", "F-038", "F-039"]
+    },
+    {
+      "name": "ui",
+      "description": "UI 组件库：基础 UI 组件 + 移动端特权 + Tab Bar 毛玻璃",
+      "features": ["F-040", "F-042", "F-043", "F-044"]
+    }
+  ]
+}

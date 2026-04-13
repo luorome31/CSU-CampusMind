@@ -5,15 +5,29 @@ pre-commit:
       glob: "*.py"
       run: cd backend && uv run ruff check .
 
+    - name: mobile-lint
+      glob: "mobile/**/*.{ts,tsx,js,jsx}"
+      run: cd mobile && npm run lint
+
+    - name: mobile-typecheck
+      glob: "mobile/**/*.{ts,tsx}"
+      run: cd mobile && npx tsc --noEmit
+
     - name: frontend-typecheck
-      glob: "*.{ts,tsx}"
+      glob: "frontend/**/*.{ts,tsx}"
       run: cd frontend && npm run build
+
+    - name: secret-scan
+      run: grep -rE "(sk-[a-zA-Z0-9]{48}|AIza[0-9A-Za-z-_]{35})" . --exclude-dir={.git,node_modules,.venv} && (echo "Potential secret found!" && exit 1) || exit 0
 
 pre-push:
   parallel: true
   jobs:
     - name: backend-test
       run: cd backend && uv run pytest -m "not e2e"
+
+    - name: mobile-test
+      run: cd mobile && npm test
 
     - name: frontend-test
       run: cd frontend && npm run test:run
@@ -24,6 +38,9 @@ pre-merge:
     - name: backend-test
       run: cd backend && uv run pytest -m "not e2e"
 
+    - name: mobile-test
+      run: cd mobile && npm test
+
     - name: frontend-test
       run: cd frontend && npm run test:run
 
@@ -33,5 +50,20 @@ pre-rebase:
     - name: backend-test
       run: cd backend && uv run pytest -m "not e2e"
 
+    - name: mobile-test
+      run: cd mobile && npm test
+
     - name: frontend-test
       run: cd frontend && npm run test:run
+
+commit-msg:
+  commands:
+    format-check:
+      run: |
+        bash -c '
+        MSG=$(cat {1})
+        if [[ ! $MSG =~ ^(feat|fix|refactor|docs|style|test|chore|perf|ci|build|revert)\(.*\):[[:space:]].+ ]]; then
+          echo "❌ Commit format error! Use: type(domain): action"
+          exit 1
+        fi
+        '
