@@ -59,3 +59,33 @@ export type ProfileScreenProps = CompositeScreenProps<
   NativeStackScreenProps<ProfileStackParamList, 'Profile'>,
   BottomTabScreenProps<RootTabParamList>
 >;
+
+// === ChatDetail Screen Props ===
+export type ChatDetailScreenProps = CompositeScreenProps<
+  NativeStackScreenProps<ChatsStackParamList, 'ChatDetail'>,
+  BottomTabScreenProps<RootTabParamList>
+>;
+
+// === KnowledgeBuild Screen Props ===
+export type KnowledgeBuildScreenProps = CompositeScreenProps<
+  NativeStackScreenProps<HomeStackParamList, 'KnowledgeBuild'>,
+  BottomTabScreenProps<RootTabParamList>
+>;
+
+// === KnowledgeDetail Screen Props ===
+export type KnowledgeDetailScreenProps = CompositeScreenProps<
+  NativeStackScreenProps<KnowledgeStackParamList, 'KnowledgeDetail'>,
+  BottomTabScreenProps<RootTabParamList>
+>;
+
+// === FileDetail Screen Props ===
+export type FileDetailScreenProps = CompositeScreenProps<
+  NativeStackScreenProps<KnowledgeStackParamList, 'FileDetail'>,
+  BottomTabScreenProps<RootTabParamList>
+>;
+
+// === SessionManagement Screen Props ===
+export type SessionManagementScreenProps = CompositeScreenProps<
+  NativeStackScreenProps<ProfileStackParamList, 'SessionManagement'>,
+  BottomTabScreenProps<RootTabParamList>
+>;
