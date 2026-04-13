@@ -471,7 +471,7 @@
       "name": "auth",
       "description": "认证：AuthStore、登录页、路由保护",
       "features": ["F-007", "F-008", "F-009"],
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "name": "home",
