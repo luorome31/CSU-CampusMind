@@ -20,3 +20,9 @@
 | 6 | 2026-04-13 | 多个 barrel 文件 (types/index.ts, hooks/index.ts, navigation/index.ts) 为空导出 | 填充正确的 re-export 语句 | 054ca26 |
 | 7 | 2026-04-13 | app.json 引用了未安装的 expo-router 插件导致启动失败 | 移除 expo-router 插件配置；移除不存在的 icon/splash/adaptive-icon 资源引用 | - |
 | 8 | 2026-04-13 | Expo 无法找到 App 入口，期望根目录有 App.tsx | 创建根目录 App.tsx re-export src/App | - |
+| 9 | 2026-04-13 | authStore.ts 中 axios.post 返回的是 AxiosResponse 对象，需通过 response.data 访问响应数据 | 修改代码为 `const data = response.data;` 再使用 data.user_id 等字段 | e6df5bb |
+| 10 | 2026-04-13 | Jest 配置缺失导致 React Native 组件测试失败：Cannot find module 'react-test-renderer' | 安装 jest-expo@52 preset，它已内置 React Native 测试支持 | 后续 commit |
+| 11 | 2026-04-13 | react-test-renderer@19.2.5 与 react@18.3.1 版本冲突（peer react^19.2.5 required） | 卸载 react-test-renderer，jest-expo 已包含所需功能 | 后续 commit |
+| 12 | 2026-04-13 | Jest 测试中 mock 路径错误：'../../utils/storage' 应为 '../../../utils/storage' | 修正从 `__tests__/` 到 `utils/` 的相对路径 | 1566a32 |
+| 13 | 2026-04-13 | Zustand store 在测试间共享状态导致测试互相干扰 | 在 beforeEach 中使用 `useAuthStore.setState({...})` 重置状态 | 后续 commit |
+| 14 | 2026-04-13 | LoginScreen 测试中 ActivityIndicator 缺少 testID 导致 getByTestId 失败 | 改用 screen.queryByText('登录') 检测 loading 状态替代方案 | 后续 commit |
