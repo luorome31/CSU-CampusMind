@@ -89,3 +89,11 @@ export type SessionManagementScreenProps = CompositeScreenProps<
   NativeStackScreenProps<ProfileStackParamList, 'SessionManagement'>,
   BottomTabScreenProps<RootTabParamList>
 >;
+
+// === Auth Stack (未登录) ===
+export type AuthStackParamList = {
+  Login: undefined;
+};
+
+// === Login Screen Props ===
+export type LoginScreenProps = NativeStackScreenProps<AuthStackParamList, 'Login'>;

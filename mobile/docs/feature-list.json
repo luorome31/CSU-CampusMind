@@ -82,9 +82,9 @@
       "id": "F-007",
       "module": "auth",
       "description": "AuthStore：登录/登出状态管理，initAuth 恢复会话",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
-        "frontend/src/features/auth/authStore.ts"
+        "mobile/src/features/auth/authStore.ts"
       ],
       "dependsOn": ["F-004", "F-005"]
     },
@@ -92,10 +92,9 @@
       "id": "F-008",
       "module": "auth",
       "description": "LoginScreen：学号/密码登录表单，调用 authStore.login()",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
-        "frontend/src/features/auth/LoginPage.tsx",
-        "frontend/src/api/auth.ts"
+        "mobile/src/features/auth/LoginScreen.tsx"
       ],
       "dependsOn": ["F-007"]
     },
@@ -103,9 +102,9 @@
       "id": "F-009",
       "module": "auth",
       "description": "ProtectedRoute：未登录重定向至 LoginScreen",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
-        "frontend/src/features/auth/ProtectedRoute.tsx"
+        "mobile/src/features/auth/ProtectedRoute.tsx"
       ],
       "dependsOn": ["F-007", "F-006"]
     },
@@ -471,7 +470,7 @@
       "name": "auth",
       "description": "认证：AuthStore、登录页、路由保护",
       "features": ["F-007", "F-008", "F-009"],
-      "status": "pending"
+      "status": "completed"
     },
     {
       "name": "home",
