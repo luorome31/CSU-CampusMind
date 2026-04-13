@@ -43,7 +43,18 @@ export const typography = {
   fontMedium: '500' as TextStyle['fontWeight'],
   fontSemibold: '600' as TextStyle['fontWeight'],
   fontBold: '700' as TextStyle['fontWeight'],
+
+  // === Letter Spacing ===
+  trackingTighter: -0.025,
+  trackingTight: -0.015,
+  trackingNormal: 0,
+  trackingWide: 0.025,
+  trackingWider: 0.05,
+  trackingWidest: 0.1,
+  trackingLabel: 0.16,
 } as const;
+
+export type Typography = typeof typography;
 
 // 常用文本样式预设
 export const textStyles = {
@@ -61,7 +72,7 @@ export const textStyles = {
     fontFamily: typography.fontSans,
     fontWeight: typography.fontMedium,
     fontSize: typography.textXs,
-    letterSpacing: 0.5,
+    letterSpacing: typography.trackingLabel,
     textTransform: 'uppercase',
   } as TextStyle,
 } as const;
