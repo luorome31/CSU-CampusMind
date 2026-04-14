@@ -31,3 +31,5 @@
 | 17 | 2026-04-14 | 登录过程产生未捕获异常导致只显示前端错误而无 log 输出，且状态机终端 | React Native Keychain 依赖未适配 Expo Go 和 Web；将其替换为 `expo-secure-store` 并增加 Web 端 `localStorage` 降级及异常 catch 日志打印 | 后续 commit |
 | 18 | 2026-04-14 | Web Bundling failed: Unable to resolve "./components/BlurView" from @react-native-community/blur | Expo 项目应使用 `expo-blur` 而非 `@react-native-community/blur`；后者依赖原生代码链接，在 Expo 托管工作流中无法正常工作 | f35004b |
 | 19 | 2026-04-14 | TabNavigator 中 Tab 图标仍使用 emoji（🏠💬📚👤）而非 lucide icons | 导入 lucide-react-native 的 Home/MessageCircle/BookOpen/User 组件替换 | 后续 commit |
+| 20 | 2026-04-14 | Expo Go 提示 ViewManagerResolver returned null for ExpoBlur 或 RCTViewManagerAdapter_ExpoBlur | 依赖版本不匹配（SDK 52 环境中使用了 55 版本）。降级 expo-blur 至 ~14.0.3，并使用 `yarn add --ignore-engines` 绕过 node 版本限制 | 后续 commit |
+
