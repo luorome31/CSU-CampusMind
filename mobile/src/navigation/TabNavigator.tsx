@@ -7,7 +7,12 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, Text, StyleSheet, Platform } from 'react-native';
-import { BlurView } from '@react-native-community/blur';
+
+// 动态导入 BlurView 以避免 Web 打包问题
+let BlurView: React.ComponentType<any> | null = null;
+if (Platform.OS !== 'web') {
+  BlurView = require('@react-native-community/blur').BlurView;
+}
 import {
   RootTabParamList,
   HomeStackParamList,
@@ -76,7 +81,7 @@ function TabIcon({ name, focused }: { name: string; focused: boolean }) {
 // Tab Bar 毛玻璃背景组件
 function TabBarBackground() {
   // BlurView 仅在 iOS/Android 原生平台支持，Web/Expo Go 使用纯色背景
-  if (Platform.OS === 'web') {
+  if (!BlurView) {
     return <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.backgroundGlass }]} />;
   }
 
