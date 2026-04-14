@@ -16,3 +16,4 @@
 | 2 | 2026-04-13 | 完成 auth 模块：AuthStore 状态管理 (login/logout/initAuth)、LoginScreen 登录页面 (学号/密码表单)、ProtectedRoute 路由保护、RootNavigator 认证状态集成 |  |
 | 3 | 2026-04-14 | 修复 auth 模块漏洞并优化移动端体验：修复 proxy 502 连接错误，替换不支持的 keychain 为 expo-secure-store 支持，并增加对 Web 和 Expo Go 的全平台适配及详细日志追踪；适配移动端 UI |  |
 | 4 | 2026-04-14 | 完成 ui 模块：基础 UI 组件 (Button/Card/Input/Badge/Modal 与 Web 端 Props API 对齐)、LoginScreen emoji 替换为 lucide icons、Tab Bar 毛玻璃效果、移动端特权工具 (imagePicker/documentPicker) |  | |
+| 5 | 2026-04-14 | 完成 home 模块：HeroBanner (品牌介绍圆角大卡)、FeatureGrid (2列功能磁贴)、HistoryList (对话历史列表)、HomeScreen (组合所有组件)、dialog API (listDialogs/deleteDialog)、TabNavigator 集成 | (见 git log) |

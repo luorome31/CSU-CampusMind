@@ -112,7 +112,7 @@
       "id": "F-010",
       "module": "home",
       "description": "HeroBanner：品牌介绍 + 水彩 Logo 圆角大卡（radius: 16px）",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/components/chat/EmptyState/index.tsx"
       ],
@@ -122,7 +122,7 @@
       "id": "F-011",
       "module": "home",
       "description": "FeatureGrid：2 列功能磁贴（新建对话/知识库/知识构建/个人中心）",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [],
       "dependsOn": ["F-002", "F-006"]
     },
@@ -130,7 +130,7 @@
       "id": "F-012",
       "module": "home",
       "description": "HistoryList：对话历史线性列表（时间戳 + 标题），点击跳转 Chats Tab 并加载对话",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/components/layout/Sidebar/Sidebar.tsx",
         "frontend/src/components/layout/Sidebar/HistoryItem.tsx",
@@ -142,7 +142,7 @@
       "id": "F-013",
       "module": "home",
       "description": "HomeScreen：组合 HeroBanner + FeatureGrid + HistoryList",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [],
       "dependsOn": ["F-010", "F-011", "F-012"]
     },
@@ -476,7 +476,7 @@
       "name": "home",
       "description": "首页：HeroBanner + FeatureGrid + HistoryList",
       "features": ["F-010", "F-011", "F-012", "F-013"],
-      "status": "pending"
+      "status": "completed"
     },
     {
       "name": "chat",
