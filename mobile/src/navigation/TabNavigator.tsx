@@ -17,6 +17,7 @@ import {
   ProfileStackParamList,
 } from './types';
 import { colors, typography, spacing } from '../styles';
+import { HomeScreen } from '../screens/HomeScreen';
 
 // 占位组件（将在后续模块实现）
 const PlaceholderScreen = () => <View style={styles.placeholder}><Text>Screen</Text></View>;
@@ -30,7 +31,7 @@ const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 function HomeStackNavigator() {
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
-      <HomeStack.Screen name="Home" component={PlaceholderScreen} />
+      <HomeStack.Screen name="Home" component={HomeScreen} />
     </HomeStack.Navigator>
   );
 }
