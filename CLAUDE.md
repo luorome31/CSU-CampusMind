@@ -107,28 +107,6 @@ git checkout -b feat/mobile/<module-name>
 
 > 详细工作流见 `superpowers:*` 相关 skill
 
-### 5. 开发结束后更新文档
-
-完成模块开发后，必须更新以下文件：
-
-| 文件 | 更新内容 |
-|------|----------|
-| `mobile/docs/problems-log.md` | 记录遇到的新问题及解决方案 |
-| `mobile/docs/progress-log.md` | 记录完成的模块、日期、关键变更 |
-| `mobile/docs/feature-list.json` | 将对应任务 `status` 改为 `"completed"` |
-
-### 6. 合并分支
-
-```bash
-# 确保测试通过后，合并到 main
-git checkout main
-git merge --no-ff feat/mobile/<module-name>
-git push origin main
-
-# 删除已合并的功能分支
-git branch -d feat/mobile/<module-name>
-```
-
 ---
 
 ## Compact Instructions
