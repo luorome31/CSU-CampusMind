@@ -101,6 +101,9 @@ export function createChatStream(
         min_score: minScore,
       });
 
+      console.log('[ChatAPI] Creating SSE connection to:', url);
+      console.log('[ChatAPI] Request body:', body);
+
       es = new EventSource(url, {
         method: 'POST',
         headers,
@@ -110,19 +113,26 @@ export function createChatStream(
       });
 
       es.addEventListener('open', () => {
-        // Connection opened
+        console.log('[ChatAPI] SSE connection opened');
       });
 
       // Listen for message events (our SSE uses 'data:' format)
       es.addEventListener('message', (event: SSEMessage) => {
+        console.log('[ChatAPI] SSE message received:', event.data);
         if (aborted) return;
         if (!event.data) return;
 
         const data = parseSSEData(event.data);
-        if (!data) return;
+        if (!data) {
+          console.log('[ChatAPI] Failed to parse SSE data');
+          return;
+        }
+
+        console.log('[ChatAPI] Parsed SSE data:', data);
 
         // Check for new dialog ID
         if (data.newDialogId) {
+          console.log('[ChatAPI] New dialog ID:', data.newDialogId);
           callbacks.onNewDialog(data.newDialogId as string);
           callbacks.onEvent('new_dialog', { dialog_id: data.newDialogId });
         }
@@ -130,18 +140,24 @@ export function createChatStream(
         // Handle event type
         const eventType = data.type as string;
         if (eventType === 'response_chunk') {
+          console.log('[ChatAPI] Response chunk:', data.chunk);
           callbacks.onChunk(data.chunk as string || '');
           callbacks.onEvent('response_chunk', data);
         } else if (eventType === 'title_update') {
+          console.log('[ChatAPI] Title update:', data.title);
           callbacks.onTitleUpdate(data.title as string);
           callbacks.onEvent('title_update', data);
         } else if (eventType === 'event' || eventType === 'tool_event') {
+          console.log('[ChatAPI] Tool event:', data);
           callbacks.onEvent('event', data as Record<string, unknown>);
+        } else {
+          console.log('[ChatAPI] Unknown event type:', eventType);
         }
       });
 
       // Error handling
       es.addEventListener('error', (event: SSEError) => {
+        console.log('[ChatAPI] SSE error:', event);
         if (aborted) return;
 
         if (event.type === 'error') {
@@ -158,6 +174,7 @@ export function createChatStream(
       });
 
     } catch (error) {
+      console.log('[ChatAPI] Exception:', error);
       if (!aborted) {
         callbacks.onError(error instanceof Error ? error : new Error(String(error)));
       }

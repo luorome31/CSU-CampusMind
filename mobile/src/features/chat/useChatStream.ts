@@ -13,6 +13,8 @@ export function useChatStream() {
 
   const sendMessage = useCallback(
     (content: string, knowledgeIds: string[]) => {
+      console.log('[useChatStream] sendMessage called with:', { content, knowledgeIds });
+
       // Cancel any existing stream
       if (abortRef.current) {
         abortRef.current();
@@ -20,6 +22,7 @@ export function useChatStream() {
       }
 
       const store = useChatStore.getState();
+      console.log('[useChatStream] Store state - currentDialogId:', store.currentDialogId);
 
       // Add user message
       const userMessage: ChatMessage = {
@@ -29,6 +32,7 @@ export function useChatStream() {
         created_at: new Date().toISOString(),
         events: [],
       };
+      console.log('[useChatStream] Adding user message:', userMessage);
       store.addMessage(userMessage);
 
       // Create assistant placeholder
@@ -39,25 +43,30 @@ export function useChatStream() {
         created_at: new Date().toISOString(),
         events: [],
       };
+      console.log('[useChatStream] Adding assistant placeholder:', assistantMessage);
       store.addMessage(assistantMessage);
 
       // Start streaming
       store.setToolEvents([]);
       useChatStore.setState({ isStreaming: true });
+      console.log('[useChatStream] Streaming started, isStreaming: true');
 
       const options: ChatStreamOptions = {
         dialogId: store.currentDialogId ?? undefined,
         knowledgeIds,
         enableRag: store.enableRag && knowledgeIds.length > 0,
       };
+      console.log('[useChatStream] Stream options:', options);
 
       const { abort } = createChatStream(content, options, {
-        onChunk: (_chunk: string) => {
-          // Chunk is already accumulated in onEvent via response_chunk
+        onChunk: (chunk: string) => {
+          console.log('[useChatStream] onChunk:', chunk);
         },
         onEvent: (eventType: string, data: Record<string, unknown>) => {
+          console.log('[useChatStream] onEvent:', eventType, data);
           if (eventType === 'response_chunk') {
             const accumulated = data.accumulated as string;
+            console.log('[useChatStream] Updating streaming message, accumulated length:', accumulated.length);
             useChatStore.getState().updateStreamingMessage(accumulated);
           } else if (eventType === 'event' || eventType === 'tool_event') {
             const toolData = data as unknown as {
@@ -73,10 +82,12 @@ export function useChatStream() {
               status: toolData.status,
               timestamp: new Date().toISOString(),
             };
+            console.log('[useChatStream] Adding tool event:', toolEvent);
             useChatStore.getState().addToolEvent(toolEvent);
           }
         },
         onNewDialog: (dialogId: string) => {
+          console.log('[useChatStream] onNewDialog:', dialogId);
           if (!useChatStore.getState().currentDialogId) {
             useChatStore.getState().setCurrentDialogId(dialogId);
             useChatStore.getState().upsertDialog({
@@ -87,6 +98,7 @@ export function useChatStream() {
           }
         },
         onTitleUpdate: (title: string) => {
+          console.log('[useChatStream] onTitleUpdate:', title);
           const currentId = useChatStore.getState().currentDialogId;
           if (currentId) {
             useChatStore.getState().upsertDialog({
@@ -97,11 +109,12 @@ export function useChatStream() {
           }
         },
         onDone: () => {
+          console.log('[useChatStream] onDone - streaming finished');
           useChatStore.setState({ isStreaming: false });
           abortRef.current = null;
         },
         onError: (error: Error) => {
-          console.error('Stream error:', error);
+          console.error('[useChatStream] onError:', error);
           useChatStore.setState({ isStreaming: false });
           abortRef.current = null;
         },
@@ -113,6 +126,7 @@ export function useChatStream() {
   );
 
   const cancelStream = useCallback(() => {
+    console.log('[useChatStream] cancelStream called');
     if (abortRef.current) {
       abortRef.current();
       abortRef.current = null;
