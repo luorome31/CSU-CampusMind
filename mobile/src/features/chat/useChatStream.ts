@@ -65,11 +65,16 @@ export function useChatStream() {
         onEvent: (eventType: string, data: Record<string, unknown>) => {
           console.log('[useChatStream] onEvent:', eventType, data);
           if (eventType === 'response_chunk') {
-            const accumulated = data.accumulated as string;
+            // Backend sends: {type: "response_chunk", data: {chunk: "..."}}
+            // Chunk is at data.data.chunk
+            const nestedData = data.data as Record<string, unknown> | undefined;
+            const accumulated = (nestedData?.accumulated || nestedData?.chunk || data.accumulated || data.chunk || '') as string;
             console.log('[useChatStream] Updating streaming message, accumulated length:', accumulated.length);
             useChatStore.getState().updateStreamingMessage(accumulated);
           } else if (eventType === 'event' || eventType === 'tool_event') {
-            const toolData = data as unknown as {
+            // Backend sends: {type: "event", data: {id, status, title, message}}
+            const nestedData = data.data as Record<string, unknown> | undefined;
+            const toolData = (nestedData || data) as {
               id?: string;
               status: 'START' | 'END' | 'ERROR';
               title: string;

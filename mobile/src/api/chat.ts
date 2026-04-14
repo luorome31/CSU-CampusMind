@@ -38,10 +38,20 @@ interface SSEError {
 
 /**
  * Parse SSE data line into event object.
+ * Handles potential double-wrapping where backend sends {data: {type, data: ...}}
  */
 function parseSSEData(dataStr: string): Record<string, unknown> | null {
   try {
-    return JSON.parse(dataStr);
+    const parsed = JSON.parse(dataStr);
+    // Handle potential double-wrapping: {data: {type, data: {...}}}
+    // If parsed has a 'data' property that contains type and data, unwrap it
+    if (parsed.data && typeof parsed.data === 'object' && (parsed.type || parsed.event_type)) {
+      return {
+        type: parsed.type || parsed.event_type,
+        data: parsed.data,
+      };
+    }
+    return parsed;
   } catch {
     return null;
   }
@@ -138,14 +148,22 @@ export function createChatStream(
         }
 
         // Handle event type
-        const eventType = data.type as string;
+        const eventType = (data.type || data.event_type) as string;
+        console.log('[ChatAPI] Event type:', eventType, 'Full data:', JSON.stringify(data).substring(0, 200));
+
         if (eventType === 'response_chunk') {
-          console.log('[ChatAPI] Response chunk:', data.chunk);
-          callbacks.onChunk(data.chunk as string || '');
+          // Backend sends: {type: "response_chunk", data: {chunk: "..."}}
+          // So chunk is at data.data.chunk, not data.chunk
+          const nestedData = data.data as Record<string, unknown> | undefined;
+          const chunk = (nestedData?.chunk || nestedData?.accumulated || data.chunk || data.accumulated || '') as string;
+          console.log('[ChatAPI] Response chunk:', chunk.substring(0, 100));
+          callbacks.onChunk(chunk);
           callbacks.onEvent('response_chunk', data);
         } else if (eventType === 'title_update') {
-          console.log('[ChatAPI] Title update:', data.title);
-          callbacks.onTitleUpdate(data.title as string);
+          const nestedData = data.data as Record<string, unknown> | undefined;
+          const title = (nestedData?.title || data.title) as string;
+          console.log('[ChatAPI] Title update:', title);
+          callbacks.onTitleUpdate(title);
           callbacks.onEvent('title_update', data);
         } else if (eventType === 'event' || eventType === 'tool_event') {
           console.log('[ChatAPI] Tool event:', data);
