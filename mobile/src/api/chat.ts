@@ -1,8 +1,10 @@
 /**
  * Chat API - React Native SSE Stream Handling
- * Uses fetch + response.body.getReader() pattern (RN doesn't support ReadableStream)
+ * Uses react-native-sse library for SSE support
  */
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const EventSource = require('react-native-sse').default;
 import { storage } from '../utils/storage';
 import { setUnauthorizedCallback } from './client';
 
@@ -12,142 +14,157 @@ export interface ChatStreamOptions {
   enableRag?: boolean;
   topK?: number;
   minScore?: number;
-  signal?: AbortSignal;
 }
 
-export interface ChatStreamResult {
-  event: SSEEvent;
-  newDialogId?: string;
+export interface ChatStreamCallbacks {
+  onChunk: (data: string) => void;
+  onEvent: (eventType: string, data: Record<string, unknown>) => void;
+  onNewDialog: (dialogId: string) => void;
+  onTitleUpdate: (title: string) => void;
+  onDone: () => void;
+  onError: (error: Error) => void;
 }
 
-export type SSEEventType = 'event' | 'response_chunk' | 'new_dialog' | 'title_update';
-
-export interface SSEEvent {
-  type: SSEEventType;
-  data: Record<string, unknown>;
-  timestamp?: number;
+// SSE event data interface (simplified, no types from library)
+interface SSEMessage {
+  data: string;
+  type?: string;
 }
 
-export interface SSEToolEventData {
-  status: 'START' | 'END' | 'ERROR';
-  title: string;
-  message: string;
-}
-
-export interface SSEResponseChunkData {
-  chunk: string;
-  accumulated: string;
+interface SSEError {
+  type: string;
+  message?: string;
 }
 
 /**
- * Parse SSE lines from chunk text.
- * Yields individual SSE events.
+ * Parse SSE data line into event object.
  */
-function* parseSSELines(text: string): Generator<SSEEvent> {
-  const lines = text.split('\n');
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed || !trimmed.startsWith('data: ')) continue;
-
-    try {
-      const data = JSON.parse(trimmed.slice(6));
-      if (data.newDialogId) {
-        yield {
-          type: 'new_dialog' as SSEEventType,
-          data: { dialog_id: data.newDialogId },
-        };
-      } else if (data.type === 'title_update') {
-        yield {
-          type: 'title_update' as SSEEventType,
-          data: data.data,
-          timestamp: data.timestamp,
-        };
-      } else {
-        yield {
-          type: data.type as SSEEventType,
-          data: data.data,
-          timestamp: data.timestamp,
-        };
-      }
-    } catch {
-      // Skip malformed JSON
-    }
+function parseSSEData(dataStr: string): Record<string, unknown> | null {
+  try {
+    return JSON.parse(dataStr);
+  } catch {
+    return null;
   }
 }
 
 /**
- * Create a chat SSE stream for React Native.
- * Uses fetch + response.body.getReader() instead of ReadableStream.
- * Returns an async generator that yields SSE events.
+ * Create a chat SSE connection for React Native.
+ * Uses react-native-sse which implements EventSource over XMLHttpRequest.
  */
-export async function* createChatStream(
+export function createChatStream(
   message: string,
-  options: ChatStreamOptions
-): AsyncGenerator<ChatStreamResult> {
+  options: ChatStreamOptions,
+  callbacks: ChatStreamCallbacks
+): { abort: () => void } {
   const {
     dialogId,
     knowledgeIds,
     enableRag = knowledgeIds.length > 0,
     topK = 5,
     minScore = 0.0,
-    signal,
   } = options;
 
-  const token = await storage.getToken();
-  const sessionId = await storage.getSessionId();
+  let es: ReturnType<typeof EventSource> | null = null;
+  let aborted = false;
 
-  const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1'}/completion/stream`,
-    {
-      method: 'POST',
-      headers: {
+  const abort = () => {
+    aborted = true;
+    if (es) {
+      es.close();
+      es = null;
+    }
+  };
+
+  const run = async () => {
+    try {
+      const token = await storage.getToken();
+      const sessionId = await storage.getSessionId();
+
+      const url = `${process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1'}/completion/stream`;
+
+      const headers: Record<string, string> = {
         'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...(sessionId ? { 'X-Session-ID': sessionId } : {}),
-      },
-      body: JSON.stringify({
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      if (sessionId) {
+        headers['X-Session-ID'] = sessionId;
+      }
+
+      const body = JSON.stringify({
         message,
         dialog_id: dialogId ?? undefined,
         knowledge_ids: knowledgeIds,
         enable_rag: enableRag,
         top_k: topK,
         min_score: minScore,
-      }),
-      signal,
-    }
-  );
+      });
 
-  // Handle 401 specifically - clear tokens and trigger logout
-  if (response.status === 401) {
-    await storage.clear();
-    setUnauthorizedCallback(() => {});
-    throw new Error('Unauthorized');
-  }
+      es = new EventSource(url, {
+        method: 'POST',
+        headers,
+        body,
+        timeout: 0,
+        pollingInterval: 0,
+      });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.detail || 'Stream request failed');
-  }
+      es.addEventListener('open', () => {
+        // Connection opened
+      });
 
-  // Get new dialog ID from response headers
-  const newDialogId = response.headers.get('X-Dialog-ID') ?? undefined;
+      // Listen for message events (our SSE uses 'data:' format)
+      es.addEventListener('message', (event: SSEMessage) => {
+        if (aborted) return;
+        if (!event.data) return;
 
-  const reader = response.body!.getReader();
-  const decoder = new TextDecoder();
+        const data = parseSSEData(event.data);
+        if (!data) return;
 
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+        // Check for new dialog ID
+        if (data.newDialogId) {
+          callbacks.onNewDialog(data.newDialogId as string);
+          callbacks.onEvent('new_dialog', { dialog_id: data.newDialogId });
+        }
 
-      const chunk = decoder.decode(value, { stream: true });
+        // Handle event type
+        const eventType = data.type as string;
+        if (eventType === 'response_chunk') {
+          callbacks.onChunk(data.chunk as string || '');
+          callbacks.onEvent('response_chunk', data);
+        } else if (eventType === 'title_update') {
+          callbacks.onTitleUpdate(data.title as string);
+          callbacks.onEvent('title_update', data);
+        } else if (eventType === 'event' || eventType === 'tool_event') {
+          callbacks.onEvent('event', data as Record<string, unknown>);
+        }
+      });
 
-      for (const event of parseSSELines(chunk)) {
-        yield { event, newDialogId };
+      // Error handling
+      es.addEventListener('error', (event: SSEError) => {
+        if (aborted) return;
+
+        if (event.type === 'error') {
+          if (event.message && event.message.includes('401')) {
+            storage.clear();
+            setUnauthorizedCallback(() => {});
+            callbacks.onError(new Error('Unauthorized'));
+            return;
+          }
+          callbacks.onError(new Error(event.message || 'Connection error'));
+        } else if (event.type === 'exception') {
+          callbacks.onError(new Error(event.message || 'Exception'));
+        }
+      });
+
+    } catch (error) {
+      if (!aborted) {
+        callbacks.onError(error instanceof Error ? error : new Error(String(error)));
       }
     }
-  } finally {
-    reader.releaseLock();
-  }
+  };
+
+  run();
+
+  return { abort };
 }

@@ -1,7 +1,7 @@
 // mobile/src/features/chat/useChatStream.ts
 import { useCallback, useRef } from 'react';
 import { useChatStore, type ChatMessage, type ToolEvent } from './chatStore';
-import { createChatStream, type ChatStreamResult } from '../../api/chat';
+import { createChatStream, type ChatStreamOptions } from '../../api/chat';
 
 let toolEventIdCounter = 0;
 function generateToolEventId(): string {
@@ -9,13 +9,15 @@ function generateToolEventId(): string {
 }
 
 export function useChatStream() {
-  const abortControllerRef = useRef<AbortController | null>(null);
+  const abortRef = useRef<(() => void) | null>(null);
 
   const sendMessage = useCallback(
-    async (content: string, knowledgeIds: string[]) => {
+    (content: string, knowledgeIds: string[]) => {
       // Cancel any existing stream
-      abortControllerRef.current?.abort();
-      abortControllerRef.current = new AbortController();
+      if (abortRef.current) {
+        abortRef.current();
+        abortRef.current = null;
+      }
 
       const store = useChatStore.getState();
 
@@ -43,73 +45,78 @@ export function useChatStream() {
       store.setToolEvents([]);
       useChatStore.setState({ isStreaming: true });
 
-      try {
-        const stream = createChatStream(content, {
-          dialogId: store.currentDialogId ?? undefined,
-          knowledgeIds,
-          enableRag: store.enableRag && knowledgeIds.length > 0,
-          signal: abortControllerRef.current.signal,
-        });
+      const options: ChatStreamOptions = {
+        dialogId: store.currentDialogId ?? undefined,
+        knowledgeIds,
+        enableRag: store.enableRag && knowledgeIds.length > 0,
+      };
 
-        // RN uses async generator iteration instead of ReadableStream reader
-        for await (const { event, newDialogId } of stream) {
-          // Set new dialog ID from header fallback
-          if (newDialogId && !useChatStore.getState().currentDialogId) {
-            useChatStore.getState().setCurrentDialogId(newDialogId);
-            useChatStore.getState().upsertDialog({
-              id: newDialogId,
-              title: content.slice(0, 25) + (content.length > 25 ? '...' : ''),
-              updated_at: new Date().toISOString()
-            });
-          }
-
-          if (event.type === 'new_dialog') {
-            const data = event.data as { dialog_id: string };
-            if (!useChatStore.getState().currentDialogId) {
-              useChatStore.getState().setCurrentDialogId(data.dialog_id);
-              useChatStore.getState().upsertDialog({
-                id: data.dialog_id,
-                title: content.slice(0, 25) + (content.length > 25 ? '...' : ''),
-                updated_at: new Date().toISOString()
-              });
-            }
-          } else if (event.type === 'response_chunk') {
-            const data = event.data as { accumulated: string };
-            useChatStore.getState().updateStreamingMessage(data.accumulated);
-          } else if (event.type === 'event') {
-            const data = event.data as { id?: string; status: 'START' | 'END' | 'ERROR'; title: string; message: string };
+      const { abort } = createChatStream(content, options, {
+        onChunk: (_chunk: string) => {
+          // Chunk is already accumulated in onEvent via response_chunk
+        },
+        onEvent: (eventType: string, data: Record<string, unknown>) => {
+          if (eventType === 'response_chunk') {
+            const accumulated = data.accumulated as string;
+            useChatStore.getState().updateStreamingMessage(accumulated);
+          } else if (eventType === 'event' || eventType === 'tool_event') {
+            const toolData = data as unknown as {
+              id?: string;
+              status: 'START' | 'END' | 'ERROR';
+              title: string;
+              message: string;
+            };
             const toolEvent: ToolEvent = {
-              id: data.id || generateToolEventId(),
+              id: toolData.id || generateToolEventId(),
               type: 'tool_call',
-              name: data.title,
-              status: data.status,
+              name: toolData.title,
+              status: toolData.status,
               timestamp: new Date().toISOString(),
             };
             useChatStore.getState().addToolEvent(toolEvent);
-          } else if (event.type === 'title_update') {
-            const data = event.data as { title: string };
-            const currentId = useChatStore.getState().currentDialogId;
-            if (currentId) {
-              useChatStore.getState().upsertDialog({
-                id: currentId,
-                title: data.title,
-                updated_at: new Date().toISOString()
-              });
-            }
           }
-        }
-      } catch (err) {
-        console.error('Stream error:', err);
-      } finally {
-        useChatStore.setState({ isStreaming: false });
-        abortControllerRef.current = null;
-      }
+        },
+        onNewDialog: (dialogId: string) => {
+          if (!useChatStore.getState().currentDialogId) {
+            useChatStore.getState().setCurrentDialogId(dialogId);
+            useChatStore.getState().upsertDialog({
+              id: dialogId,
+              title: content.slice(0, 25) + (content.length > 25 ? '...' : ''),
+              updated_at: new Date().toISOString(),
+            });
+          }
+        },
+        onTitleUpdate: (title: string) => {
+          const currentId = useChatStore.getState().currentDialogId;
+          if (currentId) {
+            useChatStore.getState().upsertDialog({
+              id: currentId,
+              title,
+              updated_at: new Date().toISOString(),
+            });
+          }
+        },
+        onDone: () => {
+          useChatStore.setState({ isStreaming: false });
+          abortRef.current = null;
+        },
+        onError: (error: Error) => {
+          console.error('Stream error:', error);
+          useChatStore.setState({ isStreaming: false });
+          abortRef.current = null;
+        },
+      });
+
+      abortRef.current = abort;
     },
     []
   );
 
   const cancelStream = useCallback(() => {
-    abortControllerRef.current?.abort();
+    if (abortRef.current) {
+      abortRef.current();
+      abortRef.current = null;
+    }
     useChatStore.setState({ isStreaming: false });
   }, []);
 
