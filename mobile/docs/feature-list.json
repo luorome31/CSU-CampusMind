@@ -150,7 +150,7 @@
       "id": "F-014",
       "module": "chat",
       "description": "ChatStore：消息状态管理（messages/streaming/toolEvents/dialogId/knowledgeIds）",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/features/chat/chatStore.ts"
       ],
@@ -160,7 +160,7 @@
       "id": "F-015",
       "module": "chat",
       "description": "useChatStream：SSE 流式对话 Hook（AbortController + SSE 事件处理）",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/features/chat/useChatStream.ts",
         "frontend/src/api/chat.ts",
@@ -172,7 +172,7 @@
       "id": "F-016",
       "module": "chat",
       "description": "MessageBubble：用户/助手消息气泡，Markdown 渲染 + 代码高亮",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/components/chat/MessageBubble/index.tsx"
       ],
@@ -182,7 +182,7 @@
       "id": "F-017",
       "module": "chat",
       "description": "MessageList：消息列表容器，自动滚动到底部",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/components/chat/MessageList/index.tsx"
       ],
@@ -192,7 +192,7 @@
       "id": "F-018",
       "module": "chat",
       "description": "ChatInput：对话输入框，发送时调用 useChatStream.sendMessage()",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/components/chat/ChatInput/index.tsx"
       ],
@@ -202,7 +202,7 @@
       "id": "F-019",
       "module": "chat",
       "description": "ThinkingBlock：AI 思考过程折叠展示（可折叠单个步骤 + 展开全部）",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/components/chat/ThinkingBlock/index.tsx",
         "frontend/src/utils/parseThinking.ts"
@@ -223,7 +223,7 @@
       "id": "F-021",
       "module": "chat",
       "description": "EmptyState：空对话时的品牌展示与功能引导",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/components/chat/EmptyState/index.tsx"
       ],
@@ -233,7 +233,7 @@
       "id": "F-022",
       "module": "chat",
       "description": "ChatsScreen：组合 MessageList + ChatInput + ThinkingBlock + ToolGroup + EmptyState",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/features/chat/ChatPage.tsx"
       ],
@@ -482,7 +482,7 @@
       "name": "chat",
       "description": "对话核心：ChatStore、useChatStream、消息渲染组件、ChatsScreen",
       "features": ["F-014", "F-015", "F-016", "F-017", "F-018", "F-019", "F-020", "F-021", "F-022"],
-      "status": "pending"
+      "status": "completed"
     },
     {
       "name": "knowledge",
