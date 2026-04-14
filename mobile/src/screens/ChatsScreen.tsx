@@ -14,7 +14,7 @@ import { ChatInput } from '../components/chat/ChatInput';
 import { EmptyState } from '../components/chat/EmptyState';
 import { useChatStream } from '../features/chat/useChatStream';
 import { useChatStore } from '../features/chat/chatStore';
-import { colors, spacing } from '../styles';
+import { colors } from '../styles';
 
 export function ChatsScreen() {
   const { sendMessage, isStreaming, messages } = useChatStream();

@@ -4,6 +4,7 @@
  */
 
 import { storage } from '../utils/storage';
+import { setUnauthorizedCallback } from './client';
 
 export interface ChatStreamOptions {
   dialogId?: string;
@@ -55,6 +56,12 @@ function* parseSSELines(text: string): Generator<SSEEvent> {
         yield {
           type: 'new_dialog' as SSEEventType,
           data: { dialog_id: data.newDialogId },
+        };
+      } else if (data.type === 'title_update') {
+        yield {
+          type: 'title_update' as SSEEventType,
+          data: data.data,
+          timestamp: data.timestamp,
         };
       } else {
         yield {
@@ -110,6 +117,13 @@ export async function* createChatStream(
       signal,
     }
   );
+
+  // Handle 401 specifically - clear tokens and trigger logout
+  if (response.status === 401) {
+    await storage.clear();
+    setUnauthorizedCallback(() => {});
+    throw new Error('Unauthorized');
+  }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));

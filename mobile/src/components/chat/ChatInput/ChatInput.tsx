@@ -4,6 +4,7 @@
  * Multi-line chat input with auto-grow TextInput and send button.
  * - Placeholder changes based on disabled state
  * - Send button only visible when there's content
+ * - Auto-grows as content increases (minHeight: 24, maxHeight: 120)
  */
 
 import React, { useState, useCallback } from 'react';
@@ -22,6 +23,9 @@ interface ChatInputProps {
   disabled?: boolean;
 }
 
+const MIN_HEIGHT = 24;
+const MAX_HEIGHT = 120;
+
 /**
  * ChatInput - Multi-line input with send button
  *
@@ -30,6 +34,7 @@ interface ChatInputProps {
  */
 export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled }) => {
   const [value, setValue] = useState('');
+  const [inputHeight, setInputHeight] = useState(MIN_HEIGHT);
 
   const handleSend = useCallback(() => {
     const trimmed = value.trim();
@@ -43,17 +48,23 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled }) => {
     setValue(text);
   }, []);
 
+  const handleContentSizeChange = useCallback((e: { nativeEvent: { contentSize: { height: number } } }) => {
+    const newHeight = e.nativeEvent.contentSize.height;
+    setInputHeight(Math.min(Math.max(newHeight, MIN_HEIGHT), MAX_HEIGHT));
+  }, []);
+
   const showSendButton = value.trim().length > 0 && !disabled;
 
   return (
     <View style={styles.container}>
       <View style={[styles.inputWrapper, disabled && styles.inputWrapperDisabled]}>
         <TextInput
-          style={styles.textInput}
+          style={[styles.textInput, { height: inputHeight }]}
           placeholder={disabled ? '等待回复中...' : '输入消息...'}
           placeholderTextColor={colors.textMuted}
           value={value}
           onChangeText={handleChangeText}
+          onContentSizeChange={handleContentSizeChange}
           multiline
           maxLength={2000}
           editable={!disabled}
@@ -105,8 +116,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 0,
     margin: 0,
-    minHeight: 24,
-    maxHeight: 120,
   },
   sendButton: {
     width: 36,

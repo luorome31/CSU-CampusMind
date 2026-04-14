@@ -6,11 +6,14 @@
  * - Assistant: left-aligned, backgroundCard background, with avatar
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { colors } from '../../../styles/tokens/colors';
 import type { ChatMessage } from '../../../features/chat/chatStore';
+import { ThinkingBlock } from '../ThinkingBlock';
+import { ToolGroup } from '../ToolGroup';
+import { parseThinkingContent } from '../../../utils/parseThinking';
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -26,6 +29,12 @@ const ASSISTANT_AVATAR = require('../../../assets/csu-xiaotuanzi-answer.png');
  */
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   const isUser = message.role === 'user';
+
+  // Parse thinking content from assistant messages
+  const parsedContent = useMemo(() => {
+    if (isUser) return null;
+    return parseThinkingContent(message.content);
+  }, [message.content, isUser]);
 
   return (
     <View
@@ -52,7 +61,18 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
       >
         {isUser ? (
           <Text style={[styles.userText]}>{message.content}</Text>
+        ) : parsedContent ? (
+          <>
+            {parsedContent.thinking.length > 0 && (
+              <ThinkingBlock thinking={parsedContent.thinking} />
+            )}
+            {parsedContent.text && (
+              <Markdown style={markdownStyles}>{parsedContent.text}</Markdown>
+            )}
+            {message.events.length > 0 && <ToolGroup events={message.events} />}
+          </>
         ) : (
+          // Fallback for messages without thinking tags (legacy or simple text)
           <Markdown style={markdownStyles}>{message.content}</Markdown>
         )}
       </View>

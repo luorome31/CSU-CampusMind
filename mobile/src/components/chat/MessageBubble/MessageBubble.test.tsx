@@ -9,6 +9,15 @@ import { MessageBubble } from './MessageBubble';
 import type { ChatMessage } from '../../../features/chat/chatStore';
 
 // Mock Image component to handle local asset requires
+jest.mock('react-native', () => {
+  const ActualRN = jest.requireActual('react-native');
+  return {
+    ...ActualRN,
+    Image: jest.fn(() => null),
+  };
+});
+
+// Mock Image component to handle local asset requires
 jest.mock('react-native-markdown-display', () => {
   const { Text } = require('react-native');
   return {
