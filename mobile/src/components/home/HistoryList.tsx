@@ -19,10 +19,11 @@ interface HistoryListProps {
 function HistoryItem({ dialog }: { dialog: Dialog }) {
   const navigation = useNavigation<NavigationProp>();
   const title = dialog.title || '新对话';
-  const time = formatDistanceToNow(new Date(dialog.updatedAt), {
-    addSuffix: true,
-    locale: zhCN,
-  });
+  const updatedDate = new Date(dialog.updatedAt);
+  const isValidDate = !isNaN(updatedDate.getTime());
+  const time = isValidDate
+    ? formatDistanceToNow(updatedDate, { addSuffix: true, locale: zhCN })
+    : '未知时间';
 
   return (
     <Pressable
