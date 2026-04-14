@@ -185,9 +185,24 @@ export function createChatStream(
             callbacks.onError(new Error('Unauthorized'));
             return;
           }
+          // Normal stream end triggers an error event with message containing "null"
+          // Check if it's a normal close (message is "null" or empty)
+          if (event.message === 'null' || event.message === '' || !event.message) {
+            console.log('[ChatAPI] Stream ended normally');
+            callbacks.onDone();
+            return;
+          }
           callbacks.onError(new Error(event.message || 'Connection error'));
         } else if (event.type === 'exception') {
           callbacks.onError(new Error(event.message || 'Exception'));
+        }
+      });
+
+      // Listen for close event (stream completed normally)
+      es.addEventListener('close', () => {
+        console.log('[ChatAPI] SSE connection closed');
+        if (!aborted) {
+          callbacks.onDone();
         }
       });
 

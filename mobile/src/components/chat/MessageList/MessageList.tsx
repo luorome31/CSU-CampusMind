@@ -57,8 +57,8 @@ export const MessageList: React.FC<MessageListProps> = ({
         showsVerticalScrollIndicator={true}
         contentContainerStyle={styles.contentContainer}
         onContentSizeChange={() => {
-          // Ensure we scroll to end when content size changes (e.g., streaming)
-          if (messages.length > 0) {
+          // Only auto-scroll during streaming - don't scroll when user expands ThinkingBlock
+          if (isStreaming && messages.length > 0) {
             flatListRef.current?.scrollToEnd({ animated: true });
           }
         }}
