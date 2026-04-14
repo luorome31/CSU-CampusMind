@@ -36,7 +36,7 @@ describe('LoginScreen', () => {
     render(<LoginScreen />);
 
     expect(screen.getByText('CampusMind')).toBeTruthy();
-    expect(screen.getByText('🎓')).toBeTruthy();
+    // Logo is now rendered as GraduationCap icon component, title check is sufficient
   });
 
   it('should render footer', () => {

@@ -16,6 +16,15 @@ import {
 } from 'react-native';
 import { useAuthStore } from './authStore';
 import { colors, typography, spacing } from '../../styles';
+import {
+  User,
+  Lock,
+  Eye,
+  EyeOff,
+  GraduationCap,
+  Leaf,
+  Compass,
+} from 'lucide-react-native';
 
 export function LoginScreen() {
   const [username, setUsername] = useState('');
@@ -48,20 +57,20 @@ export function LoginScreen() {
       >
         {/* Decorative leaves */}
         <View style={styles.leavesContainer}>
-          <Text style={styles.leaf1}>🍃</Text>
-          <Text style={styles.leaf2}>🍃</Text>
-          <Text style={styles.leaf3}>🍂</Text>
-          <Text style={styles.leaf4}>🍃</Text>
+          <Leaf size={24} color={colors.green} style={styles.leaf1} />
+          <Leaf size={24} color={colors.green} style={styles.leaf2} />
+          <Leaf size={24} color={colors.green} style={styles.leaf3} />
+          <Leaf size={24} color={colors.green} style={styles.leaf4} />
         </View>
 
-        <Text style={styles.compassDecoration}>🧭</Text>
+        <Compass size={40} color={colors.accent} style={styles.compassDecoration} />
 
         {/* Login Card */}
         <View style={styles.card}>
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.logoContainer}>
-              <Text style={styles.logoEmoji}>🎓</Text>
+              <GraduationCap size={42} color={colors.accent} />
             </View>
             <Text style={styles.title}>CampusMind</Text>
             <Text style={styles.subtitle}>
@@ -75,7 +84,7 @@ export function LoginScreen() {
             <View style={styles.inputField}>
               <Text style={styles.label}>学号</Text>
               <View style={styles.inputWithIcon}>
-                <Text style={styles.inputIcon}>👤</Text>
+                <User size={18} color={colors.textLight} style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   value={username}
@@ -92,7 +101,7 @@ export function LoginScreen() {
             <View style={styles.inputField}>
               <Text style={styles.label}>密码</Text>
               <View style={styles.inputWithIcon}>
-                <Text style={styles.inputIcon}>🔒</Text>
+                <Lock size={18} color={colors.textLight} style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   value={password}
@@ -107,7 +116,11 @@ export function LoginScreen() {
                   style={styles.passwordToggle}
                   onPress={() => setShowPassword(!showPassword)}
                 >
-                  <Text>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
+                  {showPassword ? (
+                    <EyeOff size={18} color={colors.textMuted} />
+                  ) : (
+                    <Eye size={18} color={colors.textMuted} />
+                  )}
                 </TouchableOpacity>
               </View>
             </View>
@@ -160,15 +173,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: 0,
   },
-  leaf1: { position: 'absolute', top: '10%', left: '10%', fontSize: 24, opacity: 0.6 },
-  leaf2: { position: 'absolute', top: '20%', right: '15%', fontSize: 24, opacity: 0.6, transform: [{ rotate: '45deg' }] },
-  leaf3: { position: 'absolute', bottom: '15%', left: '15%', fontSize: 24, opacity: 0.6, transform: [{ rotate: '-30deg' }] },
-  leaf4: { position: 'absolute', bottom: '25%', right: '10%', fontSize: 24, opacity: 0.6, transform: [{ rotate: '15deg' }] },
+  leaf1: { position: 'absolute', top: '10%', left: '10%', opacity: 0.2 },
+  leaf2: { position: 'absolute', top: '20%', right: '15%', opacity: 0.2, transform: [{ rotate: '45deg' }] },
+  leaf3: { position: 'absolute', bottom: '15%', left: '15%', opacity: 0.2, transform: [{ rotate: '-30deg' }] },
+  leaf4: { position: 'absolute', bottom: '25%', right: '10%', opacity: 0.2, transform: [{ rotate: '15deg' }] },
   compassDecoration: {
     position: 'absolute',
     bottom: '10%',
     left: '5%',
-    fontSize: 40,
     opacity: 0.3,
     transform: [{ rotate: '-15deg' }],
   },
@@ -197,7 +209,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: spacing[3],
   },
-  logoEmoji: { fontSize: 42 },
   title: {
     fontSize: 24,
     fontWeight: typography.fontSemibold,
@@ -231,7 +242,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[3],
   },
   inputIcon: {
-    fontSize: 18,
     marginRight: spacing[2],
   },
   input: {

@@ -7,6 +7,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, Text, StyleSheet } from 'react-native';
+import { BlurView } from '@react-native-community/blur';
 import {
   RootTabParamList,
   HomeStackParamList,
@@ -72,6 +73,17 @@ function TabIcon({ name, focused }: { name: string; focused: boolean }) {
   );
 }
 
+// Tab Bar 毛玻璃背景组件
+function TabBarBackground() {
+  return (
+    <BlurView
+      style={StyleSheet.absoluteFill}
+      blurType="light"
+      blurAmount={80}
+    />
+  );
+}
+
 export function TabNavigator() {
   return (
     <Tab.Navigator
@@ -82,6 +94,7 @@ export function TabNavigator() {
         tabBarInactiveTintColor: colors.textMuted,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabLabel,
+        tabBarBackground: () => <TabBarBackground />,
       })}
     >
       <Tab.Screen
