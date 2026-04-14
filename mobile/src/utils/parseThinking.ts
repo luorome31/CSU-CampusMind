@@ -15,9 +15,9 @@ export interface ParsedContent {
  * @param content - Raw message content with optional thinking tags
  * @returns Separated thinking blocks and the actual text content
  */
-export function parseThinkingContent(content: string): ParsedContent {
+export function parseThinkingContent(content: string | undefined | null): ParsedContent {
   const thinking: string[] = [];
-  let text = content;
+  let text = content || '';
 
   // Match <think>...</think> tags (including multiline)
   const thinkTagPattern = /<think>([\s\S]*?)(?=<\/think>|$)/g;
