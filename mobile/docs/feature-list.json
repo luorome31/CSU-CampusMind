@@ -213,7 +213,7 @@
       "id": "F-020",
       "module": "chat",
       "description": "ToolGroup：Tool 调用事件折叠展示（START/END/ERROR 状态 + 进度显示）",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/components/chat/ToolGroup/index.tsx"
       ],

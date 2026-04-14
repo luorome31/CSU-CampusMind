@@ -18,4 +18,5 @@
 | 4 | 2026-04-14 | 完成 ui 模块：基础 UI 组件 (Button/Card/Input/Badge/Modal 与 Web 端 Props API 对齐)、LoginScreen emoji 替换为 lucide icons、Tab Bar 毛玻璃效果、移动端特权工具 (imagePicker/documentPicker) |  | |
 | 5 | 2026-04-14 | 完成 home 模块：HeroBanner (品牌介绍圆角大卡)、FeatureGrid (2列功能磁贴)、HistoryList (对话历史列表)、HomeScreen (组合所有组件)、dialog API (listDialogs/deleteDialog)、TabNavigator 集成 | (见 git log) |
 | 6 | 2026-04-14 | 深度重构首页 UI 以匹配设计原稿：HeroBanner 角色插图破框溢出效果、精简 2 列功能按钮、卡片式对话历史列表；修复 TabBar 毛玻璃穿透效果及遮挡问题 | 后续 commit |
+| 7 | 2026-04-14 | 完成 F-020 ToolGroup 组件：内联折叠卡片设计，显示工具调用进度和状态图标(成功/失败/进行中)，展开后显示每个工具的名称、输入、输出、错误信息 | |
 
