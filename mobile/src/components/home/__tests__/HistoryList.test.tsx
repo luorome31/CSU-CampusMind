@@ -12,7 +12,7 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 const mockDialogs: Dialog[] = [
-  { id: '1', title: 'Test Dialog', updatedAt: new Date().toISOString() },
+  { id: '1', title: 'Test Dialog', updated_at: new Date().toISOString() },
 ];
 
 describe('HistoryList', () => {

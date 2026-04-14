@@ -4,7 +4,7 @@ import { apiClient } from './client';
 export interface Dialog {
   id: string;
   title?: string;
-  updatedAt: string;
+  updated_at: string;
 }
 
 export async function listDialogs(limit = 50): Promise<Dialog[]> {

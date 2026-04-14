@@ -8,8 +8,8 @@ import * as dialogApi from '../../api/dialog';
 jest.mock('../../api/dialog');
 
 const mockDialogs: dialogApi.Dialog[] = [
-  { id: '1', title: 'Dialog 1', updatedAt: new Date().toISOString() },
-  { id: '2', title: 'Dialog 2', updatedAt: new Date().toISOString() },
+  { id: '1', title: 'Dialog 1', updated_at: new Date().toISOString() },
+  { id: '2', title: 'Dialog 2', updated_at: new Date().toISOString() },
 ];
 
 function renderWithNavigation(ui: React.ReactElement) {
