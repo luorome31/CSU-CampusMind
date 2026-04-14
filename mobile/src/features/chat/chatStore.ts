@@ -20,12 +20,13 @@ export interface ToolEvent {
 
 /**
  * Chat message type for store internal use
+ * Note: events is internal for SSE streaming, distinct from citations in API response
  */
 export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
-  createdAt: Date;
+  created_at: string;
   events: ToolEvent[];
 }
 
@@ -54,7 +55,18 @@ interface ChatActions {
   updateDialogTitle: (dialogId: string | null, title: string) => void;
   removeDialog: (dialogId: string) => void;
   upsertDialog: (dialog: Dialog) => void;
-  loadDialog: (dialogId: string, dbMessages: unknown[]) => void;
+  loadDialog: (dialogId: string, dbMessages: DbMessage[]) => void;
+}
+
+/**
+ * Database message type for loading dialogs from persistence
+ */
+interface DbMessage {
+  id: string;
+  role: string;
+  content: string;
+  created_at: string;
+  events?: string;
 }
 
 type ChatStore = ChatState & ChatActions;
@@ -83,9 +95,10 @@ export const useChatStore = create<ChatStore>((set) => ({
 
   updateStreamingMessage: (content) =>
     set((state) => {
-      const messages = [...state.messages];
-      if (messages.length === 0) return state;
+      if (state.messages.length === 0) return state;
 
+      // Get copy BEFORE modifying
+      const messages = [...state.messages];
       const lastMsg = messages[messages.length - 1];
       if (lastMsg.role !== 'assistant') return state;
 
@@ -181,24 +194,23 @@ export const useChatStore = create<ChatStore>((set) => ({
   },
 
   loadDialog: (dialogId, dbMessages) => {
-    const messages: ChatMessage[] = (dbMessages as Array<{
-      id: string;
-      role: string;
-      content: string;
-      created_at: string;
-      events?: string;
-    }>).map((m) => {
+    const messages: ChatMessage[] = dbMessages.map((m) => {
       let events: ToolEvent[] = [];
       if (m.events) {
-        const parsed = JSON.parse(m.events) as ToolEvent[];
-        // Merge events with same id (same as addToolEvent logic)
-        for (const event of parsed) {
-          const existingIdx = events.findIndex((e) => e.id === event.id);
-          if (existingIdx >= 0) {
-            events[existingIdx] = { ...events[existingIdx], ...event };
-          } else {
-            events.push(event);
+        try {
+          const parsed = JSON.parse(m.events) as ToolEvent[];
+          // Merge events with same id (same as addToolEvent logic)
+          for (const event of parsed) {
+            const existingIdx = events.findIndex((e) => e.id === event.id);
+            if (existingIdx >= 0) {
+              events[existingIdx] = { ...events[existingIdx], ...event };
+            } else {
+              events.push(event);
+            }
           }
+        } catch {
+          // Handle malformed JSON gracefully
+          events = [];
         }
       }
       return {
@@ -206,7 +218,7 @@ export const useChatStore = create<ChatStore>((set) => ({
         role: m.role as 'user' | 'assistant' | 'system',
         content: m.content,
         events,
-        createdAt: new Date(m.created_at),
+        created_at: m.created_at,
       };
     });
     set({ currentDialogId: dialogId, messages, toolEvents: [] });

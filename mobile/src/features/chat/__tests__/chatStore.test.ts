@@ -9,7 +9,7 @@ const createMsg = (overrides: Partial<ChatMessage> = {}): ChatMessage => ({
   id: 'msg-1',
   role: 'user',
   content: 'Hello',
-  createdAt: new Date(),
+  created_at: new Date().toISOString(),
   events: [],
   ...overrides,
 });
@@ -329,14 +329,14 @@ describe('useChatStore', () => {
           role: 'user',
           content: 'Hello',
           created_at: '2024-01-01T10:00:00Z',
-          events: null,
+          events: undefined,
         },
         {
           id: 'msg-2',
           role: 'assistant',
           content: 'Hi there',
           created_at: '2024-01-01T10:01:00Z',
-          events: null,
+          events: undefined,
         },
       ];
       act(() => {
@@ -345,7 +345,7 @@ describe('useChatStore', () => {
       expect(result.current.currentDialogId).toBe('dialog-123');
       expect(result.current.messages).toHaveLength(2);
       expect(result.current.messages[0].content).toBe('Hello');
-      expect(result.current.messages[0].createdAt).toBeInstanceOf(Date);
+      expect(result.current.messages[0].created_at).toBe('2024-01-01T10:00:00Z');
     });
 
     it('should parse and merge tool events from db', () => {
