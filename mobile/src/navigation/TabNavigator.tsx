@@ -6,7 +6,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { BlurView } from '@react-native-community/blur';
 import {
   RootTabParamList,
@@ -75,6 +75,11 @@ function TabIcon({ name, focused }: { name: string; focused: boolean }) {
 
 // Tab Bar 毛玻璃背景组件
 function TabBarBackground() {
+  // BlurView 仅在 iOS/Android 原生平台支持，Web/Expo Go 使用纯色背景
+  if (Platform.OS === 'web') {
+    return <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.backgroundGlass }]} />;
+  }
+
   return (
     <BlurView
       style={StyleSheet.absoluteFill}
