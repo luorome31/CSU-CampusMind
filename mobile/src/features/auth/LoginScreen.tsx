@@ -31,7 +31,8 @@ export function LoginScreen() {
     try {
       await login(username, password);
       // Navigation will be handled by RootNavigator state change
-    } catch {
+    } catch (e: any) {
+      console.error('[LoginScreen] 登录遇到未捕获异常:', e?.message || e);
       setError('登录失败，请检查学号和密码');
     }
   };
@@ -53,7 +54,7 @@ export function LoginScreen() {
           <Text style={styles.leaf4}>🍃</Text>
         </View>
 
-        <View style={styles.compassDecoration}>🧭</View>
+        <Text style={styles.compassDecoration}>🧭</Text>
 
         {/* Login Card */}
         <View style={styles.card}>
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: spacing[6],
+    padding: spacing[4],
   },
   leavesContainer: {
     position: 'absolute',
@@ -178,27 +179,27 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: spacing[8],
+    padding: spacing[5],
     zIndex: 1,
     shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 1,
-    shadowRadius: 32,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
   },
   header: {
     alignItems: 'center',
-    marginBottom: spacing[8],
+    marginBottom: spacing[6],
   },
   logoContainer: {
     backgroundColor: '#fff',
     padding: 12,
     borderRadius: 20,
-    marginBottom: spacing[4],
+    marginBottom: spacing[3],
   },
-  logoEmoji: { fontSize: 48 },
+  logoEmoji: { fontSize: 42 },
   title: {
-    fontSize: typography.text3xl,
+    fontSize: 24,
     fontWeight: typography.fontSemibold,
     color: colors.text,
     marginBottom: spacing[2],

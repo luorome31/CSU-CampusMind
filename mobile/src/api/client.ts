@@ -17,7 +17,7 @@ export const setUnauthorizedCallback = (callback: () => void) => {
 // 创建 Axios 实例
 const createApiClient = () => {
   const client = axios.create({
-    baseURL: process.env.API_BASE_URL || 'http://localhost:8000/api/v1',
+    baseURL: process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1',
     timeout: 30000,
     headers: {
       'Content-Type': 'application/json',

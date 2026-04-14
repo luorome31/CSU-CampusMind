@@ -109,7 +109,7 @@
 |------|----------|------|
 | 相机/相册 | **react-native-image-picker** | 文档拍摄与相册上传 |
 | 文件系统 | **react-native-document-picker** | 文件管理器调用 |
-| 安全存储 | **react-native-keychain** | token 安全存储（替代 sessionStorage） |
+| 安全存储 | **expo-secure-store** | token 安全存储（替代 sessionStorage） |
 | 手势处理 | **react-native-gesture-handler** | Bottom Sheet 滑动手势 |
 
 ### 5.4 开发与构建
@@ -137,7 +137,7 @@
 | 状态管理 | Zustand 5 | Zustand 5（统一） |
 | 路由 | React Router v6 | React Navigation 7 |
 | 样式 | CSS Modules + Tokens | StyleSheet + Tokens |
-| 存储 | sessionStorage | react-native-keychain |
+| 存储 | sessionStorage | expo-secure-store |
 | 字体 | LXGW WenKai Screen | 系统默认 + 思源黑体 |
 
 ## 6. 项目文件夹结构

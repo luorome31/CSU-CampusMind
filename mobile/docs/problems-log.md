@@ -26,3 +26,6 @@
 | 12 | 2026-04-13 | Jest 测试中 mock 路径错误：'../../utils/storage' 应为 '../../../utils/storage' | 修正从 `__tests__/` 到 `utils/` 的相对路径 | 1566a32 |
 | 13 | 2026-04-13 | Zustand store 在测试间共享状态导致测试互相干扰 | 在 beforeEach 中使用 `useAuthStore.setState({...})` 重置状态 | 后续 commit |
 | 14 | 2026-04-13 | LoginScreen 测试中 ActivityIndicator 缺少 testID 导致 getByTestId 失败 | 改用 screen.queryByText('登录') 检测 loading 状态替代方案 | 后续 commit |
+| 15 | 2026-04-14 | 移动端 LoginScreen 样式局促，组件过度拥挤 | 减小了外层 padding，调整标题字体及卡片内边距以适配小屏 | 后续 commit |
+| 16 | 2026-04-14 | 发起登录 API 时报错 502 Bad Gateway 且后端无收发记录 | 本地网络代理(如 7890)拦截了局域网请求，在代理配置中忽略了 `192.168.*` | - |
+| 17 | 2026-04-14 | 登录过程产生未捕获异常导致只显示前端错误而无 log 输出，且状态机终端 | React Native Keychain 依赖未适配 Expo Go 和 Web；将其替换为 `expo-secure-store` 并增加 Web 端 `localStorage` 降级及异常 catch 日志打印 | 后续 commit |

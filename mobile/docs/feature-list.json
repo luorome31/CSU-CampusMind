@@ -58,7 +58,7 @@
     {
       "id": "F-005",
       "module": "foundation",
-      "description": "安全存储封装：react-native-keychain 替代 sessionStorage",
+      "description": "安全存储封装：expo-secure-store 替代 sessionStorage",
       "status": "completed",
       "referenceCode": [
         "mobile/src/utils/storage.ts"

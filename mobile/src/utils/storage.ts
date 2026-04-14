@@ -1,63 +1,64 @@
 /**
  * 安全存储封装
- * 使用 react-native-keychain 替代 sessionStorage
+ * 替换不支持 Expo Go 的 react-native-keychain 为 expo-secure-store
  */
 
-import * as Keychain from 'react-native-keychain';
-
-const SERVICE_NAME = 'CampusMind';
+import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 
 export const storage = {
   async setToken(token: string): Promise<void> {
-    await Keychain.setGenericPassword('token', token, {
-      service: `${SERVICE_NAME}.token`,
-    });
+    if (Platform.OS === 'web') {
+      try { localStorage.setItem('token', token); } catch {}
+      return;
+    }
+    await SecureStore.setItemAsync('token', token);
   },
 
   async getToken(): Promise<string | null> {
+    if (Platform.OS === 'web') {
+      try { return localStorage.getItem('token'); } catch { return null; }
+    }
     try {
-      const credentials = await Keychain.getGenericPassword({
-        service: `${SERVICE_NAME}.token`,
-      });
-      if (credentials) {
-        return credentials.password;
-      }
-      return null;
+      return await SecureStore.getItemAsync('token');
     } catch {
       return null;
     }
   },
 
   async removeToken(): Promise<void> {
-    await Keychain.resetGenericPassword({
-      service: `${SERVICE_NAME}.token`,
-    });
+    if (Platform.OS === 'web') {
+      try { localStorage.removeItem('token'); } catch {}
+      return;
+    }
+    await SecureStore.deleteItemAsync('token');
   },
 
   async setSessionId(sessionId: string): Promise<void> {
-    await Keychain.setGenericPassword('sessionId', sessionId, {
-      service: `${SERVICE_NAME}.sessionId`,
-    });
+    if (Platform.OS === 'web') {
+      try { localStorage.setItem('sessionId', sessionId); } catch {}
+      return;
+    }
+    await SecureStore.setItemAsync('sessionId', sessionId);
   },
 
   async getSessionId(): Promise<string | null> {
+    if (Platform.OS === 'web') {
+      try { return localStorage.getItem('sessionId'); } catch { return null; }
+    }
     try {
-      const credentials = await Keychain.getGenericPassword({
-        service: `${SERVICE_NAME}.sessionId`,
-      });
-      if (credentials) {
-        return credentials.password;
-      }
-      return null;
+      return await SecureStore.getItemAsync('sessionId');
     } catch {
       return null;
     }
   },
 
   async removeSessionId(): Promise<void> {
-    await Keychain.resetGenericPassword({
-      service: `${SERVICE_NAME}.sessionId`,
-    });
+    if (Platform.OS === 'web') {
+      try { localStorage.removeItem('sessionId'); } catch {}
+      return;
+    }
+    await SecureStore.deleteItemAsync('sessionId');
   },
 
   async clear(): Promise<void> {
