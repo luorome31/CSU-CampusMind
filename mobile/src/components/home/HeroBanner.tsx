@@ -1,22 +1,33 @@
-// mobile/src/components/home/HeroBanner.tsx
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { Card } from '../ui/Card';
 import { colors, typography, spacing } from '../../styles';
+import type { RootTabParamList } from '../../navigation/types';
+
+type NavigationProp = BottomTabNavigationProp<RootTabParamList>;
 
 export function HeroBanner() {
+  const navigation = useNavigation<NavigationProp>();
+
   return (
     <Card style={styles.card}>
-      <View style={styles.logoPlaceholder}>
-        <Text style={styles.logoText}>CM</Text>
+      <View style={styles.content}>
+        <Text style={styles.title}>CampusMind</Text>
+        <Text style={styles.subtitle}>基于 RAG 与 Tool-calling 的智能校园助手。连接校园知识，赋能学习生活。✨</Text>
+        <Pressable
+          style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+          onPress={() => navigation.navigate('ChatsTab' as any)}
+        >
+          <Text style={styles.buttonText}>新建对话</Text>
+        </Pressable>
       </View>
-      <Text style={styles.title}>CampusMind</Text>
-      <Text style={styles.subtitle}>你的智能校园助手</Text>
-      <View style={styles.features}>
-        <Text style={styles.feature}>查询成绩和课表</Text>
-        <Text style={styles.feature}>了解校园通知和活动</Text>
-        <Text style={styles.feature}>获取选课和教务信息</Text>
-      </View>
+      <Image
+        source={require('../../assets/csu-xiaotuanzi-dashboard.png')}
+        style={styles.image}
+        resizeMode="contain"
+      />
     </Card>
   );
 }
@@ -25,44 +36,51 @@ const styles = StyleSheet.create({
   card: {
     marginHorizontal: spacing[4],
     marginTop: spacing[4],
-    padding: spacing[4],
+    padding: spacing[5],
     backgroundColor: colors.backgroundCard,
     borderRadius: 16,
-  },
-  logoPlaceholder: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: colors.accent,
-    justifyContent: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    alignSelf: 'center',
-    marginBottom: spacing[3],
+    overflow: 'hidden',
   },
-  logoText: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#fff',
+  content: {
+    width: '62%',
+    zIndex: 2,
   },
   title: {
-    fontSize: typography.text2xl,
+    fontSize: 22,
     fontWeight: typography.fontBold,
     color: colors.text,
-    textAlign: 'center',
-    marginBottom: spacing[1],
+    marginBottom: spacing[2],
   },
   subtitle: {
-    fontSize: typography.textBase,
+    fontSize: typography.textSm,
     color: colors.textLight,
-    textAlign: 'center',
+    lineHeight: 20,
     marginBottom: spacing[4],
   },
-  features: {
-    gap: spacing[1],
+  button: {
+    backgroundColor: '#5A7F93',
+    paddingVertical: spacing[2],
+    paddingHorizontal: spacing[4],
+    borderRadius: 20,
+    alignSelf: 'flex-start',
   },
-  feature: {
+  buttonPressed: {
+    opacity: 0.8,
+  },
+  buttonText: {
+    color: '#ffffff',
     fontSize: typography.textSm,
-    color: colors.textMuted,
-    textAlign: 'center',
+    fontWeight: typography.fontMedium,
+  },
+  image: {
+    width: 140,
+    height: 140,
+    position: 'absolute',
+    right: 0,
+    bottom: -10,
+    zIndex: 1,
   },
 });

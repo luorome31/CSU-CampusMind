@@ -1,11 +1,8 @@
-// mobile/src/components/home/HistoryList.tsx
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { MessageSquare } from 'lucide-react-native';
-import { formatDistanceToNow } from 'date-fns';
-import { zhCN } from 'date-fns/locale';
+import { MessageSquare, ArrowRight } from 'lucide-react-native';
 import { colors, typography, spacing } from '../../styles';
 import type { RootTabParamList } from '../../navigation/types';
 import type { Dialog } from '../../api/dialog';
@@ -19,12 +16,7 @@ interface HistoryListProps {
 function HistoryItem({ dialog }: { dialog: Dialog }) {
   const navigation = useNavigation<NavigationProp>();
   const title = dialog.title || '新对话';
-  const updatedDate = new Date(dialog.updated_at);
-  const isValidDate = !isNaN(updatedDate.getTime());
-  const time = isValidDate
-    ? formatDistanceToNow(updatedDate, { addSuffix: true, locale: zhCN })
-    : '未知时间';
-  // console.log(`[HistoryList] dialog:`, dialog);
+
   return (
     <Pressable
       style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
@@ -35,13 +27,15 @@ function HistoryItem({ dialog }: { dialog: Dialog }) {
         } as any)
       }
     >
-      <MessageSquare size={16} color={colors.accent} strokeWidth={2} />
+      <View style={styles.iconContainer}>
+        <MessageSquare size={16} color={colors.textLight} strokeWidth={2} />
+      </View>
       <View style={styles.itemContent}>
         <Text style={styles.itemTitle} numberOfLines={1}>
           {title}
         </Text>
-        <Text style={styles.itemTime}>{time}</Text>
       </View>
+      <ArrowRight size={18} color={colors.textLight} />
     </Pressable>
   );
 }
@@ -60,6 +54,7 @@ export function HistoryList({ dialogs }: HistoryListProps) {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <HistoryItem dialog={item} />}
           scrollEnabled={false}
+          contentContainerStyle={styles.listContainer}
         />
       )}
     </View>
@@ -72,26 +67,40 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[4],
   },
   sectionTitle: {
-    fontSize: typography.textLg,
-    fontWeight: typography.fontMedium,
+    fontSize: 20,
+    fontWeight: typography.fontBold,
     color: colors.text,
-    marginBottom: spacing[3],
+    marginBottom: spacing[4],
+  },
+  listContainer: {
+    paddingBottom: spacing[4],
   },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: spacing[3],
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
-    gap: spacing[3],
+    paddingHorizontal: spacing[4],
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 16,
+    backgroundColor: '#FCFAF5',
+    marginBottom: spacing[3],
   },
   itemPressed: {
     opacity: 0.7,
   },
+  iconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing[3],
+  },
   itemContent: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
   },
   itemTitle: {
@@ -99,10 +108,6 @@ const styles = StyleSheet.create({
     color: colors.text,
     flex: 1,
     marginRight: spacing[2],
-  },
-  itemTime: {
-    fontSize: typography.textSm,
-    color: colors.textMuted,
   },
   empty: {
     paddingVertical: spacing[8],
