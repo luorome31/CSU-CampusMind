@@ -18,6 +18,7 @@ import {
 } from './types';
 import { colors, typography, spacing } from '../styles';
 import { HomeScreen } from '../screens/HomeScreen';
+import { ChatsScreen } from '../screens/ChatsScreen';
 
 // 占位组件（将在后续模块实现）
 const PlaceholderScreen = () => <View style={styles.placeholder}><Text>Screen</Text></View>;
@@ -39,7 +40,7 @@ function HomeStackNavigator() {
 function ChatsStackNavigator() {
   return (
     <ChatsStack.Navigator screenOptions={{ headerShown: false }}>
-      <ChatsStack.Screen name="Chats" component={PlaceholderScreen} />
+      <ChatsStack.Screen name="Chats" component={ChatsScreen} />
     </ChatsStack.Navigator>
   );
 }
