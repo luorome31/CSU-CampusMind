@@ -8,6 +8,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, Text, StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
+import { Home, MessageCircle, BookOpen, User } from 'lucide-react-native';
 import {
   RootTabParamList,
   HomeStackParamList,
@@ -60,16 +61,21 @@ function ProfileStackNavigator() {
 
 // Tab 图标组件
 function TabIcon({ name, focused }: { name: string; focused: boolean }) {
-  const iconMap: Record<string, string> = {
-    HomeTab: '🏠',
-    ChatsTab: '💬',
-    KnowledgeTab: '📚',
-    ProfileTab: '👤',
+  const iconMap: Record<string, React.ComponentType<any>> = {
+    HomeTab: Home,
+    ChatsTab: MessageCircle,
+    KnowledgeTab: BookOpen,
+    ProfileTab: User,
   };
+  const Icon = iconMap[name];
+  if (!Icon) return null;
+
   return (
-    <Text style={[styles.tabIcon, focused && styles.tabIconFocused]}>
-      {iconMap[name] || '•'}
-    </Text>
+    <Icon
+      size={22}
+      color={focused ? colors.accent : colors.textMuted}
+      strokeWidth={2}
+    />
   );
 }
 
@@ -132,12 +138,6 @@ const styles = StyleSheet.create({
   tabLabel: {
     fontSize: typography.textXs,
     fontWeight: typography.fontMedium,
-  },
-  tabIcon: {
-    fontSize: 20,
-  },
-  tabIconFocused: {
-    opacity: 1,
   },
   placeholder: {
     flex: 1,
