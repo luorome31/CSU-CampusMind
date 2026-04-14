@@ -29,3 +29,5 @@
 | 15 | 2026-04-14 | 移动端 LoginScreen 样式局促，组件过度拥挤 | 减小了外层 padding，调整标题字体及卡片内边距以适配小屏 | 后续 commit |
 | 16 | 2026-04-14 | 发起登录 API 时报错 502 Bad Gateway 且后端无收发记录 | 本地网络代理(如 7890)拦截了局域网请求，在代理配置中忽略了 `192.168.*` | - |
 | 17 | 2026-04-14 | 登录过程产生未捕获异常导致只显示前端错误而无 log 输出，且状态机终端 | React Native Keychain 依赖未适配 Expo Go 和 Web；将其替换为 `expo-secure-store` 并增加 Web 端 `localStorage` 降级及异常 catch 日志打印 | 后续 commit |
+| 18 | 2026-04-14 | Web Bundling failed: Unable to resolve "./components/BlurView" from @react-native-community/blur | Expo 项目应使用 `expo-blur` 而非 `@react-native-community/blur`；后者依赖原生代码链接，在 Expo 托管工作流中无法正常工作 | f35004b |
+| 19 | 2026-04-14 | TabNavigator 中 Tab 图标仍使用 emoji（🏠💬📚👤）而非 lucide icons | 导入 lucide-react-native 的 Home/MessageCircle/BookOpen/User 组件替换 | 后续 commit |
