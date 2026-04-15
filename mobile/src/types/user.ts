@@ -2,6 +2,8 @@
  * User/Profile 模块类型定义
  */
 
+export type { User } from './api';
+
 export interface UsageStats {
   conversation_count: number;
   message_count: number;
