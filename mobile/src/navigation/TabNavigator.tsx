@@ -20,6 +20,9 @@ import { colors, typography, spacing } from '../styles';
 import { HomeScreen } from '../screens/HomeScreen';
 import { ChatsScreen } from '../screens/ChatsScreen';
 import { BuildScreen } from '../screens/BuildScreen';
+import { KnowledgeScreen } from '../screens/KnowledgeScreen';
+import { KnowledgeDetailScreen } from '../screens/KnowledgeDetailScreen';
+import { FileDetailScreen } from '../screens/FileDetailScreen';
 
 // 占位组件（将在后续模块实现）
 const PlaceholderScreen = () => <View style={styles.placeholder}><Text>Screen</Text></View>;
@@ -50,7 +53,9 @@ function ChatsStackNavigator() {
 function KnowledgeStackNavigator() {
   return (
     <KnowledgeStack.Navigator screenOptions={{ headerShown: false }}>
-      <KnowledgeStack.Screen name="KnowledgeList" component={PlaceholderScreen} />
+      <KnowledgeStack.Screen name="KnowledgeList" component={KnowledgeScreen} />
+      <KnowledgeStack.Screen name="KnowledgeDetail" component={KnowledgeDetailScreen} />
+      <KnowledgeStack.Screen name="FileDetail" component={FileDetailScreen} />
     </KnowledgeStack.Navigator>
   );
 }
