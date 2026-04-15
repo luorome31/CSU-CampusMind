@@ -32,4 +32,8 @@
 | 18 | 2026-04-14 | Web Bundling failed: Unable to resolve "./components/BlurView" from @react-native-community/blur | Expo 项目应使用 `expo-blur` 而非 `@react-native-community/blur`；后者依赖原生代码链接，在 Expo 托管工作流中无法正常工作 | f35004b |
 | 19 | 2026-04-14 | TabNavigator 中 Tab 图标仍使用 emoji（🏠💬📚👤）而非 lucide icons | 导入 lucide-react-native 的 Home/MessageCircle/BookOpen/User 组件替换 | 后续 commit |
 | 20 | 2026-04-14 | Expo Go 提示 ViewManagerResolver returned null for ExpoBlur 或 RCTViewManagerAdapter_ExpoBlur | 依赖版本不匹配（SDK 52 环境中使用了 55 版本）。降级 expo-blur 至 ~14.0.3，并使用 `yarn add --ignore-engines` 绕过 node 版本限制 | 后续 commit |
+| 21 | 2026-04-15 | Chat SSE 数据解析错误：后端发送 `{type: "response_chunk", data: {chunk: "..."}}`，前端错误地访问 `data.chunk` 而非 `data.data.chunk`，导致 UI 不更新 | 修正 parseSSEData 处理双重包装结构，正确从 `data.data.chunk` 提取内容 | 2d99b67 |
+| 22 | 2026-04-15 | `onDone` 回调从未被调用：react-native-sse 在流结束时触发 error 事件而非 close 事件，且错误消息为 "null" 时应视为正常结束 | 添加 close 事件监听器；错误处理中检测 "null" 消息判定为正常结束 | fab7731 |
+| 23 | 2026-04-15 | ThinkingBlock 展开时 FlatList 的 `onContentSizeChange` 无条件调用 `scrollToEnd`，导致用户滚动阅读时被强制拉到最底部 | 使用 `isAtBottom` ref 追踪用户是否在底部，仅在 `isStreaming` 或用户位于底部时才自动滚动 | fab7731 |
+| 24 | 2026-04-15 | react-native-sse 在流正常结束后不会触发 close 事件，且会尝试自动重连，导致 `onDone` 无法被调用 | 重写 chat.ts 使用原生 XMLHttpRequest，正确检测 `readyState === XMLHttpRequest.DONE` 并在 status 2xx 时调用 `onDone` | 用户最新 commit |
 
