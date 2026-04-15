@@ -367,9 +367,9 @@
       "id": "F-035",
       "module": "profile",
       "description": "ProfileStore：用户信息，用量统计、会话列表状态管理",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
-        "frontend/src/features/profile/profileStore.ts"
+        "mobile/src/features/profile/profileStore.ts"
       ],
       "dependsOn": ["F-007"]
     },
@@ -377,9 +377,9 @@
       "id": "F-036",
       "module": "profile",
       "description": "ProfileCard：信息编辑卡片（昵称/邮箱/电话）",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
-        "frontend/src/features/profile/components/ProfileCard.tsx"
+        "mobile/src/features/profile/components/ProfileCard.tsx"
       ],
       "dependsOn": ["F-002", "F-035"]
     },
@@ -387,9 +387,9 @@
       "id": "F-037",
       "module": "profile",
       "description": "StatsGrid：用量统计网格（对话数/消息数/KB 数/加入时间）",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
-        "frontend/src/features/profile/components/StatsGrid.tsx"
+        "mobile/src/features/profile/components/StatsGrid.tsx"
       ],
       "dependsOn": ["F-002", "F-035"]
     },
@@ -397,9 +397,9 @@
       "id": "F-038",
       "module": "profile",
       "description": "SessionList：活跃会话列表（设备/位置）+ revocation 支持",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
-        "frontend/src/features/profile/components/SessionList.tsx"
+        "mobile/src/features/profile/components/SessionList.tsx"
       ],
       "dependsOn": ["F-035"]
     },
@@ -407,9 +407,9 @@
       "id": "F-039",
       "module": "profile",
       "description": "ProfileScreen：个人中心完整页面（ProfileCard + StatsGrid + SessionList + 退出登录）",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
-        "frontend/src/features/profile/ProfilePage.tsx"
+        "mobile/src/features/profile/ProfileScreen.tsx"
       ],
       "dependsOn": ["F-036", "F-037", "F-038"]
     },
@@ -500,7 +500,7 @@
       "name": "profile",
       "description": "个人中心：ProfileStore、ProfileCard、StatsGrid、SessionList、ProfileScreen",
       "features": ["F-035", "F-036", "F-037", "F-038", "F-039"],
-      "status": "pending"
+      "status": "completed"
     },
     {
       "name": "ui",
