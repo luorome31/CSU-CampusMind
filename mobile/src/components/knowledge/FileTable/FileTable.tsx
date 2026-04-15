@@ -10,19 +10,23 @@ export interface FileTableProps {
 }
 
 const STATUS_LABELS: Record<KnowledgeFile['status'], string> = {
-  pending: '待处理',
-  processing: '处理中',
-  ready: '就绪',
+  process: '处理中',
+  indexing: '索引中',
+  success: '成功',
   verified: '已验证',
-  error: '失败',
+  indexed: '已索引',
+  fail: '失败',
+  pending_verify: '待验证',
 };
 
 const STATUS_VARIANT: Record<KnowledgeFile['status'], 'success' | 'error' | 'warning' | 'info'> = {
-  pending: 'warning',
-  processing: 'info',
-  ready: 'success',
+  process: 'warning',
+  indexing: 'info',
+  success: 'success',
   verified: 'success',
-  error: 'error',
+  indexed: 'success',
+  fail: 'error',
+  pending_verify: 'warning',
 };
 
 function formatDate(dateStr: string): string {

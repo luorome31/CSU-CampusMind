@@ -20,7 +20,7 @@ describe('knowledgeApi', () => {
           id: 'file-1',
           kb_id: 'kb-1',
           file_name: 'test.md',
-          status: 'pending',
+          status: 'pending_verify',
           create_time: '2024-01-01T00:00:00Z',
           update_time: '2024-01-01T00:00:00Z',
         },

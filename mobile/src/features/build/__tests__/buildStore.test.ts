@@ -42,7 +42,7 @@ describe('buildStore', () => {
   describe('clearSelectedFile', () => {
     it('should clear selectedFile and fileContent', () => {
       useBuildStore.setState({
-        selectedFile: { id: 'file-1', kb_id: 'kb-1', file_name: 'test.md', status: 'pending', create_time: '', update_time: '' },
+        selectedFile: { id: 'file-1', kb_id: 'kb-1', file_name: 'test.md', status: 'pending_verify', create_time: '', update_time: '' },
         fileContent: '# content',
       });
 

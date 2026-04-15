@@ -9,7 +9,7 @@ describe('FileTable', () => {
       id: '1',
       kb_id: 'kb1',
       file_name: '测试文件.pdf',
-      status: 'ready',
+      status: 'success',
       create_time: '2024-01-01T00:00:00Z',
       update_time: '2024-01-01T00:00:00Z',
     },
@@ -17,7 +17,7 @@ describe('FileTable', () => {
       id: '2',
       kb_id: 'kb1',
       file_name: '处理中文件.pdf',
-      status: 'processing',
+      status: 'process',
       create_time: '2024-01-02T00:00:00Z',
       update_time: '2024-01-02T00:00:00Z',
     },
@@ -42,7 +42,7 @@ describe('FileTable', () => {
     const { getByText } = render(
       <FileTable files={mockFiles} onFileClick={() => {}} />
     );
-    expect(getByText('就绪')).toBeTruthy();
+    expect(getByText('成功')).toBeTruthy();
     expect(getByText('处理中')).toBeTruthy();
   });
 

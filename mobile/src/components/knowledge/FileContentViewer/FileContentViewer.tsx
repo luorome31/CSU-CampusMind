@@ -1,8 +1,38 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import ReactMarkdown from 'react-native-markdown-display';
+import Markdown, {
+  // @ts-expect-error - FitImage is exported in JS but missing in type definitions
+  FitImage
+} from 'react-native-markdown-display';
 import { Badge } from '../../ui/Badge';
 import { colors, typography, spacing, elevation } from '../../../styles';
+
+const markdownRules = {
+  image: (node: any, children: any, parent: any, styles: any, allowedImageHandlers: any, defaultImageHandler: any) => {
+    const { src, alt } = node.attributes;
+
+    const show = allowedImageHandlers.filter((value: string) => {
+      return src.toLowerCase().startsWith(value.toLowerCase());
+    }).length > 0;
+
+    if (show === false && defaultImageHandler === null) {
+      return null;
+    }
+
+    const uri = show === true ? src : `${defaultImageHandler}${src}`;
+
+    return (
+      <FitImage
+        key={node.key}
+        indicator={false}
+        style={styles._VIEW_SAFE_image}
+        source={{ uri }}
+        accessible={!!alt}
+        accessibilityLabel={alt}
+      />
+    );
+  },
+};
 
 export interface FileContentViewerProps {
   content: string;
@@ -28,7 +58,7 @@ export const FileContentViewer: React.FC<FileContentViewerProps> = ({
         <Badge variant="info">只读</Badge>
       </View>
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-        <ReactMarkdown style={markdownStyles}>{content}</ReactMarkdown>
+        <Markdown style={markdownStyles} rules={markdownRules as any}>{content}</Markdown>
       </ScrollView>
     </View>
   );
