@@ -4,6 +4,7 @@
 import { create } from 'zustand';
 import { profileApi, type UpdateProfileData } from './api/profile';
 import type { User, UsageStats, Session } from '../../types/user';
+import { ApiError } from '../../types/api';
 
 interface ProfileState {
   user: User | null;
@@ -36,7 +37,8 @@ export const useProfileStore = create<ProfileStore>((set) => ({
       const response = await profileApi.getProfile();
       set({ user: response.data, isLoading: false });
     } catch (err) {
-      set({ error: (err as Error).message, isLoading: false });
+      const apiError = err as ApiError;
+      set({ error: apiError.detail || apiError.message, isLoading: false });
     }
   },
 
@@ -46,7 +48,8 @@ export const useProfileStore = create<ProfileStore>((set) => ({
       const response = await profileApi.updateProfile(data);
       set({ user: response.data, isLoading: false });
     } catch (err) {
-      set({ error: (err as Error).message, isLoading: false });
+      const apiError = err as ApiError;
+      set({ error: apiError.detail || apiError.message, isLoading: false });
     }
   },
 
@@ -56,7 +59,8 @@ export const useProfileStore = create<ProfileStore>((set) => ({
       const response = await profileApi.getStats();
       set({ stats: response.data, isLoading: false });
     } catch (err) {
-      set({ error: (err as Error).message, isLoading: false });
+      const apiError = err as ApiError;
+      set({ error: apiError.detail || apiError.message, isLoading: false });
     }
   },
 
@@ -66,7 +70,8 @@ export const useProfileStore = create<ProfileStore>((set) => ({
       const response = await profileApi.getSessions();
       set({ sessions: response.data, isLoading: false });
     } catch (err) {
-      set({ error: (err as Error).message, isLoading: false });
+      const apiError = err as ApiError;
+      set({ error: apiError.detail || apiError.message, isLoading: false });
     }
   },
 
