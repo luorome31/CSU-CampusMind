@@ -243,7 +243,7 @@
       "id": "F-023",
       "module": "knowledge",
       "description": "KnowledgeListStore：KB 列表、文件列表、文件内容状态管理",
-      "status": "in_progress",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/features/knowledge/knowledgeListStore.ts"
       ],
@@ -253,7 +253,7 @@
       "id": "F-024",
       "module": "knowledge",
       "description": "KnowledgeCard：KB 卡片（名称/描述/文件数）",
-      "status": "in_progress",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/components/knowledge/KnowledgeCard/index.tsx"
       ],
@@ -263,7 +263,7 @@
       "id": "F-025",
       "module": "knowledge",
       "description": "FileTable：文件列表表格（文件名/状态 Badge/创建时间）",
-      "status": "in_progress",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/components/knowledge/FileTable/index.tsx"
       ],
@@ -273,7 +273,7 @@
       "id": "F-026",
       "module": "knowledge",
       "description": "FileContentViewer：文件内容查看（Markdown 渲染）",
-      "status": "in_progress",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/components/knowledge/FileContentViewer/index.tsx"
       ],
@@ -283,7 +283,7 @@
       "id": "F-027",
       "module": "knowledge",
       "description": "RAG 开关 + KnowledgeSelector：勾选 KB 附加到当前对话（知识选择器）",
-      "status": "in_progress",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/components/chat/KnowledgeSelector/index.tsx",
         "frontend/src/api/knowledge.ts"
@@ -294,7 +294,7 @@
       "id": "F-028",
       "module": "knowledge",
       "description": "KnowledgeScreen：KB 列表页（进入 KB 后展示文件列表 + 文件详情）",
-      "status": "in_progress",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/features/knowledge/KnowledgeListPage.tsx",
         "frontend/src/features/knowledge/KnowledgeFileListPage.tsx",
@@ -306,7 +306,7 @@
       "id": "F-029",
       "module": "knowledge",
       "description": "Build 入口：知识构建跳转按钮（跳转到 Build 模块）",
-      "status": "in_progress",
+      "status": "completed",
       "referenceCode": [],
       "dependsOn": ["F-028"]
     },
@@ -488,7 +488,7 @@
       "name": "knowledge",
       "description": "知识库：KnowledgeListStore、KB/文件组件，知识选择器、KnowledgeScreen",
       "features": ["F-023", "F-024", "F-025", "F-026", "F-027", "F-028", "F-029"],
-      "status": "pending"
+      "status": "completed"
     },
     {
       "name": "build",
