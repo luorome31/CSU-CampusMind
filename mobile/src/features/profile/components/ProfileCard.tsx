@@ -6,7 +6,9 @@ import { Card } from '../../../components/ui/Card';
 import { colors, typography, spacing, elevation } from '../../../styles';
 import { useProfileStore } from '../profileStore';
 
-export function ProfileCard() {
+interface ProfileCardProps {}
+
+export function ProfileCard(_props: ProfileCardProps) {
   const { user, updateProfile, isLoading } = useProfileStore();
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
@@ -57,8 +59,9 @@ export function ProfileCard() {
           style={styles.fieldDisplay}
           onPress={() => editable && handleStartEdit(field, value || '')}
           disabled={!editable}
+          accessibilityRole="button"
         >
-          <Text style={[styles.fieldValue, !editable && styles.fieldReadonly]}>
+          <Text style={[styles.fieldValue, !editable && styles.fieldReadonly]} numberOfLines={1}>
             {value || '未设置'}
           </Text>
           {editable && <Text style={styles.editHint}>点击编辑</Text>}
@@ -77,7 +80,7 @@ export function ProfileCard() {
             </Text>
           </View>
           <Pressable style={styles.avatarUpload}>
-            <Camera size={14} color="#fff" />
+            <Camera size={14} color={AVATAR_TEXT_COLOR} />
           </Pressable>
         </View>
         <View style={styles.nameSection}>
@@ -92,6 +95,10 @@ export function ProfileCard() {
     </Card>
   );
 }
+
+// Style constants for reusable values
+const AVATAR_OVERLAY_BG = 'rgba(0,0,0,0.5)';
+const AVATAR_TEXT_COLOR = '#fff';
 
 const styles = StyleSheet.create({
   card: {
@@ -117,8 +124,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatarText: {
-    color: '#fff',
-    fontSize: 24,
+    color: AVATAR_TEXT_COLOR,
+    fontSize: typography.textXl,
     fontWeight: typography.fontBold,
   },
   avatarUpload: {
@@ -128,7 +135,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: AVATAR_OVERLAY_BG,
     justifyContent: 'center',
     alignItems: 'center',
   },
