@@ -113,7 +113,10 @@ export function TabNavigator() {
       <Tab.Screen
         name="ChatsTab"
         component={ChatsStackNavigator}
-        options={{ tabBarLabel: '对话' }}
+        options={{ 
+          tabBarLabel: '对话',
+          tabBarStyle: { display: 'none' },
+        }}
       />
       <Tab.Screen
         name="KnowledgeTab"

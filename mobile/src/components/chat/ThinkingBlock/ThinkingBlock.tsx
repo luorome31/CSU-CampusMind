@@ -9,7 +9,7 @@
 
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Brain, ChevronDown, ChevronRight } from 'lucide-react-native';
+import { Brain, ChevronDown, ChevronRight, ChevronUp } from 'lucide-react-native';
 import ReactMarkdown from 'react-native-markdown-display';
 import { colors, spacing } from '../../../styles';
 
@@ -35,15 +35,13 @@ export const ThinkingBlock: React.FC<ThinkingBlockProps> = ({ thinking }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header - always visible */}
       <TouchableOpacity
         style={styles.header}
         onPress={toggleExpand}
         activeOpacity={0.7}
       >
-        <Brain size={16} color={colors.accent} />
-        <Text style={styles.headerText}>AI 思考过程</Text>
-        <Text style={styles.stepCount}>({thinking.length}步)</Text>
+        <Brain size={18} color={colors.accent} />
+        <Text style={styles.stepCount}>({thinking.length})</Text>
         <View style={styles.toggleIcon}>
           {expanded ? (
             <ChevronDown size={18} color={colors.textLight} />
@@ -52,17 +50,6 @@ export const ThinkingBlock: React.FC<ThinkingBlockProps> = ({ thinking }) => {
           )}
         </View>
       </TouchableOpacity>
-
-      {/* Expand hint - shown when collapsed */}
-      {!expanded && (
-        <TouchableOpacity
-          style={styles.expandHint}
-          onPress={toggleExpand}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.expandHintText}>查看思考过程</Text>
-        </TouchableOpacity>
-      )}
 
       {/* Content - shown when expanded */}
       {expanded && (
@@ -73,7 +60,6 @@ export const ThinkingBlock: React.FC<ThinkingBlockProps> = ({ thinking }) => {
                 <View style={styles.stepIndicator}>
                   <Text style={styles.stepNumber}>{index + 1}</Text>
                 </View>
-                <Text style={styles.stepLabel}>步骤 {index + 1}</Text>
               </View>
               <View style={styles.thoughtBody}>
                 <ReactMarkdown style={markdownStyles}>{thought}</ReactMarkdown>
@@ -87,7 +73,7 @@ export const ThinkingBlock: React.FC<ThinkingBlockProps> = ({ thinking }) => {
             onPress={toggleExpand}
             activeOpacity={0.7}
           >
-            <Text style={styles.collapseButtonText}>收起</Text>
+            <ChevronUp size={20} color={colors.textLight} />
           </TouchableOpacity>
         </View>
       )}
@@ -153,12 +139,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[3],
     paddingVertical: spacing[2],
   },
-  headerText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-    marginLeft: spacing[2],
-  },
   stepCount: {
     fontSize: 14,
     color: colors.textLight,
@@ -166,14 +146,6 @@ const styles = StyleSheet.create({
   },
   toggleIcon: {
     marginLeft: 'auto',
-  },
-  expandHint: {
-    paddingHorizontal: spacing[3],
-    paddingBottom: spacing[2],
-  },
-  expandHintText: {
-    fontSize: 13,
-    color: colors.accent,
   },
   content: {
     paddingHorizontal: spacing[3],
@@ -201,11 +173,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.backgroundCard,
   },
-  stepLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.text,
-  },
   thoughtBody: {
     marginLeft: spacing[6],
     paddingLeft: spacing[3],
@@ -217,10 +184,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[4],
     paddingVertical: spacing[2],
     marginTop: spacing[2],
-  },
-  collapseButtonText: {
-    fontSize: 13,
-    color: colors.textMuted,
   },
 });
 

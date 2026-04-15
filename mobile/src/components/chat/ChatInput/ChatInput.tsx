@@ -90,9 +90,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: spacing[4],
     paddingVertical: spacing[3],
-    backgroundColor: colors.backgroundCard,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.border,
+    backgroundColor: 'transparent',
   },
   inputWrapper: {
     flexDirection: 'row',

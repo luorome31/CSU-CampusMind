@@ -7,16 +7,17 @@
  */
 
 import React, { useCallback } from 'react';
-import { View, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ChevronLeft } from 'lucide-react-native';
 import { MessageList } from '../components/chat/MessageList';
 import { ChatInput } from '../components/chat/ChatInput';
 import { EmptyState } from '../components/chat/EmptyState';
 import { useChatStream } from '../features/chat/useChatStream';
 import { useChatStore } from '../features/chat/chatStore';
-import { colors } from '../styles';
+import { colors, spacing, typography } from '../styles';
 
-export function ChatsScreen() {
+export function ChatsScreen({ navigation }: any) {
   const { sendMessage, isStreaming, messages } = useChatStream();
   const currentKnowledgeIds = useChatStore((s) => s.currentKnowledgeIds);
 
@@ -31,6 +32,17 @@ export function ChatsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={() => navigation.navigate('HomeTab')}
+          activeOpacity={0.7}
+        >
+          <ChevronLeft size={24} color={colors.text} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>CampusMind</Text>
+        <View style={styles.headerRight} />
+      </View>
       <KeyboardAvoidingView
         style={styles.keyboardAvoid}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -53,6 +65,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[3],
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
+    backgroundColor: colors.backgroundGlass,
+  },
+  backButton: {
+    padding: spacing[1],
+    marginLeft: -spacing[1],
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: typography.fontBold,
+    color: colors.text,
+    letterSpacing: 0.5,
+  },
+  headerRight: {
+    width: 32,
   },
   keyboardAvoid: {
     flex: 1,
