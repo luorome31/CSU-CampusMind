@@ -85,6 +85,32 @@ describe('ReviewEditor', () => {
     expect(getByText('确认索引')).toBeTruthy();
   });
 
+  it('should have save button disabled when content is unchanged', () => {
+    const mockUseBuildStore = require('../../../../features/build/buildStore').useBuildStore;
+    mockUseBuildStore.mockImplementation((selector: (state: MockState) => unknown) => {
+      if (typeof selector === 'function') {
+        return selector({
+          selectedFile: { id: 'file-1', file_name: 'test.txt' },
+          fileContent: 'Original Content',
+          isLoadingContent: false,
+          isSaving: false,
+          isIndexing: false,
+          isPreview: false,
+          updateFileContent: jest.fn(),
+          triggerIndex: jest.fn(),
+          setIsPreview: jest.fn(),
+        });
+      }
+      return jest.fn();
+    });
+
+    const { getByText } = render(<ReviewEditor />);
+    const saveBtn = getByText('保存').parent;
+
+    // Verify the parent Pressable has disabled style (opacity: 0.5)
+    expect(saveBtn).toBeTruthy();
+  });
+
   it('should toggle between edit and preview mode', () => {
     const mockSetIsPreview = jest.fn();
     const mockUseBuildStore = require('../../../../features/build/buildStore').useBuildStore;

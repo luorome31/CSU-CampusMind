@@ -1,7 +1,7 @@
 // mobile/src/components/build/ReviewTab/ReviewInbox.tsx
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { Clipboard } from 'lucide-react-native';
+import { ClipboardList } from 'lucide-react-native';
 import { colors, typography, spacing, elevation } from '../../../styles';
 
 interface ReviewInboxProps {
@@ -19,7 +19,7 @@ export function ReviewInbox({ count, onPress }: ReviewInboxProps) {
       disabled={isDisabled}
     >
       <View style={styles.content}>
-        <Clipboard size={18} color={isDisabled ? colors.textMuted : colors.accent} />
+        <ClipboardList size={18} color={isDisabled ? colors.textMuted : colors.accent} />
         <Text style={[styles.label, isDisabled && styles.labelDisabled]}>待审核文件</Text>
       </View>
       {count > 0 && (

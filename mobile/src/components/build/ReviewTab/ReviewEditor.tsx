@@ -95,25 +95,27 @@ export function ReviewEditor() {
       {/* Actions */}
       <View style={styles.actions}>
         <Pressable
-          style={[styles.btn, styles.btnPrimary, !canSave && styles.btnDisabled]}
+          style={[styles.btn, styles.btnSecondary, !canSave && styles.btnDisabled]}
           onPress={handleSave}
           disabled={!canSave}
+          accessibilityLabel="保存"
         >
           {isSaving ? (
             <ActivityIndicator size="small" color={colors.background} />
           ) : (
-            <Text style={styles.btnPrimaryText}>保存</Text>
+            <Text style={styles.btnSecondaryText}>保存</Text>
           )}
         </Pressable>
         <Pressable
-          style={[styles.btn, styles.btnSecondary, !canIndex && styles.btnDisabled]}
+          style={[styles.btn, styles.btnPrimary, !canIndex && styles.btnDisabled]}
           onPress={handleIndex}
           disabled={!canIndex}
+          accessibilityLabel="确认索引"
         >
           {isIndexing ? (
             <ActivityIndicator size="small" color={colors.accent} />
           ) : (
-            <Text style={styles.btnSecondaryText}>确认索引</Text>
+            <Text style={styles.btnPrimaryText}>确认索引</Text>
           )}
         </Pressable>
       </View>
@@ -192,7 +194,7 @@ const styles = StyleSheet.create({
     fontSize: typography.textSm,
     color: colors.text,
     fontFamily: typography.fontMono,
-    lineHeight: typography.textSm * typography.leadingNormal,
+    lineHeight: 22,
   },
   previewContent: {
     flex: 1,
@@ -200,7 +202,7 @@ const styles = StyleSheet.create({
     fontSize: typography.textSm,
     color: colors.text,
     fontFamily: typography.fontMono,
-    lineHeight: typography.textSm * typography.leadingNormal,
+    lineHeight: 22,
   },
   actions: {
     flexDirection: 'row',
