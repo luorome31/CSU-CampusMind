@@ -314,7 +314,7 @@
       "id": "F-030",
       "module": "build",
       "description": "BuildStore：爬取任务状态、轮询、Review 队列管理",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/features/build/buildStore.ts"
       ],
@@ -324,7 +324,7 @@
       "id": "F-031",
       "module": "build",
       "description": "CrawlPanel + UrlImportModal：URL 输入 + 批量导入",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/components/knowledge_build/CrawlTab/CrawlPanel.tsx",
         "frontend/src/components/knowledge_build/CrawlTab/UrlImportModal.tsx"
@@ -335,7 +335,7 @@
       "id": "F-032",
       "module": "build",
       "description": "TaskList + TaskCard：爬取任务卡片列表（状态/进度）",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/components/knowledge_build/CrawlTab/TaskList.tsx",
         "frontend/src/components/knowledge_build/CrawlTab/TaskCard.tsx"
@@ -346,7 +346,7 @@
       "id": "F-033",
       "module": "build",
       "description": "ReviewInbox + ReviewEditor：待审核文件列表 + 内容审核编辑",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/components/knowledge_build/ReviewTab/ReviewInbox.tsx",
         "frontend/src/components/knowledge_build/ReviewTab/ReviewEditor.tsx"
@@ -357,7 +357,7 @@
       "id": "F-034",
       "module": "build",
       "description": "BuildScreen：知识构建全流程页面（Crawl 阶段 + Review 阶段 + 3s 轮询）",
-      "status": "pending",
+      "status": "completed",
       "referenceCode": [
         "frontend/src/features/build/KnowledgeBuildPage.tsx"
       ],
@@ -494,7 +494,7 @@
       "name": "build",
       "description": "知识构建：BuildStore、CrawlPanel、TaskList、Review、BuildScreen",
       "features": ["F-030", "F-031", "F-032", "F-033", "F-034"],
-      "status": "pending"
+      "status": "completed"
     },
     {
       "name": "profile",
