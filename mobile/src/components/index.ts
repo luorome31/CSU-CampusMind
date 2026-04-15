@@ -1,1 +1,1 @@
-export {};
+export { KnowledgeCard } from './knowledge/KnowledgeCard';
