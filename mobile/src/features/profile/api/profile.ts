@@ -3,8 +3,7 @@
  */
 
 import { apiClient } from '../../../api/client';
-import type { User } from '../../../types/api';
-import type { UsageStats, Session } from '../../../types/user';
+import type { User, UsageStats, Session } from '../../../types/user';
 
 export interface UpdateProfileData {
   display_name?: string;
