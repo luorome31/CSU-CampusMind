@@ -22,7 +22,7 @@ export type HomeStackParamList = {
 
 // === Chats Stack ===
 export type ChatsStackParamList = {
-  Chats: undefined;
+  Chats: { dialogId?: string };
   ChatDetail: { dialogId: string };
 };
 

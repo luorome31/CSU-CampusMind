@@ -24,7 +24,7 @@ describe('Navigation types', () => {
     it('should have 4 tab routes', () => {
       const tabs: RootTabParamList = {
         HomeTab: { screen: 'Home' },
-        ChatsTab: { screen: 'Chats' },
+        ChatsTab: { screen: 'Chats', params: {} },
         KnowledgeTab: { screen: 'KnowledgeList' },
         ProfileTab: { screen: 'Profile' },
       };

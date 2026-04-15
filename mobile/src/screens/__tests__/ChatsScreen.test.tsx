@@ -48,13 +48,18 @@ const mockNavigation = {
   setOptions: jest.fn(),
 };
 
+// Mock route
+const mockRoute = {
+  params: {},
+};
+
 describe('ChatsScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('should render header correctly', async () => {
-    const { getAllByText } = render(<ChatsScreen navigation={mockNavigation as any} />);
+    const { getAllByText } = render(<ChatsScreen navigation={mockNavigation as any} route={mockRoute as any} />);
 
     await waitFor(() => {
       expect(getAllByText('CampusMind').length).toBeGreaterThan(0);

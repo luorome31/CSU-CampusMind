@@ -4,7 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { MessageSquare, ArrowRight } from 'lucide-react-native';
 import { colors, typography, spacing } from '../../styles';
-import type { RootTabParamList } from '../../navigation/types';
+import type { RootTabParamList, ChatsStackParamList } from '../../navigation/types';
+import type { NavigatorScreenParams } from '@react-navigation/native';
 import type { Dialog } from '../../api/dialog';
 
 type NavigationProp = BottomTabNavigationProp<RootTabParamList>;
@@ -22,7 +23,7 @@ function HistoryItem({ dialog }: { dialog: Dialog }) {
       style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
       onPress={() =>
         navigation.navigate('ChatsTab', {
-          screen: 'ChatDetail',
+          screen: 'Chats',
           params: { dialogId: dialog.id },
         } as any)
       }

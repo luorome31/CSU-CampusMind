@@ -4,9 +4,10 @@
  * 组合 MessageList + ChatInput + EmptyState
  * 有消息时显示 MessageList + ChatInput
  * 无消息时显示 EmptyState + ChatInput
+ * 支持从 Home 导航时传入 dialogId 加载历史对话
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
@@ -15,11 +16,26 @@ import { ChatInput } from '../components/chat/ChatInput';
 import { EmptyState } from '../components/chat/EmptyState';
 import { useChatStream } from '../features/chat/useChatStream';
 import { useChatStore } from '../features/chat/chatStore';
+import { getDialogMessages } from '../api/dialog';
 import { colors, spacing, typography } from '../styles';
+import type { ChatsScreenProps } from '../navigation/types';
 
-export function ChatsScreen({ navigation }: any) {
+export function ChatsScreen({ navigation, route }: ChatsScreenProps) {
   const { sendMessage, isStreaming, messages } = useChatStream();
   const currentKnowledgeIds = useChatStore((s) => s.currentKnowledgeIds);
+  const loadDialog = useChatStore((s) => s.loadDialog);
+  const clearMessages = useChatStore((s) => s.clearMessages);
+  const dialogId = route.params?.dialogId;
+
+  useEffect(() => {
+    if (dialogId) {
+      getDialogMessages(dialogId)
+        .then((dbMessages) => loadDialog(dialogId, dbMessages))
+        .catch(console.error);
+    } else {
+      clearMessages();
+    }
+  }, [dialogId]);
 
   const handleSend = useCallback(
     (content: string) => {
@@ -33,9 +49,9 @@ export function ChatsScreen({ navigation }: any) {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => navigation.navigate('HomeTab')}
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.navigate('HomeTab' as any)}
           activeOpacity={0.7}
         >
           <ChevronLeft size={24} color={colors.text} />
