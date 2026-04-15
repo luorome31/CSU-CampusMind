@@ -20,7 +20,11 @@ export const KnowledgeCard: React.FC<KnowledgeCardProps> = ({
   onClick,
 }) => {
   return (
-    <Pressable onPress={onClick}>
+    <Pressable
+      onPress={onClick}
+      accessibilityRole="button"
+      accessibilityLabel={`知识库: ${knowledge.name}, ${fileCount} 个文件`}
+    >
       <Card variant="elevated" padding="md" style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title} numberOfLines={1}>
