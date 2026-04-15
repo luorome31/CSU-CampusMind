@@ -36,4 +36,9 @@
 | 22 | 2026-04-15 | `onDone` 回调从未被调用：react-native-sse 在流结束时触发 error 事件而非 close 事件，且错误消息为 "null" 时应视为正常结束 | 添加 close 事件监听器；错误处理中检测 "null" 消息判定为正常结束 | fab7731 |
 | 23 | 2026-04-15 | ThinkingBlock 展开时 FlatList 的 `onContentSizeChange` 无条件调用 `scrollToEnd`，导致用户滚动阅读时被强制拉到最底部 | 使用 `isAtBottom` ref 追踪用户是否在底部，仅在 `isStreaming` 或用户位于底部时才自动滚动 | fab7731 |
 | 24 | 2026-04-15 | react-native-sse 在流正常结束后不会触发 close 事件，且会尝试自动重连，导致 `onDone` 无法被调用 | 重写 chat.ts 使用原生 XMLHttpRequest，正确检测 `readyState === XMLHttpRequest.DONE` 并在 status 2xx 时调用 `onDone` | 用户最新 commit |
+| 25 | 2026-04-15 | BuildScreen 爬取任务 tab 不支持滑动：crawl tab 内容区直接用 `View` 包含 `<CrawlPanel />` 和 `<TaskList />`，未包裹 `ScrollView` | 将 crawl tab 内容包裹在 `<ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>` 中 | c668315 |
+| 26 | 2026-04-15 | ReviewEditor 预览模式使用 `<Text>` 纯文本展示，无法滚动查看完整内容 | 预览内容包裹在 `<ScrollView>` 中 | c668315 |
+| 27 | 2026-04-15 | ReviewEditor 预览模式使用 `<Text>` 渲染，无法显示 Markdown 格式（标题、代码块等） | 使用 `react-native-markdown-display` 的 `<Markdown>` 组件替代 `<Text>` | c668315 |
+| 28 | 2026-04-15 | fetchTasks API 解析错误：后端返回 `CrawlTask[]` 原始数组，前端错误地访问 `response.data.tasks` | 修正为 `return response.data \|\| []` | c81637b |
+| 29 | 2026-04-15 | BuildScreen 使用 MOCK_KB_LIST 假数据，知识库列表无法显示真实数据 | 新增 `knowledge.ts` API 模块和 `fetchKnowledgeBases` action，移除假数据 | c81637b |
 
