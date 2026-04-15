@@ -25,7 +25,13 @@ export const RAGSwitch: React.FC<RAGSwitchProps> = ({
   return (
     <Card variant="default" padding="sm" style={styles.container}>
       <View style={styles.header}>
-        <Pressable style={styles.toggleRow} onPress={onToggle}>
+        <Pressable
+          style={styles.toggleRow}
+          onPress={onToggle}
+          accessibilityRole="switch"
+          accessibilityLabel="RAG 检索开关"
+          accessibilityState={{ checked: enabled }}
+        >
           <View style={[styles.switch, enabled && styles.switchEnabled]}>
             <View style={[styles.switchThumb, enabled && styles.switchThumbEnabled]} />
           </View>
