@@ -23,9 +23,7 @@ import { BuildScreen } from '../screens/BuildScreen';
 import { KnowledgeScreen } from '../screens/KnowledgeScreen';
 import { KnowledgeDetailScreen } from '../screens/KnowledgeDetailScreen';
 import { FileDetailScreen } from '../screens/FileDetailScreen';
-
-// 占位组件（将在后续模块实现）
-const PlaceholderScreen = () => <View style={styles.placeholder}><Text>Screen</Text></View>;
+import { ProfileScreen } from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
@@ -63,7 +61,7 @@ function KnowledgeStackNavigator() {
 function ProfileStackNavigator() {
   return (
     <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
-      <ProfileStack.Screen name="Profile" component={PlaceholderScreen} />
+      <ProfileStack.Screen name="Profile" component={ProfileScreen} />
     </ProfileStack.Navigator>
   );
 }
