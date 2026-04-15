@@ -1,1 +1,1 @@
-export {};
+export { useKnowledgeStore } from './knowledge/knowledgeStore';
