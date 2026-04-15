@@ -8,8 +8,9 @@
  */
 
 import React, { useCallback, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import { ChevronLeft } from 'lucide-react-native';
 import { MessageList } from '../components/chat/MessageList';
 import { ChatInput } from '../components/chat/ChatInput';
@@ -25,13 +26,26 @@ export function ChatsScreen({ navigation, route }: ChatsScreenProps) {
   const currentKnowledgeIds = useChatStore((s) => s.currentKnowledgeIds);
   const loadDialog = useChatStore((s) => s.loadDialog);
   const clearMessages = useChatStore((s) => s.clearMessages);
+  const setIsLoadingHistory = useChatStore((s) => s.setIsLoadingHistory);
+  const isLoadingHistory = useChatStore((s) => s.isLoadingHistory);
   const dialogId = route.params?.dialogId;
+
+  // 每次 screen focus 时，如果是新建对话则清空消息
+  useFocusEffect(
+    useCallback(() => {
+      if (!dialogId) {
+        clearMessages();
+      }
+    }, [dialogId])
+  );
 
   useEffect(() => {
     if (dialogId) {
+      setIsLoadingHistory(true);
       getDialogMessages(dialogId)
         .then((dbMessages) => loadDialog(dialogId, dbMessages))
-        .catch(console.error);
+        .catch(console.error)
+        .finally(() => setIsLoadingHistory(false));
     } else {
       clearMessages();
     }
@@ -64,7 +78,12 @@ export function ChatsScreen({ navigation, route }: ChatsScreenProps) {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={styles.content}>
-          {hasMessages ? (
+          {isLoadingHistory ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={colors.accent} />
+              <Text style={styles.loadingText}>加载历史消息...</Text>
+            </View>
+          ) : hasMessages ? (
             <MessageList messages={messages} isStreaming={isStreaming} />
           ) : (
             <EmptyState />
@@ -109,5 +128,15 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: spacing[4],
+    fontSize: typography.textBase,
+    color: colors.textMuted,
   },
 });
