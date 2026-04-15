@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    marginRight: 8,
+    marginRight: -8,
   },
   bubble: {
     maxWidth: '75%',
@@ -201,6 +201,8 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 4,
   },
   assistantBubble: {
+    maxWidth: '100%',
+    flex: 1,
     backgroundColor: 'transparent',
     borderBottomLeftRadius: 4,
   },

@@ -38,6 +38,15 @@ export const ToolGroup: React.FC<ToolGroupProps> = ({ events }) => {
     return <RefreshCw size={14} color={colors.accent} />;
   };
 
+  const getStatusText = () => {
+    if (totalCount === 0) return '正在准备工具...';
+    if (allDone) {
+      if (errorCount > 0) return `${errorCount} 个工具失败`;
+      return `${totalCount} 个工具成功`;
+    }
+    return `调用工具 (${doneCount}/${totalCount})`;
+  };
+
   const getToolStatusIcon = (status: ToolEvent['status']) => {
     switch (status) {
       case 'END':
@@ -46,6 +55,17 @@ export const ToolGroup: React.FC<ToolGroupProps> = ({ events }) => {
         return <XCircle size={14} color={colors.error} />;
       default:
         return <RefreshCw size={14} color={colors.accent} />;
+    }
+  };
+
+  const getToolStatusText = (status: ToolEvent['status']) => {
+    switch (status) {
+      case 'END':
+        return '成功';
+      case 'ERROR':
+        return '失败';
+      default:
+        return '进行中';
     }
   };
 
@@ -65,8 +85,10 @@ export const ToolGroup: React.FC<ToolGroupProps> = ({ events }) => {
         activeOpacity={0.7}
       >
         <Wrench size={16} color={colors.accent} />
+        <Text style={styles.headerText}>调用工具</Text>
         <View style={styles.statusBadge}>
           {getStatusIcon()}
+          <Text style={styles.statusText}>{getStatusText()}</Text>
         </View>
         <View style={styles.toggleIcon}>
           {expanded ? (
@@ -85,6 +107,15 @@ export const ToolGroup: React.FC<ToolGroupProps> = ({ events }) => {
               <View style={styles.toolHeader}>
                 {getToolStatusIcon(event.status)}
                 <Text style={[styles.toolName, { marginLeft: spacing[2] }]}>{event.name}</Text>
+                <Text
+                  style={[
+                    styles.toolStatusText,
+                    event.status === 'END' && styles.toolStatusSuccess,
+                    event.status === 'ERROR' && styles.toolStatusError,
+                  ]}
+                >
+                  {getToolStatusText(event.status)}
+                </Text>
               </View>
 
               {/* Input section */}
@@ -121,15 +152,6 @@ export const ToolGroup: React.FC<ToolGroupProps> = ({ events }) => {
               )}
             </View>
           ))}
-
-          {/* Collapse button */}
-          <TouchableOpacity
-            style={styles.collapseButton}
-            onPress={toggleExpand}
-            activeOpacity={0.7}
-          >
-            <ChevronUp size={20} color={colors.textLight} />
-          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -139,7 +161,6 @@ export const ToolGroup: React.FC<ToolGroupProps> = ({ events }) => {
 const styles = StyleSheet.create({
   container: {
     marginVertical: spacing[2],
-    marginHorizontal: spacing[4],
     backgroundColor: colors.toolBg,
     borderRadius: 12,
     borderWidth: 1,
@@ -263,12 +284,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: colors.error,
-  },
-  collapseButton: {
-    alignSelf: 'center',
-    paddingHorizontal: spacing[4],
-    paddingVertical: spacing[2],
-    marginTop: spacing[2],
   },
 });
 

@@ -31,7 +31,7 @@ export function ChatsScreen({ navigation }: any) {
   const hasMessages = messages.length > 0;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity 
           style={styles.backButton} 
@@ -45,8 +45,7 @@ export function ChatsScreen({ navigation }: any) {
       </View>
       <KeyboardAvoidingView
         style={styles.keyboardAvoid}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={styles.content}>
           {hasMessages ? (

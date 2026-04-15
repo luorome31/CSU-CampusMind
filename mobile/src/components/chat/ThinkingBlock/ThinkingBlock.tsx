@@ -41,7 +41,8 @@ export const ThinkingBlock: React.FC<ThinkingBlockProps> = ({ thinking }) => {
         activeOpacity={0.7}
       >
         <Brain size={18} color={colors.accent} />
-        <Text style={styles.stepCount}>({thinking.length})</Text>
+        <Text style={styles.headerText}>思考</Text>
+        <Text style={styles.stepCount}>({thinking.length} 步)</Text>
         <View style={styles.toggleIcon}>
           {expanded ? (
             <ChevronDown size={18} color={colors.textLight} />
@@ -66,15 +67,6 @@ export const ThinkingBlock: React.FC<ThinkingBlockProps> = ({ thinking }) => {
               </View>
             </View>
           ))}
-
-          {/* Collapse button */}
-          <TouchableOpacity
-            style={styles.collapseButton}
-            onPress={toggleExpand}
-            activeOpacity={0.7}
-          >
-            <ChevronUp size={20} color={colors.textLight} />
-          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -126,7 +118,6 @@ const markdownStyles = StyleSheet.create({
 const styles = StyleSheet.create({
   container: {
     marginVertical: spacing[2],
-    marginHorizontal: spacing[4],
     backgroundColor: colors.moodBg,
     borderRadius: 12,
     borderWidth: 1,
@@ -138,6 +129,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing[3],
     paddingVertical: spacing[2],
+  },
+  headerText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+    marginLeft: spacing[2],
   },
   stepCount: {
     fontSize: 14,
@@ -178,12 +175,6 @@ const styles = StyleSheet.create({
     paddingLeft: spacing[3],
     borderLeftWidth: 2,
     borderLeftColor: colors.border,
-  },
-  collapseButton: {
-    alignSelf: 'center',
-    paddingHorizontal: spacing[4],
-    paddingVertical: spacing[2],
-    marginTop: spacing[2],
   },
 });
 

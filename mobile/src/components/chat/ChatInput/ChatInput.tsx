@@ -15,6 +15,7 @@ import {
   StyleSheet,
   Keyboard,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Send } from 'lucide-react-native';
 import { colors, spacing } from '../../../styles';
 
@@ -35,6 +36,7 @@ const MAX_HEIGHT = 120;
 export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled }) => {
   const [value, setValue] = useState('');
   const [inputHeight, setInputHeight] = useState(MIN_HEIGHT);
+  const insets = useSafeAreaInsets();
 
   const handleSend = useCallback(() => {
     const trimmed = value.trim();
@@ -56,7 +58,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled }) => {
   const showSendButton = value.trim().length > 0 && !disabled;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, spacing[3]) }]}>
       <View style={[styles.inputWrapper, disabled && styles.inputWrapperDisabled]}>
         <TextInput
           style={[styles.textInput, { height: inputHeight }]}
@@ -89,7 +91,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled }) => {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: spacing[4],
-    paddingVertical: spacing[3],
+    paddingTop: spacing[3],
     backgroundColor: 'transparent',
   },
   inputWrapper: {
