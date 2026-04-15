@@ -117,6 +117,15 @@ export function TabNavigator() {
           tabBarLabel: '对话',
           tabBarStyle: { display: 'none' },
         }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.navigate('ChatsTab', {
+              screen: 'Chats',
+              params: { dialogId: undefined },
+            } as any);
+          },
+        })}
       />
       <Tab.Screen
         name="KnowledgeTab"

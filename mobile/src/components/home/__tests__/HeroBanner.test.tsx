@@ -27,8 +27,19 @@ describe('HeroBanner', () => {
     expect(getByText(/基于 RAG 与 Tool-calling 的智能校园助手/)).toBeTruthy();
   });
 
-  it('should render "新建对话" button', () => {
+  it('should navigate to ChatsTab with undefined dialogId when "新建对话" is pressed', () => {
+    const mockNavigate = jest.fn();
+    jest.spyOn(require('@react-navigation/native'), 'useNavigation').mockReturnValue({ navigate: mockNavigate });
+
     const { getByText } = render(<HeroBanner />);
-    expect(getByText('新建对话')).toBeTruthy();
+    const button = getByText('新建对话');
+
+    const { fireEvent } = require('@testing-library/react-native');
+    fireEvent.press(button);
+
+    expect(mockNavigate).toHaveBeenCalledWith('ChatsTab', {
+      screen: 'Chats',
+      params: { dialogId: undefined },
+    });
   });
 });

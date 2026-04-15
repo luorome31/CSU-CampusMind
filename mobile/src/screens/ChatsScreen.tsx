@@ -31,12 +31,14 @@ export function ChatsScreen({ navigation, route }: ChatsScreenProps) {
   const dialogId = route.params?.dialogId;
 
   // 每次 screen focus 时，如果是新建对话则清空消息
+  // 不依赖 dialogId，因为 useFocusEffect 每次 focus 都会执行
   useFocusEffect(
     useCallback(() => {
-      if (!dialogId) {
+      const currentDialogId = route.params?.dialogId;
+      if (!currentDialogId) {
         clearMessages();
       }
-    }, [dialogId])
+    }, [route.params])
   );
 
   useEffect(() => {

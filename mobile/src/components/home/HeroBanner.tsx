@@ -18,7 +18,12 @@ export function HeroBanner() {
         <Text style={styles.subtitle}>基于 RAG 与 Tool-calling 的智能校园助手。连接校园知识，赋能学习生活。✨</Text>
         <Pressable
           style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
-          onPress={() => navigation.navigate('ChatsTab' as any)}
+          onPress={() =>
+            navigation.navigate('ChatsTab', {
+              screen: 'Chats',
+              params: { dialogId: undefined },
+            } as any)
+          }
         >
           <Text style={styles.buttonText}>新建对话</Text>
         </Pressable>
