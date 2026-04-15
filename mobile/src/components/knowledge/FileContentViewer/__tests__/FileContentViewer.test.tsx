@@ -1,6 +1,17 @@
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 import { FileContentViewer } from '../FileContentViewer';
+
+// Mock react-native-markdown-display
+jest.mock('react-native-markdown-display', () => {
+  const { Text } = require('react-native');
+  return {
+    __esModule: true,
+    default: ({ children }: { children: string }) => (
+      <Text testID="markdown-content">{children}</Text>
+    ),
+  };
+});
 
 describe('FileContentViewer', () => {
   it('should render empty state when no content', () => {
@@ -10,11 +21,11 @@ describe('FileContentViewer', () => {
     expect(getByText('暂无内容')).toBeTruthy();
   });
 
-  it('should render content', () => {
-    const { getByText } = render(
+  it('should render markdown content', () => {
+    render(
       <FileContentViewer content="# Hello World" />
     );
-    expect(getByText('# Hello World')).toBeTruthy();
+    expect(screen.getByTestId('markdown-content')).toBeTruthy();
   });
 
   it('should render filename if provided', () => {
@@ -22,5 +33,12 @@ describe('FileContentViewer', () => {
       <FileContentViewer content="test" fileName="test.txt" />
     );
     expect(getByText('test.txt')).toBeTruthy();
+  });
+
+  it('should render markdown with proper content', () => {
+    render(
+      <FileContentViewer content="## Test Header\nSome content here" />
+    );
+    expect(screen.getByTestId('markdown-content')).toBeTruthy();
   });
 });

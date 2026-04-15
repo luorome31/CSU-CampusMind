@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import ReactMarkdown from 'react-native-markdown-display';
 import { Badge } from '../../ui/Badge';
 import { colors, typography, spacing, elevation } from '../../../styles';
 
@@ -27,11 +28,85 @@ export const FileContentViewer: React.FC<FileContentViewerProps> = ({
         <Badge variant="info">只读</Badge>
       </View>
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-        <Text style={styles.markdownText}>{content}</Text>
+        <ReactMarkdown style={markdownStyles}>{content}</ReactMarkdown>
       </ScrollView>
     </View>
   );
 };
+
+// Markdown styles matching warm paper theme
+const markdownStyles = StyleSheet.create({
+  body: {
+    fontSize: typography.textSm,
+    color: colors.text,
+    lineHeight: typography.textSm * 1.8,
+  },
+  heading1: {
+    fontSize: typography.textXl,
+    fontWeight: typography.fontBold,
+    color: colors.text,
+    marginBottom: spacing[3],
+  },
+  heading2: {
+    fontSize: typography.textLg,
+    fontWeight: typography.fontSemibold,
+    color: colors.text,
+    marginBottom: spacing[2],
+  },
+  heading3: {
+    fontSize: typography.textBase,
+    fontWeight: typography.fontSemibold,
+    color: colors.text,
+    marginBottom: spacing[2],
+  },
+  paragraph: {
+    marginVertical: spacing[1],
+  },
+  code_inline: {
+    backgroundColor: colors.moodBg,
+    paddingHorizontal: spacing[2],
+    borderRadius: elevation.radiusSm,
+    fontFamily: 'monospace',
+  },
+  code_block: {
+    backgroundColor: colors.moodBg,
+    padding: spacing[3],
+    borderRadius: elevation.radiusMd,
+    marginVertical: spacing[2],
+  },
+  fence: {
+    backgroundColor: colors.moodBg,
+    padding: spacing[3],
+    borderRadius: elevation.radiusMd,
+    marginVertical: spacing[2],
+  },
+  link: {
+    color: colors.accent,
+  },
+  strong: {
+    fontWeight: typography.fontBold,
+  },
+  em: {
+    fontStyle: 'italic',
+  },
+  blockquote: {
+    backgroundColor: colors.moodBg,
+    borderLeftWidth: 4,
+    borderLeftColor: colors.border,
+    paddingLeft: spacing[3],
+    paddingVertical: spacing[2],
+    marginVertical: spacing[2],
+  },
+  list_item: {
+    marginVertical: spacing[1],
+  },
+  bullet_list: {
+    marginVertical: spacing[1],
+  },
+  ordered_list: {
+    marginVertical: spacing[1],
+  },
+});
 
 const styles = StyleSheet.create({
   container: {
