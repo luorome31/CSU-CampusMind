@@ -14,6 +14,7 @@ import { useBuildStore } from '../features/build/buildStore';
 import { colors, spacing } from '../styles';
 import type { KnowledgeBuildScreenProps } from '../navigation/types';
 
+// TODO: Replace with real API once knowledge service is implemented
 const MOCK_KB_LIST = [
   { id: 'kb-1', name: '教务处', file_count: 12 },
   { id: 'kb-2', name: '图书馆', file_count: 8 },
@@ -33,6 +34,7 @@ export function BuildScreen({ navigation }: KnowledgeBuildScreenProps) {
   const fetchTasks = useBuildStore((s) => s.fetchTasks);
   const fetchPendingFiles = useBuildStore((s) => s.fetchPendingFiles);
   const fetchFileContent = useBuildStore((s) => s.fetchFileContent);
+  const openImportModal = useBuildStore((s) => s.openImportModal);
   const pendingFiles = useBuildStore((s) => s.pendingFiles);
   const pendingReviewCount = useBuildStore((s) => s.pendingReviewCount);
 
@@ -62,7 +64,7 @@ export function BuildScreen({ navigation }: KnowledgeBuildScreenProps) {
   };
 
   const handleOpenImportModal = () => {
-    useBuildStore.getState().openImportModal();
+    openImportModal();
   };
 
   const handleOpenFileSelect = () => {
@@ -144,8 +146,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing[3],
   },
   backButton: {
-    width: 40,
-    height: 40,
+    padding: spacing[2],
     alignItems: 'center',
     justifyContent: 'center',
   },
