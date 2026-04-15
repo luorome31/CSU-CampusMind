@@ -19,6 +19,7 @@ import {
 import { colors, typography, spacing } from '../styles';
 import { HomeScreen } from '../screens/HomeScreen';
 import { ChatsScreen } from '../screens/ChatsScreen';
+import { BuildScreen } from '../screens/BuildScreen';
 
 // 占位组件（将在后续模块实现）
 const PlaceholderScreen = () => <View style={styles.placeholder}><Text>Screen</Text></View>;
@@ -33,6 +34,7 @@ function HomeStackNavigator() {
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
       <HomeStack.Screen name="Home" component={HomeScreen} />
+      <HomeStack.Screen name="KnowledgeBuild" component={BuildScreen} />
     </HomeStack.Navigator>
   );
 }
