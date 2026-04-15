@@ -27,12 +27,9 @@ export function FeatureGrid() {
         <Pressable
           style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
           onPress={() => {
-            const parent = navigation.getParent();
-            if (parent) {
-              parent.navigate('HomeTab', {
-                screen: 'KnowledgeBuild',
-              });
-            }
+            navigation.getParent()?.navigate('HomeTab', {
+              screen: 'KnowledgeBuild',
+            });
           }}
         >
           <View style={styles.iconContainer}>
