@@ -22,7 +22,7 @@ export function KnowledgeDetailScreen({ navigation, route }: Props) {
       setCurrentKB(kb);
     }
     fetchFiles(kbId);
-  }, [kbId, knowledgeBases, setCurrentKB, fetchFiles]);
+  }, [kbId, setCurrentKB, fetchFiles]);
 
   const handleBack = () => {
     navigation.goBack();
