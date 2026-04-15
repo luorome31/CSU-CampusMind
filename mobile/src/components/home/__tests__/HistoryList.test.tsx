@@ -34,7 +34,7 @@ describe('HistoryList', () => {
     const { getByText } = render(<HistoryList dialogs={mockDialogs} />);
     fireEvent.press(getByText('Test Dialog'));
     expect(mockNavigate).toHaveBeenCalledWith('ChatsTab', {
-      screen: 'ChatDetail',
+      screen: 'Chats',
       params: { dialogId: '1' },
     });
   });
