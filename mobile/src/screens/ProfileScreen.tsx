@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: typography.textLg,
     fontWeight: typography.fontBold,
     color: colors.text,
   },
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     marginTop: spacing[6],
     height: 48,
     backgroundColor: colors.coral,
-    borderRadius: 12,
+    borderRadius: spacing[3],
   },
   logoutText: {
     fontSize: typography.textBase,
@@ -146,5 +146,3 @@ const styles = StyleSheet.create({
     marginLeft: spacing[2],
   },
 });
-
-export default ProfileScreen;
