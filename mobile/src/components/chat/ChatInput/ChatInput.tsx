@@ -61,6 +61,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled }) => {
     <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, spacing[3]) }]}>
       <View style={[styles.inputWrapper, disabled && styles.inputWrapperDisabled]}>
         <TextInput
+          testID="chat-input"
           style={[styles.textInput, { height: inputHeight }]}
           placeholder={disabled ? '等待回复中...' : '输入消息...'}
           placeholderTextColor={colors.textMuted}
@@ -72,6 +73,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled }) => {
           editable={!disabled}
         />
         <TouchableOpacity
+          testID="send-button"
           style={[styles.sendButton, showSendButton && styles.sendButtonActive]}
           onPress={handleSend}
           disabled={!showSendButton}

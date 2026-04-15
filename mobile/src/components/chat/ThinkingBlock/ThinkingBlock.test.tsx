@@ -11,6 +11,7 @@ jest.mock('lucide-react-native', () => ({
   Brain: () => null,
   ChevronDown: () => null,
   ChevronRight: () => null,
+  ChevronUp: () => null,
 }));
 
 // Mock react-native-markdown-display
@@ -18,7 +19,7 @@ jest.mock('react-native-markdown-display', () => {
   const { Text } = require('react-native');
   return {
     __esModule: true,
-    default: ({ children, style }: { children: string; style: object }) => (
+    default: ({ children }: { children: string }) => (
       <Text testID="markdown-content">{children}</Text>
     ),
   };
@@ -31,16 +32,16 @@ describe('ThinkingBlock Component', () => {
 
       render(<ThinkingBlock thinking={thinking} />);
 
-      expect(screen.getByText('AI 思考过程')).toBeTruthy();
-      expect(screen.getByText('(2步)')).toBeTruthy();
+      expect(screen.getByText('思考')).toBeTruthy();
+      expect(screen.getByText('(2 步)')).toBeTruthy();
     });
 
-    it('should show expand hint when collapsed', () => {
+    it('should show step count when collapsed', () => {
       const thinking = ['Step 1 thought'];
 
       render(<ThinkingBlock thinking={thinking} />);
 
-      expect(screen.getByText('查看思考过程')).toBeTruthy();
+      expect(screen.getByText('(1 步)')).toBeTruthy();
     });
 
     it('should not show step content when collapsed', () => {
@@ -48,16 +49,14 @@ describe('ThinkingBlock Component', () => {
 
       render(<ThinkingBlock thinking={thinking} />);
 
-      expect(screen.queryByText('步骤 1')).toBeNull();
-      expect(screen.queryByText('步骤 2')).toBeNull();
+      expect(screen.queryByTestId('markdown-content')).toBeNull();
     });
 
     it('should render nothing when thinking is empty', () => {
       render(<ThinkingBlock thinking={[]} />);
 
       // Should not render any thinking-related content
-      expect(screen.queryByText('AI 思考过程')).toBeNull();
-      expect(screen.queryByText('查看思考过程')).toBeNull();
+      expect(screen.queryByText('思考')).toBeNull();
     });
   });
 
@@ -67,9 +66,9 @@ describe('ThinkingBlock Component', () => {
 
       render(<ThinkingBlock thinking={thinking} />);
 
-      fireEvent.press(screen.getByText('查看思考过程'));
+      fireEvent.press(screen.getByText('思考'));
 
-      expect(screen.getByText('步骤 1')).toBeTruthy();
+      expect(screen.getByTestId('markdown-content')).toBeTruthy();
     });
 
     it('should show all thinking steps when expanded', () => {
@@ -77,11 +76,10 @@ describe('ThinkingBlock Component', () => {
 
       render(<ThinkingBlock thinking={thinking} />);
 
-      fireEvent.press(screen.getByText('查看思考过程'));
+      fireEvent.press(screen.getByText('思考'));
 
-      expect(screen.getByText('步骤 1')).toBeTruthy();
-      expect(screen.getByText('步骤 2')).toBeTruthy();
-      expect(screen.getByText('步骤 3')).toBeTruthy();
+      const steps = screen.getAllByTestId('markdown-content');
+      expect(steps).toHaveLength(3);
     });
 
     it('should render markdown content for each step', () => {
@@ -89,53 +87,25 @@ describe('ThinkingBlock Component', () => {
 
       render(<ThinkingBlock thinking={thinking} />);
 
-      fireEvent.press(screen.getByText('查看思考过程'));
+      fireEvent.press(screen.getByText('思考'));
 
       expect(screen.getByTestId('markdown-content')).toBeTruthy();
-    });
-
-    it('should show collapse button when expanded', () => {
-      const thinking = ['Step 1 thought'];
-
-      render(<ThinkingBlock thinking={thinking} />);
-
-      fireEvent.press(screen.getByText('查看思考过程'));
-
-      expect(screen.getByText('收起')).toBeTruthy();
     });
   });
 
   describe('Toggle Behavior', () => {
-    it('should collapse when collapse button is pressed', () => {
+    it('should collapse when header is pressed again', () => {
       const thinking = ['Step 1 thought'];
 
       render(<ThinkingBlock thinking={thinking} />);
 
       // Expand
-      fireEvent.press(screen.getByText('查看思考过程'));
-      expect(screen.getByText('步骤 1')).toBeTruthy();
+      fireEvent.press(screen.getByText('思考'));
+      expect(screen.getByTestId('markdown-content')).toBeTruthy();
 
       // Collapse
-      fireEvent.press(screen.getByText('收起'));
-      expect(screen.queryByText('步骤 1')).toBeNull();
-    });
-
-    it('should re-expand when header is pressed after collapse', () => {
-      const thinking = ['Step 1 thought'];
-
-      render(<ThinkingBlock thinking={thinking} />);
-
-      // Expand
-      fireEvent.press(screen.getByText('查看思考过程'));
-      expect(screen.getByText('步骤 1')).toBeTruthy();
-
-      // Collapse
-      fireEvent.press(screen.getByText('收起'));
-      expect(screen.queryByText('步骤 1')).toBeNull();
-
-      // Re-expand
-      fireEvent.press(screen.getByText('查看思考过程'));
-      expect(screen.getByText('步骤 1')).toBeTruthy();
+      fireEvent.press(screen.getByText('思考'));
+      expect(screen.queryByTestId('markdown-content')).toBeNull();
     });
   });
 
@@ -145,11 +115,11 @@ describe('ThinkingBlock Component', () => {
 
       render(<ThinkingBlock thinking={thinking} />);
 
-      expect(screen.getByText('(1步)')).toBeTruthy();
+      expect(screen.getByText('(1 步)')).toBeTruthy();
 
-      fireEvent.press(screen.getByText('查看思考过程'));
+      fireEvent.press(screen.getByText('思考'));
 
-      expect(screen.getByText('步骤 1')).toBeTruthy();
+      expect(screen.getByTestId('markdown-content')).toBeTruthy();
     });
 
     it('should handle many steps', () => {
@@ -157,12 +127,12 @@ describe('ThinkingBlock Component', () => {
 
       render(<ThinkingBlock thinking={thinking} />);
 
-      expect(screen.getByText('(10步)')).toBeTruthy();
+      expect(screen.getByText('(10 步)')).toBeTruthy();
 
-      fireEvent.press(screen.getByText('查看思考过程'));
+      fireEvent.press(screen.getByText('思考'));
 
-      expect(screen.getByText('步骤 1')).toBeTruthy();
-      expect(screen.getByText('步骤 10')).toBeTruthy();
+      const steps = screen.getAllByTestId('markdown-content');
+      expect(steps).toHaveLength(10);
     });
 
     it('should handle empty string steps', () => {
@@ -170,11 +140,10 @@ describe('ThinkingBlock Component', () => {
 
       render(<ThinkingBlock thinking={thinking} />);
 
-      fireEvent.press(screen.getByText('查看思考过程'));
+      fireEvent.press(screen.getByText('思考'));
 
-      expect(screen.getByText('步骤 1')).toBeTruthy();
-      expect(screen.getByText('步骤 2')).toBeTruthy();
-      expect(screen.getByText('步骤 3')).toBeTruthy();
+      const steps = screen.getAllByTestId('markdown-content');
+      expect(steps).toHaveLength(3);
     });
   });
 });
