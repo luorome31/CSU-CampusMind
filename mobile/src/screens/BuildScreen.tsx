@@ -1,6 +1,6 @@
 // mobile/src/screens/BuildScreen.tsx
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
 import { SegmentedControl } from '../components/build/SegmentedControl';
@@ -95,7 +95,7 @@ export function BuildScreen({ navigation }: KnowledgeBuildScreenProps) {
       {/* Content */}
       <View style={styles.content}>
         {activeTab === 'crawl' ? (
-          <>
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
             <CrawlPanel
               knowledgeBases={knowledgeBases}
               onSelectKnowledge={handleSelectKnowledge}
@@ -103,7 +103,7 @@ export function BuildScreen({ navigation }: KnowledgeBuildScreenProps) {
               onOpenImportModal={handleOpenImportModal}
             />
             <TaskList />
-          </>
+          </ScrollView>
         ) : (
           <>
             <View style={styles.reviewInboxWrapper}>

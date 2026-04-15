@@ -1,6 +1,11 @@
 // mobile/src/components/build/ReviewTab/ReviewEditor.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import Markdown, {
+  // @ts-expect-error - FitImage is exported in JS but missing in type definitions
+  FitImage
+} from 'react-native-markdown-display';
+
 import { Eye, Edit3 } from 'lucide-react-native';
 import { useBuildStore } from '../../../features/build/buildStore';
 import { colors, typography, spacing, elevation } from '../../../styles';
@@ -17,6 +22,36 @@ export function ReviewEditor() {
   const setIsPreview = useBuildStore((s) => s.setIsPreview);
 
   const [editedContent, setEditedContent] = useState(fileContent);
+
+  const markdownRules = {
+    image: (node: any, children: any, parent: any, styles: any, allowedImageHandlers: any, defaultImageHandler: any) => {
+      const { src, alt } = node.attributes;
+
+      const show = allowedImageHandlers.filter((value: string) => {
+        return src.toLowerCase().startsWith(value.toLowerCase());
+      }).length > 0;
+
+      if (show === false && defaultImageHandler === null) {
+        return null;
+      }
+
+      const uri = show === true ? src : `${defaultImageHandler}${src}`;
+
+      return (
+        <FitImage
+          key={node.key}
+          // Set indicator to false to avoid stuck spinner issue in some RN versions
+          indicator={false}
+          style={styles._VIEW_SAFE_image}
+          source={{ uri }}
+          accessible={!!alt}
+          accessibilityLabel={alt}
+        />
+
+      );
+    },
+  };
+
 
   // Sync local state when fileContent changes from store
   useEffect(() => {
@@ -78,7 +113,10 @@ export function ReviewEditor() {
       {/* Content Area */}
       <View style={styles.contentContainer}>
         {isPreview ? (
-          <Text style={styles.previewContent}>{fileContent}</Text>
+          <ScrollView style={{ flex: 1 }}>
+            <Markdown style={markdownStyles} rules={markdownRules as any}>{fileContent}</Markdown>
+
+          </ScrollView>
         ) : (
           <TextInput
             style={styles.editor}
@@ -197,7 +235,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   previewContent: {
-    flex: 1,
     padding: spacing[4],
     fontSize: typography.textSm,
     color: colors.text,
@@ -237,5 +274,87 @@ const styles = StyleSheet.create({
     fontSize: typography.textSm,
     fontWeight: typography.fontMedium,
     color: colors.accent,
+  },
+});
+
+const markdownStyles = StyleSheet.create({
+  body: {
+    fontSize: typography.textSm,
+    color: colors.text,
+    fontFamily: typography.fontMono,
+    lineHeight: 22,
+  },
+  heading1: {
+    fontSize: typography.textXl,
+    fontWeight: typography.fontBold,
+    color: colors.text,
+    marginBottom: spacing[2],
+  },
+  heading2: {
+    fontSize: typography.textLg,
+    fontWeight: typography.fontSemibold,
+    color: colors.text,
+    marginBottom: spacing[2],
+  },
+  heading3: {
+    fontSize: typography.textSm,
+    fontWeight: typography.fontMedium,
+    color: colors.text,
+    marginBottom: spacing[1],
+  },
+  paragraph: {
+    fontSize: typography.textSm,
+    color: colors.text,
+    marginBottom: spacing[2],
+  },
+  code_inline: {
+    fontFamily: typography.fontMono,
+    fontSize: typography.textXs,
+    backgroundColor: colors.backgroundGlass,
+    paddingHorizontal: spacing[1],
+    borderRadius: elevation.radiusSm,
+    color: colors.accent,
+  },
+  code_block: {
+    fontFamily: typography.fontMono,
+    fontSize: typography.textXs,
+    backgroundColor: colors.backgroundCard,
+    padding: spacing[3],
+    borderRadius: elevation.radiusMd,
+    marginVertical: spacing[2],
+  },
+  fence: {
+    fontFamily: typography.fontMono,
+    fontSize: typography.textXs,
+    backgroundColor: colors.backgroundCard,
+    padding: spacing[3],
+    borderRadius: elevation.radiusMd,
+    marginVertical: spacing[2],
+  },
+  list_item: {
+    fontSize: typography.textSm,
+    color: colors.text,
+    marginBottom: spacing[1],
+  },
+  blockquote: {
+    backgroundColor: colors.backgroundGlass,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accent,
+    paddingLeft: spacing[3],
+    paddingVertical: spacing[1],
+  },
+  link: {
+    color: colors.accent,
+  },
+  strong: {
+    fontWeight: typography.fontBold,
+  },
+  em: {
+    fontStyle: 'italic',
+  },
+  hr: {
+    backgroundColor: colors.border,
+    height: 1,
+    marginVertical: spacing[3],
   },
 });
