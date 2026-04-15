@@ -34,8 +34,8 @@ export const crawlApi = {
   },
 
   async fetchTasks(): Promise<CrawlTask[]> {
-    const response = await apiClient.get<{ tasks: CrawlTask[] }>('/crawl/tasks');
-    return response.data.tasks || [];
+    const response = await apiClient.get<CrawlTask[]>('/crawl/tasks');
+    return response.data || [];
   },
 
   async fetchTaskProgress(taskId: string): Promise<CrawlTask> {

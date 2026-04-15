@@ -14,13 +14,6 @@ import { useBuildStore } from '../features/build/buildStore';
 import { colors, spacing } from '../styles';
 import type { KnowledgeBuildScreenProps } from '../navigation/types';
 
-// TODO: Replace with real API once knowledge service is implemented
-const MOCK_KB_LIST = [
-  { id: 'kb-1', name: '教务处', file_count: 12 },
-  { id: 'kb-2', name: '图书馆', file_count: 8 },
-  { id: 'kb-3', name: '就业中心', file_count: 5 },
-];
-
 const TABS = [
   { value: 'crawl', label: '爬取任务' },
   { value: 'review', label: '审核队列' },
@@ -29,11 +22,13 @@ const TABS = [
 export function BuildScreen({ navigation }: KnowledgeBuildScreenProps) {
   const activeTab = useBuildStore((s) => s.activeTab);
   const setActiveTab = useBuildStore((s) => s.setActiveTab);
+  const knowledgeBases = useBuildStore((s) => s.knowledgeBases);
   const selectedKnowledgeId = useBuildStore((s) => s.selectedKnowledgeId);
   const setSelectedKnowledgeId = useBuildStore((s) => s.setSelectedKnowledgeId);
   const fetchTasks = useBuildStore((s) => s.fetchTasks);
   const fetchPendingFiles = useBuildStore((s) => s.fetchPendingFiles);
   const fetchFileContent = useBuildStore((s) => s.fetchFileContent);
+  const fetchKnowledgeBases = useBuildStore((s) => s.fetchKnowledgeBases);
   const openImportModal = useBuildStore((s) => s.openImportModal);
   const pendingFiles = useBuildStore((s) => s.pendingFiles);
   const pendingReviewCount = useBuildStore((s) => s.pendingReviewCount);
@@ -43,7 +38,8 @@ export function BuildScreen({ navigation }: KnowledgeBuildScreenProps) {
   useEffect(() => {
     fetchTasks();
     fetchPendingFiles();
-  }, [fetchTasks, fetchPendingFiles]);
+    fetchKnowledgeBases();
+  }, [fetchTasks, fetchPendingFiles, fetchKnowledgeBases]);
 
   useEffect(() => {
     if (activeTab === 'review' && pendingFiles.length > 0) {
@@ -101,7 +97,7 @@ export function BuildScreen({ navigation }: KnowledgeBuildScreenProps) {
         {activeTab === 'crawl' ? (
           <>
             <CrawlPanel
-              knowledgeBases={MOCK_KB_LIST}
+              knowledgeBases={knowledgeBases}
               onSelectKnowledge={handleSelectKnowledge}
               selectedKnowledgeId={selectedKnowledgeId}
               onOpenImportModal={handleOpenImportModal}

@@ -38,7 +38,7 @@ describe('crawlApi', () => {
     it('should return tasks array', async () => {
       const mockTasks = [{ id: 'task-1', status: 'pending' }];
       (apiClient.get as jest.Mock).mockResolvedValue({
-        data: { tasks: mockTasks },
+        data: mockTasks,
       });
 
       const result = await crawlApi.fetchTasks();
@@ -46,9 +46,9 @@ describe('crawlApi', () => {
       expect(result).toEqual(mockTasks);
     });
 
-    it('should return empty array if tasks is undefined', async () => {
+    it('should return empty array if data is undefined', async () => {
       (apiClient.get as jest.Mock).mockResolvedValue({
-        data: {},
+        data: undefined,
       });
 
       const result = await crawlApi.fetchTasks();

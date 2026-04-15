@@ -127,11 +127,13 @@ const mockPendingFiles = [
 const createMockState = (overrides: any = {}) => ({
   activeTab: 'crawl',
   setActiveTab: jest.fn(),
+  knowledgeBases: [],
   selectedKnowledgeId: null,
   setSelectedKnowledgeId: jest.fn(),
   fetchTasks: jest.fn().mockResolvedValue(undefined),
   fetchPendingFiles: jest.fn().mockResolvedValue(undefined),
   fetchFileContent: jest.fn().mockResolvedValue(undefined),
+  fetchKnowledgeBases: jest.fn().mockResolvedValue(undefined),
   pendingFiles: mockPendingFiles,
   pendingReviewCount: 2,
   openImportModal: jest.fn(),
@@ -260,15 +262,17 @@ describe('BuildScreen', () => {
     expect(getByTestId('url-import-modal')).toBeTruthy();
   });
 
-  it('should call fetchTasks and fetchPendingFiles on mount', () => {
+  it('should call fetchTasks, fetchPendingFiles, and fetchKnowledgeBases on mount', () => {
     const mockFetchTasks = jest.fn().mockResolvedValue(undefined);
     const mockFetchPendingFiles = jest.fn().mockResolvedValue(undefined);
+    const mockFetchKnowledgeBases = jest.fn().mockResolvedValue(undefined);
 
     mockUseBuildStore.mockImplementation((selector: any) => {
       if (typeof selector === 'function') {
         return selector(createMockState({
           fetchTasks: mockFetchTasks,
           fetchPendingFiles: mockFetchPendingFiles,
+          fetchKnowledgeBases: mockFetchKnowledgeBases,
         }));
       }
       return jest.fn();
@@ -278,6 +282,7 @@ describe('BuildScreen', () => {
 
     expect(mockFetchTasks).toHaveBeenCalled();
     expect(mockFetchPendingFiles).toHaveBeenCalled();
+    expect(mockFetchKnowledgeBases).toHaveBeenCalled();
   });
 
   it('should auto-select first file when switching to review tab with pending files', () => {

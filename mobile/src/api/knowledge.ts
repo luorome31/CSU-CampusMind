@@ -11,7 +11,22 @@ export interface KnowledgeFile {
   update_time: string;
 }
 
+export interface KnowledgeBase {
+  id: string;
+  name: string;
+  description: string;
+  user_id: string;
+  create_time: string;
+  update_time: string;
+  file_count: number;
+}
+
 export const knowledgeApi = {
+  async fetchKnowledgeBases(): Promise<KnowledgeBase[]> {
+    const response = await apiClient.get<KnowledgeBase[]>('/knowledge');
+    return response.data || [];
+  },
+
   async getPendingFiles(): Promise<KnowledgeFile[]> {
     const response = await apiClient.get<KnowledgeFile[]>('/knowledge_file/pending_verify');
     return response.data || [];

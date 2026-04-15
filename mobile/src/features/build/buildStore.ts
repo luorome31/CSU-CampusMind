@@ -1,7 +1,7 @@
 // mobile/src/features/build/buildStore.ts
 import { create } from 'zustand';
 import { crawlApi, CrawlTask } from '../../api/crawl';
-import { knowledgeApi, KnowledgeFile } from '../../api/knowledge';
+import { knowledgeApi, KnowledgeFile, KnowledgeBase } from '../../api/knowledge';
 
 const POLL_INTERVAL = 3000;
 const MAX_POLL_FAILURES = 3;
@@ -10,6 +10,9 @@ const TERMINAL_STATES = ['SUCCESS', 'FAILED', 'completed', 'failed'];
 interface BuildState {
   // UI State
   activeTab: 'crawl' | 'review';
+
+  // Knowledge Bases
+  knowledgeBases: KnowledgeBase[];
 
   // Crawl Tab
   selectedKnowledgeId: string | null;
@@ -47,6 +50,7 @@ interface BuildState {
   removeTask: (taskId: string) => Promise<void>;
   retryFailedUrls: (taskId: string) => Promise<string | null>;
   clearCompletedTasks: () => Promise<void>;
+  fetchKnowledgeBases: () => Promise<void>;
   fetchPendingFiles: () => Promise<void>;
   fetchFileContent: (fileId: string) => Promise<void>;
   updateFileContent: (fileId: string, content: string) => Promise<void>;
@@ -60,6 +64,7 @@ let pollIntervalId: ReturnType<typeof setInterval> | null = null;
 export const useBuildStore = create<BuildState>((set, get) => ({
   // Initial state
   activeTab: 'crawl',
+  knowledgeBases: [],
   selectedKnowledgeId: null,
   crawlUrls: '',
   tasks: [],
@@ -186,6 +191,15 @@ export const useBuildStore = create<BuildState>((set, get) => ({
 
     for (const task of terminalTasks) {
       await removeTask(task.id);
+    }
+  },
+
+  fetchKnowledgeBases: async () => {
+    try {
+      const kbs = await knowledgeApi.fetchKnowledgeBases();
+      set({ knowledgeBases: kbs });
+    } catch (error) {
+      console.error('Failed to fetch knowledge bases:', error);
     }
   },
 
