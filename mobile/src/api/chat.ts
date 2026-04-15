@@ -1,10 +1,8 @@
 /**
  * Chat API - React Native SSE Stream Handling
- * Uses react-native-sse library for SSE support
+ * Uses native XMLHttpRequest to properly handle stream termination
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const EventSource = require('react-native-sse').default;
 import { storage } from '../utils/storage';
 import { setUnauthorizedCallback } from './client';
 
@@ -25,41 +23,54 @@ export interface ChatStreamCallbacks {
   onError: (error: Error) => void;
 }
 
-// SSE event data interface (simplified, no types from library)
-interface SSEMessage {
-  data: string;
-  type?: string;
-}
-
-interface SSEError {
-  type: string;
-  message?: string;
-}
-
 /**
- * Parse SSE data line into event object.
- * Handles potential double-wrapping where backend sends {data: {type, data: ...}}
+ * Handle events dynamically
  */
-function parseSSEData(dataStr: string): Record<string, unknown> | null {
+function handleEventData(dataStr: string, callbacks: ChatStreamCallbacks) {
   try {
-    const parsed = JSON.parse(dataStr);
-    // Handle potential double-wrapping: {data: {type, data: {...}}}
-    // If parsed has a 'data' property that contains type and data, unwrap it
-    if (parsed.data && typeof parsed.data === 'object' && (parsed.type || parsed.event_type)) {
-      return {
-        type: parsed.type || parsed.event_type,
-        data: parsed.data,
-      };
+    const data = JSON.parse(dataStr);
+    
+    // Check for new dialog ID
+    if (data.newDialogId) {
+      console.log('[ChatAPI] New dialog ID:', data.newDialogId);
+      callbacks.onNewDialog(data.newDialogId as string);
+      callbacks.onEvent('new_dialog', { dialog_id: data.newDialogId });
+      return;
     }
-    return parsed;
-  } catch {
-    return null;
+
+    // Unwrap if double-wrapped
+    let eventType = data.type || data.event_type;
+    let payload = data.data || data;
+
+    if (data.data && typeof data.data === 'object' && (data.type || data.event_type)) {
+      eventType = data.type || data.event_type;
+      payload = data.data;
+    }
+
+    if (eventType === 'response_chunk') {
+      const chunk = (payload?.chunk || payload?.accumulated || data.chunk || data.accumulated || '') as string;
+      callbacks.onChunk(chunk);
+      callbacks.onEvent('response_chunk', data);
+    } else if (eventType === 'title_update') {
+      const title = (payload?.title || data.title) as string;
+      console.log('[ChatAPI] Title update:', title);
+      callbacks.onTitleUpdate(title);
+      callbacks.onEvent('title_update', data);
+    } else if (eventType === 'event' || eventType === 'tool_event') {
+      console.log('[ChatAPI] Tool event:', data);
+      callbacks.onEvent('event', data as Record<string, unknown>);
+    } else {
+      console.log('[ChatAPI] Unknown event type:', eventType);
+    }
+  } catch (err) {
+    console.log('[ChatAPI] Failed to parse SSE data:', dataStr);
   }
 }
 
 /**
- * Create a chat SSE connection for React Native.
- * Uses react-native-sse which implements EventSource over XMLHttpRequest.
+ * Create a chat SSE connection for React Native using native XMLHttpRequest.
+ * This correctly detects when the server closes the stream, 
+ * unlike react-native-sse which swallows the EOF to auto-reconnect.
  */
 export function createChatStream(
   message: string,
@@ -74,14 +85,14 @@ export function createChatStream(
     minScore = 0.0,
   } = options;
 
-  let es: ReturnType<typeof EventSource> | null = null;
+  let xhr: XMLHttpRequest | null = null;
   let aborted = false;
 
   const abort = () => {
     aborted = true;
-    if (es) {
-      es.close();
-      es = null;
+    if (xhr) {
+      xhr.abort();
+      xhr = null;
     }
   };
 
@@ -92,15 +103,13 @@ export function createChatStream(
 
       const url = `${process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1'}/completion/stream`;
 
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-      if (sessionId) {
-        headers['X-Session-ID'] = sessionId;
-      }
+      xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+      
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      if (sessionId) xhr.setRequestHeader('X-Session-ID', sessionId);
+      xhr.setRequestHeader('Accept', 'text/event-stream');
 
       const body = JSON.stringify({
         message,
@@ -111,100 +120,75 @@ export function createChatStream(
         min_score: minScore,
       });
 
-      console.log('[ChatAPI] Creating SSE connection to:', url);
-      console.log('[ChatAPI] Request body:', body);
+      console.log('[ChatAPI] Creating native XHR SSE connection to:', url);
 
-      es = new EventSource(url, {
-        method: 'POST',
-        headers,
-        body,
-        timeout: 0,
-        pollingInterval: 0,
-      });
+      let processedLength = 0;
+      let lineBuffer = '';
 
-      es.addEventListener('open', () => {
-        console.log('[ChatAPI] SSE connection opened');
-      });
+      xhr.onreadystatechange = () => {
+        if (aborted || !xhr) return;
 
-      // Listen for message events (our SSE uses 'data:' format)
-      es.addEventListener('message', (event: SSEMessage) => {
-        console.log('[ChatAPI] SSE message received:', event.data);
-        if (aborted) return;
-        if (!event.data) return;
+        // Process incoming chunks
+        if (xhr.readyState === XMLHttpRequest.LOADING || xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status >= 200 && xhr.status < 400 && xhr.responseText) {
+            const newText = xhr.responseText.substring(processedLength);
+            if (newText) {
+              processedLength = xhr.responseText.length;
+              lineBuffer += newText;
 
-        const data = parseSSEData(event.data);
-        if (!data) {
-          console.log('[ChatAPI] Failed to parse SSE data');
-          return;
+              const parts = lineBuffer.split(/\r?\n/);
+              // The last part is either incomplete or empty string if it ended neatly at newline
+              lineBuffer = parts.pop() || '';
+
+              for (const line of parts) {
+                const trimmed = line.trim();
+                // Standard SSE messages start with data:
+                if (!trimmed || !trimmed.startsWith('data: ')) continue;
+                
+                const dataStr = trimmed.slice(6).trim();
+                if (dataStr === '[DONE]') {
+                  continue; // Server optional explicit done
+                }
+                handleEventData(dataStr, callbacks);
+              }
+            }
+          }
         }
 
-        console.log('[ChatAPI] Parsed SSE data:', data);
+        // Handle termination
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          console.log('[ChatAPI] XHR done, status:', xhr.status);
+          
+          // Process trailing buffer data if exists
+          const finalTrimmed = lineBuffer.trim();
+          if (finalTrimmed && finalTrimmed.startsWith('data: ')) {
+             const dataStr = finalTrimmed.slice(6).trim();
+             if (dataStr !== '[DONE]') {
+                 handleEventData(dataStr, callbacks);
+             }
+          }
 
-        // Check for new dialog ID
-        if (data.newDialogId) {
-          console.log('[ChatAPI] New dialog ID:', data.newDialogId);
-          callbacks.onNewDialog(data.newDialogId as string);
-          callbacks.onEvent('new_dialog', { dialog_id: data.newDialogId });
-        }
-
-        // Handle event type
-        const eventType = (data.type || data.event_type) as string;
-        console.log('[ChatAPI] Event type:', eventType, 'Full data:', JSON.stringify(data).substring(0, 200));
-
-        if (eventType === 'response_chunk') {
-          // Backend sends: {type: "response_chunk", data: {chunk: "..."}}
-          // So chunk is at data.data.chunk, not data.chunk
-          const nestedData = data.data as Record<string, unknown> | undefined;
-          const chunk = (nestedData?.chunk || nestedData?.accumulated || data.chunk || data.accumulated || '') as string;
-          console.log('[ChatAPI] Response chunk:', chunk.substring(0, 100));
-          callbacks.onChunk(chunk);
-          callbacks.onEvent('response_chunk', data);
-        } else if (eventType === 'title_update') {
-          const nestedData = data.data as Record<string, unknown> | undefined;
-          const title = (nestedData?.title || data.title) as string;
-          console.log('[ChatAPI] Title update:', title);
-          callbacks.onTitleUpdate(title);
-          callbacks.onEvent('title_update', data);
-        } else if (eventType === 'event' || eventType === 'tool_event') {
-          console.log('[ChatAPI] Tool event:', data);
-          callbacks.onEvent('event', data as Record<string, unknown>);
-        } else {
-          console.log('[ChatAPI] Unknown event type:', eventType);
-        }
-      });
-
-      // Error handling
-      es.addEventListener('error', (event: SSEError) => {
-        console.log('[ChatAPI] SSE error:', event);
-        if (aborted) return;
-
-        if (event.type === 'error') {
-          if (event.message && event.message.includes('401')) {
+          if (xhr.status >= 200 && xhr.status < 400) {
+            callbacks.onDone();
+          } else if (xhr.status === 401) {
             storage.clear();
             setUnauthorizedCallback(() => {});
             callbacks.onError(new Error('Unauthorized'));
-            return;
+          } else if (xhr.status === 0 && !aborted) {
+            callbacks.onError(new Error('Network error or server disconnected'));
+          } else if (!aborted) {
+            callbacks.onError(new Error(`HTTP Error ${xhr.status}: ${xhr.responseText}`));
           }
-          // Normal stream end triggers an error event with message containing "null"
-          // Check if it's a normal close (message is "null" or empty)
-          if (event.message === 'null' || event.message === '' || !event.message) {
-            console.log('[ChatAPI] Stream ended normally');
-            callbacks.onDone();
-            return;
-          }
-          callbacks.onError(new Error(event.message || 'Connection error'));
-        } else if (event.type === 'exception') {
-          callbacks.onError(new Error(event.message || 'Exception'));
         }
-      });
+      };
 
-      // Listen for close event (stream completed normally)
-      es.addEventListener('close', () => {
-        console.log('[ChatAPI] SSE connection closed');
+      xhr.onerror = () => {
         if (!aborted) {
-          callbacks.onDone();
+          callbacks.onError(new Error('XMLHttpRequest Network Error'));
         }
-      });
+      };
+
+      xhr.send(body);
 
     } catch (error) {
       console.log('[ChatAPI] Exception:', error);

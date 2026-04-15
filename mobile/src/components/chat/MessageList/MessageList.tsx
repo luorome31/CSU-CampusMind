@@ -29,13 +29,24 @@ export const MessageList: React.FC<MessageListProps> = ({
   isStreaming,
 }) => {
   const flatListRef = useRef<FlatList<ChatMessage>>(null);
+  const isAtBottom = useRef(true);
 
   // Auto-scroll to bottom when messages change or streaming updates
   useEffect(() => {
-    if (messages.length > 0) {
+    // Only scroll if we were already at the bottom to avoid jerking the user
+    if (messages.length > 0 && isAtBottom.current) {
       flatListRef.current?.scrollToEnd({ animated: true });
     }
   }, [messages, isStreaming]);
+
+  const handleScroll = (event: any) => {
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    const paddingToBottom = 50;
+    const atBottom =
+      layoutMeasurement.height + contentOffset.y >=
+      contentSize.height - paddingToBottom;
+    isAtBottom.current = atBottom;
+  };
 
   const renderItem = ({ item }: { item: ChatMessage }) => (
     <MessageBubble message={item} />
@@ -56,9 +67,11 @@ export const MessageList: React.FC<MessageListProps> = ({
         ListEmptyComponent={ListEmptyComponent}
         showsVerticalScrollIndicator={true}
         contentContainerStyle={styles.contentContainer}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
         onContentSizeChange={() => {
-          // Only auto-scroll during streaming - don't scroll when user expands ThinkingBlock
-          if (isStreaming && messages.length > 0) {
+          // Only auto-scroll during streaming IF we are at the bottom
+          if (isStreaming && messages.length > 0 && isAtBottom.current) {
             flatListRef.current?.scrollToEnd({ animated: true });
           }
         }}

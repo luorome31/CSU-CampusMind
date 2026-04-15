@@ -115,12 +115,12 @@ export function useChatStream() {
         },
         onDone: () => {
           console.log('[useChatStream] onDone - streaming finished');
-          useChatStore.setState({ isStreaming: false });
+          useChatStore.getState().finishStreaming();
           abortRef.current = null;
         },
         onError: (error: Error) => {
           console.error('[useChatStream] onError:', error);
-          useChatStore.setState({ isStreaming: false });
+          useChatStore.getState().finishStreaming();
           abortRef.current = null;
         },
       });
@@ -136,7 +136,7 @@ export function useChatStream() {
       abortRef.current();
       abortRef.current = null;
     }
-    useChatStore.setState({ isStreaming: false });
+    useChatStore.getState().finishStreaming();
   }, []);
 
   return {
