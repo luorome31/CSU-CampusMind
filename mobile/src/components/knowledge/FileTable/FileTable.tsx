@@ -27,7 +27,12 @@ const STATUS_VARIANT: Record<KnowledgeFile['status'], 'success' | 'error' | 'war
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  if (isNaN(date.getTime())) {
+    return '无效日期';
+  }
+  const datePart = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  const timePart = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  return `${datePart} ${timePart}`;
 }
 
 export const FileTable: React.FC<FileTableProps> = ({ files, onFileClick }) => {

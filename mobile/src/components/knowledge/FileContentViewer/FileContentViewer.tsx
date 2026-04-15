@@ -136,11 +136,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: spacing[4],
   },
-  markdownText: {
-    fontSize: typography.textSm,
-    color: colors.text,
-    lineHeight: typography.textSm * 1.8,
-  },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',

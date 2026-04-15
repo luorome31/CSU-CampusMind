@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Text, Pressable, ActivityIndicator } from 'react-native';
+import React, { useEffect, useCallback, useState } from 'react';
+import { View, StyleSheet, ScrollView, Text, Pressable, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Plus } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -16,8 +16,9 @@ type NavigationProp = NativeStackNavigationProp<KnowledgeStackParamList>;
 
 export function KnowledgeScreen() {
   const navigation = useNavigation<NavigationProp>();
+  const [refreshing, setRefreshing] = useState(false);
 
-  const { knowledgeBases, isLoadingKBs, fetchKnowledgeBases } = useKnowledgeStore();
+  const { knowledgeBases, isLoadingKBs, error, fetchKnowledgeBases, clearError } = useKnowledgeStore();
   const enableRag = useChatStore((s) => s.enableRag);
   const toggleRag = useChatStore((s) => s.toggleRag);
   const currentKnowledgeIds = useChatStore((s) => s.currentKnowledgeIds);
@@ -26,6 +27,13 @@ export function KnowledgeScreen() {
   useEffect(() => {
     fetchKnowledgeBases();
   }, [fetchKnowledgeBases]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    clearError();
+    await fetchKnowledgeBases();
+    setRefreshing(false);
+  }, [fetchKnowledgeBases, clearError]);
 
   const handleToggleRag = () => {
     toggleRag();
@@ -62,7 +70,27 @@ export function KnowledgeScreen() {
         </Pressable>
       </View>
 
-      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={styles.contentContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.accent}
+          />
+        }
+      >
+        {/* Error Message */}
+        {error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <Pressable onPress={onRefresh}>
+              <Text style={styles.retryText}>点击重试</Text>
+            </Pressable>
+          </View>
+        )}
+
         {/* RAG Switch */}
         <RAGSwitch
           enabled={enableRag}
@@ -135,6 +163,22 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: spacing[4],
+  },
+  errorContainer: {
+    backgroundColor: colors.errorBg,
+    padding: spacing[3],
+    borderRadius: elevation.radiusMd,
+    marginBottom: spacing[4],
+  },
+  errorText: {
+    color: colors.error,
+    fontSize: typography.textSm,
+  },
+  retryText: {
+    color: colors.accent,
+    fontSize: typography.textSm,
+    fontWeight: typography.fontMedium,
+    marginTop: spacing[2],
   },
   loadingContainer: {
     flex: 1,

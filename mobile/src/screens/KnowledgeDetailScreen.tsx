@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet, Text, Pressable, ActivityIndicator } from 'react-native';
+import React, { useEffect, useCallback } from 'react';
+import { View, StyleSheet, Text, Pressable, ActivityIndicator, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKnowledgeStore } from '../features/knowledge/knowledgeStore';
 import { FileTable } from '../components/knowledge/FileTable';
-import { colors, typography, spacing } from '../styles';
+import { colors, typography, spacing, elevation } from '../styles';
 import type { KnowledgeStackParamList } from '../navigation/types';
 import type { KnowledgeFile } from '../api/knowledge';
 
@@ -14,7 +14,12 @@ type Props = NativeStackScreenProps<KnowledgeStackParamList, 'KnowledgeDetail'>;
 
 export function KnowledgeDetailScreen({ navigation, route }: Props) {
   const { kbId } = route.params;
-  const { knowledgeBases, files, currentKB, isLoadingFiles, fetchFiles, setCurrentKB } = useKnowledgeStore();
+  const { knowledgeBases, files, currentKB, isLoadingFiles, error, fetchFiles, setCurrentKB, clearError } = useKnowledgeStore();
+
+  const handleRetry = useCallback(() => {
+    clearError();
+    fetchFiles(kbId);
+  }, [clearError, fetchFiles, kbId]);
 
   useEffect(() => {
     const kb = knowledgeBases.find(k => k.id === kbId);
@@ -47,12 +52,21 @@ export function KnowledgeDetailScreen({ navigation, route }: Props) {
 
       {/* Content */}
       <View style={styles.content}>
-        {isLoadingFiles ? (
+        {error ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <Pressable onPress={handleRetry}>
+              <Text style={styles.retryText}>点击重试</Text>
+            </Pressable>
+          </View>
+        ) : isLoadingFiles ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.accent} />
           </View>
         ) : (
-          <FileTable files={files} onFileClick={handleFileClick} />
+          <ScrollView>
+            <FileTable files={files} onFileClick={handleFileClick} />
+          </ScrollView>
         )}
       </View>
     </SafeAreaView>
@@ -92,6 +106,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  errorContainer: {
+    backgroundColor: colors.errorBg,
+    padding: spacing[3],
+    borderRadius: elevation.radiusMd,
+  },
+  errorText: {
+    color: colors.error,
+    fontSize: typography.textSm,
+  },
+  retryText: {
+    color: colors.accent,
+    fontSize: typography.textSm,
+    fontWeight: typography.fontMedium,
+    marginTop: spacing[2],
   },
 });
 

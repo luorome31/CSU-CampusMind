@@ -47,8 +47,8 @@ export const useKnowledgeStore = create<KnowledgeStore>((set, get) => ({
   fetchFiles: async (kbId: string) => {
     set({ isLoadingFiles: true, error: null });
     try {
-      // API 暂缺，用空数组代替，等后端实现
-      set({ files: [], isLoadingFiles: false });
+      const files = await knowledgeApi.fetchFiles(kbId);
+      set({ files, isLoadingFiles: false });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : 'Failed to fetch files', isLoadingFiles: false });
     }

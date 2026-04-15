@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { View, StyleSheet, Text, Pressable, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
@@ -6,14 +6,19 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKnowledgeStore } from '../features/knowledge/knowledgeStore';
 import { FileContentViewer } from '../components/knowledge/FileContentViewer';
-import { colors, typography, spacing } from '../styles';
+import { colors, typography, spacing, elevation } from '../styles';
 import type { KnowledgeStackParamList } from '../navigation/types';
 
 type Props = NativeStackScreenProps<KnowledgeStackParamList, 'FileDetail'>;
 
 export function FileDetailScreen({ navigation, route }: Props) {
   const { fileId } = route.params;
-  const { currentFile, currentFileContent, isLoadingContent, fetchFileContent } = useKnowledgeStore();
+  const { currentFile, currentFileContent, isLoadingContent, error, fetchFileContent, clearError } = useKnowledgeStore();
+
+  const handleRetry = useCallback(() => {
+    clearError();
+    fetchFileContent(fileId);
+  }, [clearError, fetchFileContent, fileId]);
 
   useEffect(() => {
     fetchFileContent(fileId);
@@ -38,7 +43,14 @@ export function FileDetailScreen({ navigation, route }: Props) {
 
       {/* Content */}
       <View style={styles.content}>
-        {isLoadingContent ? (
+        {error ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <Pressable onPress={handleRetry}>
+              <Text style={styles.retryText}>点击重试</Text>
+            </Pressable>
+          </View>
+        ) : isLoadingContent ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.accent} />
           </View>
@@ -83,6 +95,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  errorContainer: {
+    backgroundColor: colors.errorBg,
+    padding: spacing[3],
+    borderRadius: elevation.radiusMd,
+  },
+  errorText: {
+    color: colors.error,
+    fontSize: typography.textSm,
+  },
+  retryText: {
+    color: colors.accent,
+    fontSize: typography.textSm,
+    fontWeight: typography.fontMedium,
+    marginTop: spacing[2],
   },
 });
 

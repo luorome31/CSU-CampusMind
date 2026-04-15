@@ -27,6 +27,11 @@ export const knowledgeApi = {
     return response.data || [];
   },
 
+  async fetchFiles(kbId: string): Promise<KnowledgeFile[]> {
+    const response = await apiClient.get<KnowledgeFile[]>(`/knowledge/${kbId}/files`);
+    return response.data || [];
+  },
+
   async getPendingFiles(): Promise<KnowledgeFile[]> {
     const response = await apiClient.get<KnowledgeFile[]>('/knowledge_file/pending_verify');
     return response.data || [];
