@@ -24,19 +24,10 @@ describe('User types', () => {
         session_id: 'session-1',
         device: 'iPhone 15',
         location: 'Beijing',
-        created_at: '2024-01-01T00:00:00Z',
+        created_at: 1704067200,
         is_current: true,
       };
       expect(session.is_current).toBe(true);
-    });
-
-    it('should accept minimal session', () => {
-      const session: Session = {
-        session_id: 'session-2',
-        created_at: '2024-01-01T00:00:00Z',
-        is_current: false,
-      };
-      expect(session.device).toBeUndefined();
     });
   });
 });

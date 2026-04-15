@@ -13,8 +13,8 @@ export interface UsageStats {
 
 export interface Session {
   session_id: string;
-  device?: string;
-  location?: string;
-  created_at: string;
+  device: string;
+  location: string;
+  created_at: number;
   is_current: boolean;
 }

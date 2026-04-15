@@ -6,7 +6,7 @@ import { Badge } from '../../../components/ui/Badge';
 import { colors, typography, spacing, elevation } from '../../../styles';
 import { useProfileStore } from '../profileStore';
 
-const getDeviceIcon = (device?: string) => {
+const getDeviceIcon = (device: string) => {
   if (!device) return Monitor;
   const d = device.toLowerCase();
   if (
@@ -20,8 +20,8 @@ const getDeviceIcon = (device?: string) => {
   return Monitor;
 };
 
-const formatTime = (timestamp: string) => {
-  const date = new Date(timestamp);
+const formatTime = (timestamp: number) => {
+  const date = new Date(timestamp * 1000);
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   const minutes = Math.floor(diff / (1000 * 60));
@@ -51,7 +51,7 @@ export function SessionList() {
                   <DeviceIcon size={20} color={colors.accent} />
                 </View>
                 <View style={styles.info}>
-                  <Text style={styles.deviceName}>{session.device || '未知设备'}</Text>
+                  <Text style={styles.deviceName}>{session.device}</Text>
                   <Text style={styles.meta}>
                     {session.location || '未知位置'} • {formatTime(session.created_at)}
                   </Text>
