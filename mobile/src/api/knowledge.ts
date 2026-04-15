@@ -5,7 +5,7 @@ export interface KnowledgeFile {
   id: string;
   kb_id: string;
   file_name: string;
-  status: 'pending' | 'processing' | 'ready' | 'error';
+  status: 'pending' | 'processing' | 'ready' | 'error' | 'verified';
   size?: number;
   create_time: string;
   update_time: string;

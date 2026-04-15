@@ -5,6 +5,9 @@ node_modules/
 dist/
 build/
 
+# Allow feature build directories
+!src/features/build/
+
 # Lock files
 package-lock.json
 
