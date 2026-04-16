@@ -11,7 +11,7 @@ export function HomeScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    listDialogs(10)
+    listDialogs()
       .then(setDialogs)
       .catch(() => setDialogs([]))
       .finally(() => setLoading(false));

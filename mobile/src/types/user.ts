@@ -2,18 +2,19 @@
  * User/Profile 模块类型定义
  */
 
+export type { User } from './api';
+
 export interface UsageStats {
-  dialog_count: number;
+  conversation_count: number;
   message_count: number;
   knowledge_base_count: number;
-  joined_at: string;
+  join_date: string;
 }
 
 export interface Session {
-  id: string;
-  device?: string;
-  location?: string;
-  ip_address?: string;
-  last_active_at: string;
+  session_id: string;
+  device: string;
+  location: string;
+  created_at: number;
   is_current: boolean;
 }

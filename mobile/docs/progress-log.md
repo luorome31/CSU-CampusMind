@@ -21,4 +21,4 @@
 | 7 | 2026-04-14 | 完成 F-020 ToolGroup 组件：内联折叠卡片设计，显示工具调用进度和状态图标(成功/失败/进行中)，展开后显示每个工具的名称、输入、输出、错误信息 | |
 | 8 | 2026-04-15 | 完成 build 模块：Completed F-030 to F-034: BuildStore, CrawlPanel, TaskList, TaskCard, ReviewInbox, ReviewEditor, BuildScreen | All build module features implemented with tests |
 | 9 | 2026-04-16 | 完成 knowledge 模块：F-023~F-029: KnowledgeStore (KB列表/文件列表/文件内容状态管理)、KnowledgeCard (KB卡片)、FileTable (文件列表)、FileContentViewer (Markdown渲染)、RAGSwitch (RAG开关+KB选择器)、KnowledgeScreen+KnowledgeDetailScreen+FileDetailScreen (三级导航)、Build入口跳转；修复Markdown图片key prop错误和status值与API不匹配问题 | c34e2f4 |
-
+| 10 | 2026-04-16 | 完成 profile 模块：F-035~F-039 ProfileStore/ProfileCard/StatsGrid/SessionList/ProfileScreen | |
