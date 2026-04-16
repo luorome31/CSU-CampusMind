@@ -2,6 +2,9 @@
 import { useCallback, useRef } from 'react';
 import { useChatStore, type ChatMessage, type ToolEvent } from './chatStore';
 import { createChatStream, type ChatStreamOptions } from '../../api/chat';
+import { logger } from '../../utils/logger';
+
+const TAG = 'useChatStream';
 
 let toolEventIdCounter = 0;
 function generateToolEventId(): string {
@@ -13,7 +16,7 @@ export function useChatStream() {
 
   const sendMessage = useCallback(
     (content: string, knowledgeIds: string[]) => {
-      console.log('[useChatStream] sendMessage called with:', { content, knowledgeIds });
+      logger.debug(TAG, 'sendMessage called with:', { content, knowledgeIds });
 
       // Cancel any existing stream
       if (abortRef.current) {
@@ -22,7 +25,7 @@ export function useChatStream() {
       }
 
       const store = useChatStore.getState();
-      console.log('[useChatStream] Store state - currentDialogId:', store.currentDialogId);
+      logger.debug(TAG, 'Store state - currentDialogId:', store.currentDialogId);
 
       // Add user message
       const userMessage: ChatMessage = {
@@ -32,7 +35,7 @@ export function useChatStream() {
         created_at: new Date().toISOString(),
         events: [],
       };
-      console.log('[useChatStream] Adding user message:', userMessage);
+      logger.debug(TAG, 'Adding user message:', userMessage);
       store.addMessage(userMessage);
 
       // Create assistant placeholder
@@ -43,33 +46,33 @@ export function useChatStream() {
         created_at: new Date().toISOString(),
         events: [],
       };
-      console.log('[useChatStream] Adding assistant placeholder:', assistantMessage);
+      logger.debug(TAG, 'Adding assistant placeholder:', assistantMessage);
       store.addMessage(assistantMessage);
 
       // Start streaming
       store.setToolEvents([]);
       useChatStore.setState({ isStreaming: true });
-      console.log('[useChatStream] Streaming started, isStreaming: true');
+      logger.debug(TAG, 'Streaming started, isStreaming: true');
 
       const options: ChatStreamOptions = {
         dialogId: store.currentDialogId ?? undefined,
         knowledgeIds,
         enableRag: store.enableRag && knowledgeIds.length > 0,
       };
-      console.log('[useChatStream] Stream options:', options);
+      logger.debug(TAG, 'Stream options:', options);
 
       const { abort } = createChatStream(content, options, {
         onChunk: (chunk: string) => {
-          console.log('[useChatStream] onChunk:', chunk);
+          logger.debug(TAG, 'onChunk:', chunk);
         },
         onEvent: (eventType: string, data: Record<string, unknown>) => {
-          console.log('[useChatStream] onEvent:', eventType, data);
+          logger.debug(TAG, 'onEvent:', eventType, data);
           if (eventType === 'response_chunk') {
             // Backend sends: {type: "response_chunk", data: {chunk: "..."}}
             // Chunk is at data.data.chunk
             const nestedData = data.data as Record<string, unknown> | undefined;
             const accumulated = (nestedData?.accumulated || nestedData?.chunk || data.accumulated || data.chunk || '') as string;
-            console.log('[useChatStream] Updating streaming message, accumulated length:', accumulated.length);
+            logger.debug(TAG, 'Updating streaming message, accumulated length:', accumulated.length);
             useChatStore.getState().updateStreamingMessage(accumulated);
           } else if (eventType === 'event' || eventType === 'tool_event') {
             // Backend sends: {type: "event", data: {id, status, title, message}}
@@ -87,12 +90,12 @@ export function useChatStream() {
               status: toolData.status,
               timestamp: new Date().toISOString(),
             };
-            console.log('[useChatStream] Adding tool event:', toolEvent);
+            logger.debug(TAG, 'Adding tool event:', toolEvent);
             useChatStore.getState().addToolEvent(toolEvent);
           }
         },
         onNewDialog: (dialogId: string) => {
-          console.log('[useChatStream] onNewDialog:', dialogId);
+          logger.debug(TAG, 'onNewDialog:', dialogId);
           if (!useChatStore.getState().currentDialogId) {
             useChatStore.getState().setCurrentDialogId(dialogId);
             useChatStore.getState().upsertDialog({
@@ -103,7 +106,7 @@ export function useChatStream() {
           }
         },
         onTitleUpdate: (title: string) => {
-          console.log('[useChatStream] onTitleUpdate:', title);
+          logger.debug(TAG, 'onTitleUpdate:', title);
           const currentId = useChatStore.getState().currentDialogId;
           if (currentId) {
             useChatStore.getState().upsertDialog({
@@ -114,12 +117,12 @@ export function useChatStream() {
           }
         },
         onDone: () => {
-          console.log('[useChatStream] onDone - streaming finished');
+          logger.debug(TAG, 'onDone - streaming finished');
           useChatStore.getState().finishStreaming();
           abortRef.current = null;
         },
         onError: (error: Error) => {
-          console.error('[useChatStream] onError:', error);
+          logger.error(TAG, 'onError:', error);
           useChatStore.getState().finishStreaming();
           abortRef.current = null;
         },
@@ -131,7 +134,7 @@ export function useChatStream() {
   );
 
   const cancelStream = useCallback(() => {
-    console.log('[useChatStream] cancelStream called');
+    logger.debug(TAG, 'cancelStream called');
     if (abortRef.current) {
       abortRef.current();
       abortRef.current = null;

@@ -4,6 +4,7 @@
  */
 
 import { storage } from '../utils/storage';
+import { logger } from '../utils/logger';
 import { setUnauthorizedCallback } from './client';
 
 export interface ChatStreamOptions {
@@ -23,6 +24,8 @@ export interface ChatStreamCallbacks {
   onError: (error: Error) => void;
 }
 
+const TAG = 'ChatAPI';
+
 /**
  * Handle events dynamically
  */
@@ -32,7 +35,7 @@ function handleEventData(dataStr: string, callbacks: ChatStreamCallbacks) {
     
     // Check for new dialog ID
     if (data.newDialogId) {
-      console.log('[ChatAPI] New dialog ID:', data.newDialogId);
+      logger.debug(TAG, 'New dialog ID:', data.newDialogId);
       callbacks.onNewDialog(data.newDialogId as string);
       callbacks.onEvent('new_dialog', { dialog_id: data.newDialogId });
       return;
@@ -53,17 +56,17 @@ function handleEventData(dataStr: string, callbacks: ChatStreamCallbacks) {
       callbacks.onEvent('response_chunk', data);
     } else if (eventType === 'title_update') {
       const title = (payload?.title || data.title) as string;
-      console.log('[ChatAPI] Title update:', title);
+      logger.debug(TAG, 'Title update:', title);
       callbacks.onTitleUpdate(title);
       callbacks.onEvent('title_update', data);
     } else if (eventType === 'event' || eventType === 'tool_event') {
-      console.log('[ChatAPI] Tool event:', data);
+      logger.debug(TAG, 'Tool event:', data);
       callbacks.onEvent('event', data as Record<string, unknown>);
     } else {
-      console.log('[ChatAPI] Unknown event type:', eventType);
+      logger.debug(TAG, 'Unknown event type:', eventType);
     }
   } catch (err) {
-    console.log('[ChatAPI] Failed to parse SSE data:', dataStr);
+    logger.warn(TAG, 'Failed to parse SSE data:', dataStr);
   }
 }
 
@@ -120,7 +123,7 @@ export function createChatStream(
         min_score: minScore,
       });
 
-      console.log('[ChatAPI] Creating native XHR SSE connection to:', url);
+      logger.debug(TAG, 'Creating native XHR SSE connection to:', url);
 
       let processedLength = 0;
       let lineBuffer = '';
@@ -157,7 +160,7 @@ export function createChatStream(
 
         // Handle termination
         if (xhr.readyState === XMLHttpRequest.DONE) {
-          console.log('[ChatAPI] XHR done, status:', xhr.status);
+          logger.debug(TAG, 'XHR done, status:', xhr.status);
           
           // Process trailing buffer data if exists
           const finalTrimmed = lineBuffer.trim();
@@ -191,7 +194,7 @@ export function createChatStream(
       xhr.send(body);
 
     } catch (error) {
-      console.log('[ChatAPI] Exception:', error);
+      logger.error(TAG, 'Exception:', error);
       if (!aborted) {
         callbacks.onError(error instanceof Error ? error : new Error(String(error)));
       }

@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { network } from '../utils/network';
+import { logger } from '../utils/logger';
+
+const TAG = 'Network';
 
 export function useNetworkStatus() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
@@ -16,10 +19,10 @@ export function useNetworkStatus() {
 
       // 使用 ref 避免 stale closure
       if (!connected && !toastShownRef.current) {
-        console.log('网络不可用');
+        logger.warn(TAG, '网络不可用');
         toastShownRef.current = true;
       } else if (connected && toastShownRef.current) {
-        console.log('网络已恢复');
+        logger.info(TAG, '网络已恢复');
         toastShownRef.current = false;
       }
     });

@@ -4,8 +4,11 @@
 import { create } from 'zustand';
 import { authApi } from './api/auth';
 import { storage } from '../../utils/storage';
+import { logger } from '../../utils/logger';
 import { setUnauthorizedCallback } from '../../api/client';
 import type { User } from '../../types/api';
+
+const TAG = 'AuthStore';
 
 interface AuthState {
   user: User | null;
@@ -33,12 +36,12 @@ export const useAuthStore = create<AuthStore>((set) => ({
   login: async (username: string, password: string) => {
     set({ isLoading: true });
     try {
-      console.log('[AuthStore] 开始调用 authApi.login...');
+      logger.debug(TAG, '开始调用 authApi.login...');
       const response = await authApi.login(username, password);
-      console.log('[AuthStore] API返回响应状态:', response.status);
+      logger.debug(TAG, 'API返回响应状态:', response.status);
       
       const data = response.data;
-      console.log('[AuthStore] 解析到的响应数据:', data);
+      logger.debug(TAG, '解析到的响应数据:', data);
 
       const user: User = {
         id: data.user_id,
@@ -47,17 +50,17 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const token = data.token;
       const sessionId = data.session_id;
 
-      console.log('[AuthStore] 写入 token...');
+      logger.debug(TAG, '写入 token...');
       await storage.setToken(token);
-      console.log('[AuthStore] 写入 sessionId...');
+      logger.debug(TAG, '写入 sessionId...');
       await storage.setSessionId(sessionId);
 
-      console.log('[AuthStore] 认证完成，更新 store 状态');
+      logger.debug(TAG, '认证完成，更新 store 状态');
       set({ user, token, sessionId, isAuthenticated: true, isLoading: false });
     } catch (error: any) {
-      console.error('[AuthStore] Login failed with error:', error?.message || error);
+      logger.error(TAG, 'Login failed with error:', error?.message || error);
       if (error?.response) {
-         console.error('[AuthStore] 响应详情:', error.response.data);
+         logger.error(TAG, '响应详情:', error.response.data);
       }
       set({ isLoading: false });
       throw error;
