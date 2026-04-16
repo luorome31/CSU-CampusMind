@@ -3,17 +3,8 @@
  * 参考 Web 端 LoginPage.tsx 实现
  */
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from 'react-native';
+import { View, TouchableOpacity, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { Text, TextInput } from '@/components/ui/StyledText';
 import { useAuthStore } from './authStore';
 import { colors, typography, spacing } from '../../styles';
 import {

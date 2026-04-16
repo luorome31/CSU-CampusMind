@@ -4,15 +4,8 @@
  */
 
 import React from 'react';
-import {
-  TextInput,
-  View,
-  Text,
-  StyleSheet,
-  TextInputProps,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
+import { View, StyleSheet, TextInputProps, ViewStyle, TextStyle } from 'react-native';
+import { Text, TextInput } from '@/components/ui/StyledText';
 import { colors, typography, spacing, elevation } from '../../../styles';
 
 // === Types ===

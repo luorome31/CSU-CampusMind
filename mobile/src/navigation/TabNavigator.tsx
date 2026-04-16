@@ -6,7 +6,8 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { BlurView } from 'expo-blur';
 import { Home, MessageCircle, BookOpen, User } from 'lucide-react-native';
 import {

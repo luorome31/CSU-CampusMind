@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { TaskCard } from './TaskCard';
 import { useBuildStore } from '../../../features/build/buildStore';
 import { colors, typography, spacing } from '../../../styles';

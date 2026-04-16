@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, ActivityIndicator, View, Text } from 'react-native';
+import { ScrollView, StyleSheet, ActivityIndicator, View } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeroBanner, FeatureGrid, HistoryList } from '../components/home';
 import { listDialogs } from '../api/dialog';
@@ -54,7 +55,6 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: typography.fontBold,
     color: colors.text,
   },
   scroll: {

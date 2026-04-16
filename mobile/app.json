@@ -5,7 +5,9 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.campusmind.mobile"
@@ -13,6 +15,8 @@
     "android": {
       "package": "com.campusmind.mobile"
     },
-    "plugins": []
+    "plugins": [
+      "expo-font"
+    ]
   }
 }

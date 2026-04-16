@@ -8,13 +8,8 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Keyboard,
-} from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Keyboard } from 'react-native';
+import { TextInput } from '@/components/ui/StyledText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Send } from 'lucide-react-native';
 import { colors, spacing } from '../../../styles';

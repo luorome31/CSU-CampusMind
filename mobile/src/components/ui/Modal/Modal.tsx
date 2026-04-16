@@ -4,17 +4,8 @@
  */
 
 import React from 'react';
-import {
-  Modal as RNModal,
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
+import { Modal as RNModal, View, Pressable, StyleSheet, ScrollView, SafeAreaView, ViewStyle, TextStyle } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { colors, typography, spacing, elevation } from '../../../styles';
 
 export interface ModalProps {

@@ -1,6 +1,7 @@
 // mobile/src/components/build/CrawlTab/UrlImportModal.tsx
 import React, { useState } from 'react';
-import { View, Text, TextInput, Modal, Pressable, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Modal, Pressable, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { Text, TextInput } from '@/components/ui/StyledText';
 import { X } from 'lucide-react-native';
 import { useBuildStore } from '../../../features/build/buildStore';
 import { colors, typography, spacing, elevation } from '../../../styles';

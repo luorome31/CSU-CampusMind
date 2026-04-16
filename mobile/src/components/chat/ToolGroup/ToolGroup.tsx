@@ -8,7 +8,8 @@
  */
 
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { Wrench, ChevronDown, ChevronRight, ChevronUp, CheckCircle2, XCircle, RefreshCw } from 'lucide-react-native';
 import { colors, spacing } from '../../../styles';
 import type { ToolEvent } from '../../../types/chat';

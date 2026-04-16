@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { Card } from '../../ui';
 import { Badge } from '../../ui/Badge';
 import { colors, typography, spacing, elevation } from '../../../styles';

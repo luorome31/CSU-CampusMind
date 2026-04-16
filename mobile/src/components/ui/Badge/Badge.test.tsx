@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Text } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { render, screen } from '@testing-library/react-native';
 import { Badge } from './Badge';
 

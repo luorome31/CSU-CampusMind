@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Pressable, StyleSheet } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { Check, X, Loader2, Trash2, RotateCw, ChevronDown, ChevronUp } from 'lucide-react-native';
 import { CrawlTask } from '../../../api/crawl';
 import { colors, typography, spacing, elevation } from '../../../styles';

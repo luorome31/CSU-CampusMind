@@ -6,7 +6,8 @@
  */
 
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { colors } from '../../../styles/tokens/colors';
 import { typography } from '../../../styles/tokens/typography';
 import { spacing } from '../../../styles/tokens/spacing';

@@ -1,13 +1,6 @@
 import React, { useEffect } from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  ActivityIndicator,
-  View,
-  Text,
-  Pressable,
-  Alert,
-} from 'react-native';
+import { ScrollView, StyleSheet, ActivityIndicator, View, Pressable, Alert } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Info, FileText, LogOut } from 'lucide-react-native';
 import { ProfileCard, StatsGrid, SessionList } from '../features/profile/components';
@@ -92,7 +85,6 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: typography.textLg,
-    fontWeight: typography.fontBold,
     color: colors.text,
   },
   scroll: {

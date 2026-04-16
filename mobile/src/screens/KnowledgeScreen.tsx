@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react';
-import { View, StyleSheet, ScrollView, Text, Pressable, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable, ActivityIndicator, RefreshControl } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Plus } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';

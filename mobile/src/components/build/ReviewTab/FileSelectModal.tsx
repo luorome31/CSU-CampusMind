@@ -1,6 +1,7 @@
 // mobile/src/components/build/ReviewTab/FileSelectModal.tsx
 import React from 'react';
-import { View, Text, Modal, Pressable, FlatList, StyleSheet } from 'react-native';
+import { View, Modal, Pressable, FlatList, StyleSheet } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { X, FileText } from 'lucide-react-native';
 import { KnowledgeFile } from '../../../api/knowledge';
 import { colors, typography, spacing, elevation } from '../../../styles';

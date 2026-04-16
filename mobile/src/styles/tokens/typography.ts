@@ -6,9 +6,9 @@
 import { Platform, TextStyle } from 'react-native';
 
 const fontFamily = Platform.select({
-  ios: 'System',
-  android: 'Roboto',
-  default: 'System',
+  ios: 'LXGWWenKaiScreen',
+  android: 'LXGWWenKaiScreen',
+  default: 'LXGWWenKaiScreen',
 });
 
 export const typography = {

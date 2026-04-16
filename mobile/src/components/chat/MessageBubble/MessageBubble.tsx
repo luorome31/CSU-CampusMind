@@ -7,7 +7,8 @@
  */
 
 import React, { useMemo } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import { View, Image, StyleSheet, ScrollView } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import Markdown from 'react-native-markdown-display';
 import { colors } from '../../../styles/tokens/colors';
 import type { ChatMessage } from '../../../features/chat/chatStore';
@@ -88,29 +89,37 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   );
 };
 
+const FONT = 'LXGWWenKaiScreen';
+
 // Markdown styles for assistant messages
 const markdownStyles = StyleSheet.create({
+  // `body` applies to the root View container
   body: {
-    color: colors.assistantText,
-    fontSize: 16,
+    color: colors.text,
+  },
+  // `text` applies to ALL Text nodes — this is the key for global font
+  text: {
+    fontFamily: FONT,
+    fontSize: 15,
     lineHeight: 24,
+    color: colors.text,
   },
   heading1: {
-    color: colors.text,
-    fontSize: 20,
-    fontWeight: 'bold',
+    color: '#5A7F93', // Instead of bold
+    fontSize: 21,
+    fontFamily: FONT,
     marginVertical: 4,
   },
   heading2: {
-    color: colors.text,
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: '#5A7F93',
+    fontSize: 19,
+    fontFamily: FONT,
     marginVertical: 3,
   },
   heading3: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: '#5A7F93',
+    fontSize: 17,
+    fontFamily: FONT,
     marginVertical: 2,
   },
   paragraph: {
@@ -125,7 +134,7 @@ const markdownStyles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 2,
     borderRadius: 4,
-    fontFamily: 'monospace',
+    fontFamily: FONT,
     fontSize: 14,
   },
   code_block: {
@@ -157,10 +166,12 @@ const markdownStyles = StyleSheet.create({
     marginVertical: 4,
   },
   strong: {
-    fontWeight: 'bold',
+    color: '#5A7F93', // Instead of bold
+    fontFamily: FONT,
   },
   em: {
     fontStyle: 'italic',
+    fontFamily: FONT,
   },
   hr: {
     backgroundColor: colors.border,
@@ -208,7 +219,7 @@ const styles = StyleSheet.create({
   },
   userText: {
     color: colors.text,
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 24,
   },
 });

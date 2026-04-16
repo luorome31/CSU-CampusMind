@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
+import { View, StyleSheet, Pressable, Image } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { Card } from '../ui/Card';
@@ -55,7 +56,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontWeight: typography.fontBold,
     color: colors.text,
     marginBottom: spacing[2],
   },

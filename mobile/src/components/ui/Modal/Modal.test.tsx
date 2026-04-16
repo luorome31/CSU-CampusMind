@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react-native';
-import { Text } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { Modal } from './Modal';
 
 describe('Modal Component', () => {

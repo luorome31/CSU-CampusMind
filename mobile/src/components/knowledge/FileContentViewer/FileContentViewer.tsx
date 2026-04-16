@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import Markdown, {
   // @ts-expect-error - FitImage is exported in JS but missing in type definitions
   FitImage

@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback } from 'react';
-import { View, Text, TextInput, ScrollView, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, ScrollView, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
+import { Text, TextInput } from '@/components/ui/StyledText';
 import { Play, Upload, Trash2 } from 'lucide-react-native';
 import { useBuildStore } from '../../../features/build/buildStore';
 import { colors, typography, spacing, elevation } from '../../../styles';

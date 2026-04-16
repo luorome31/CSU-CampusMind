@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react-native';
-import { Text } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { MessageList } from './MessageList';
 import type { ChatMessage } from '../../../features/chat/chatStore';
 

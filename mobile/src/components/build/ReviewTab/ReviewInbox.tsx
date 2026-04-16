@@ -1,6 +1,7 @@
 // mobile/src/components/build/ReviewTab/ReviewInbox.tsx
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Pressable, StyleSheet } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { ClipboardList } from 'lucide-react-native';
 import { colors, typography, spacing, elevation } from '../../../styles';
 

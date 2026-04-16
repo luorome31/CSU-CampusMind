@@ -4,7 +4,8 @@
 
 import React from 'react';
 import { render, screen } from '@testing-library/react-native';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { Card } from './Card';
 
 describe('Card Component', () => {

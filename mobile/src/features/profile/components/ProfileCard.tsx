@@ -1,6 +1,7 @@
 // mobile/src/features/profile/components/ProfileCard.tsx
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, TextInput } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
+import { Text, TextInput } from '@/components/ui/StyledText';
 import { Camera, Check, X } from 'lucide-react-native';
 import { Card } from '../../../components/ui/Card';
 import { colors, typography, spacing, elevation } from '../../../styles';

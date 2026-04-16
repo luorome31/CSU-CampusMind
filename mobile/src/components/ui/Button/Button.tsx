@@ -4,15 +4,8 @@
  */
 
 import React from 'react';
-import {
-  Pressable,
-  Text,
-  ActivityIndicator,
-  StyleSheet,
-  ViewStyle,
-  TextStyle,
-  View,
-} from 'react-native';
+import { Pressable, ActivityIndicator, StyleSheet, ViewStyle, TextStyle, View } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { colors, typography, spacing, elevation } from '../../../styles';
 
 // === Types ===

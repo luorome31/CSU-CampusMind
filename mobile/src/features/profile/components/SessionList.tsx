@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { Monitor, Smartphone } from 'lucide-react-native';
 import { Card } from '../../../components/ui/Card';
 import { Badge } from '../../../components/ui/Badge';

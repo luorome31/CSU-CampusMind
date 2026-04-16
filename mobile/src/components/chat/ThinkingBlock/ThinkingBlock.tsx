@@ -8,7 +8,8 @@
  */
 
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { Brain, ChevronDown, ChevronRight, ChevronUp } from 'lucide-react-native';
 import ReactMarkdown from 'react-native-markdown-display';
 import { colors, spacing } from '../../../styles';
@@ -76,9 +77,10 @@ export const ThinkingBlock: React.FC<ThinkingBlockProps> = ({ thinking }) => {
 // Markdown styles for thinking content
 const markdownStyles = StyleSheet.create({
   body: {
-    color: colors.assistantText,
+    color: colors.text,
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 23,
+    fontFamily: 'LXGWWenKaiScreen',
   },
   paragraph: {
     marginVertical: 2,

@@ -1,6 +1,7 @@
 // mobile/src/components/build/ReviewTab/ReviewEditor.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Pressable, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import { Text, TextInput } from '@/components/ui/StyledText';
 import Markdown, {
   // @ts-expect-error - FitImage is exported in JS but missing in type definitions
   FitImage

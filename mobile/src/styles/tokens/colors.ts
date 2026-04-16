@@ -30,7 +30,7 @@ export const colors = {
   danger: '#8B3A3A',
 
   // === Chat Specific ===
-  assistantText: '#2D2B28',
+  assistantText: '#36332eff',
   moodBg: 'rgba(83, 125, 150, 0.05)',
   moodText: '#537D96',
   moodBorder: 'rgba(83, 125, 150, 0.16)',

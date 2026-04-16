@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
+import { View, StyleSheet, FlatList, Pressable } from 'react-native';
+import { Text } from '@/components/ui/StyledText';
 import { Badge } from '../../ui/Badge';
 import { colors, typography, spacing, elevation } from '../../../styles';
 import type { KnowledgeFile } from '../../../api/knowledge';
