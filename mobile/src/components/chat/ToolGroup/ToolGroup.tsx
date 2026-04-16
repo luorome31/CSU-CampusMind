@@ -104,7 +104,7 @@ export const ToolGroup: React.FC<ToolGroupProps> = ({ events }) => {
         <View style={styles.content}>
           {events.map((event) => (
             <View key={event.id} style={styles.toolItem}>
-              <View style={styles.toolHeader}>
+              <View style={[styles.toolHeader, { marginBottom: 0 }]}>
                 {getToolStatusIcon(event.status)}
                 <Text style={[styles.toolName, { marginLeft: spacing[2] }]}>{event.name}</Text>
                 <Text
@@ -117,39 +117,6 @@ export const ToolGroup: React.FC<ToolGroupProps> = ({ events }) => {
                   {getToolStatusText(event.status)}
                 </Text>
               </View>
-
-              {/* Input section */}
-              {event.input && Object.keys(event.input).length > 0 && (
-                <View style={styles.toolSection}>
-                  <View style={styles.codeBlock}>
-                    <Text style={styles.codeText}>
-                      {JSON.stringify(event.input, null, 2)}
-                    </Text>
-                  </View>
-                </View>
-              )}
-
-              {/* Output section */}
-              {event.output && Object.keys(event.output).length > 0 && (
-                <View style={styles.toolSection}>
-                  <View style={styles.codeBlock}>
-                    <Text style={styles.codeText}>
-                      {JSON.stringify(event.output, null, 2)}
-                    </Text>
-                  </View>
-                </View>
-              )}
-
-              {/* Error section */}
-              {event.error && (
-                <View style={styles.toolSection}>
-                  <View style={[styles.codeBlock, styles.errorBlock]}>
-                    <Text style={[styles.codeText, styles.errorText]}>
-                      {event.error}
-                    </Text>
-                  </View>
-                </View>
-              )}
             </View>
           ))}
         </View>

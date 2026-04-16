@@ -203,14 +203,40 @@ export const useChatStore = create<ChatStore>((set) => ({
       let events: ToolEvent[] = [];
       if (m.events) {
         try {
-          const parsed = JSON.parse(m.events) as ToolEvent[];
+          const rawEvents = JSON.parse(m.events) as any[];
           // Merge events with same id (same as addToolEvent logic)
-          for (const event of parsed) {
-            const existingIdx = events.findIndex((e) => e.id === event.id);
+          for (const raw of rawEvents) {
+            const mapped: ToolEvent = {
+              id: raw.id || `tool_${Date.now()}_${Math.random()}`,
+              type: raw.type || 'tool_call',
+              name: raw.name || raw.title || 'Unknown Tool',
+              status: raw.status || 'START',
+              timestamp: raw.timestamp || m.created_at,
+            };
+
+            // Parse message string into input/output where possible
+            if (raw.message && typeof raw.message === 'string') {
+              if (raw.status === 'START') {
+                try {
+                  mapped.input = JSON.parse(raw.message);
+                } catch {
+                  mapped.input = { content: raw.message };
+                }
+              } else if (raw.status === 'END') {
+                mapped.output = { content: raw.message };
+              }
+            }
+
+            // Prefer existing fields if they exist
+            if (raw.input) mapped.input = raw.input;
+            if (raw.output) mapped.output = raw.output;
+            if (raw.error) mapped.error = raw.error;
+
+            const existingIdx = events.findIndex((e) => e.id === mapped.id);
             if (existingIdx >= 0) {
-              events[existingIdx] = { ...events[existingIdx], ...event };
+              events[existingIdx] = { ...events[existingIdx], ...mapped };
             } else {
-              events.push(event);
+              events.push(mapped);
             }
           }
         } catch {
