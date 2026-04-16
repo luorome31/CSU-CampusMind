@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   },
   inputWrapper: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     backgroundColor: colors.background,
     borderRadius: 20,
     borderWidth: 1,
@@ -114,8 +114,9 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     fontSize: 16,
+    lineHeight: 20,
     color: colors.text,
-    paddingVertical: 4,
+    paddingVertical: 8,
     paddingHorizontal: 0,
     margin: 0,
   },
@@ -125,6 +126,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
+    alignSelf: 'flex-end',
     marginLeft: spacing[2],
     backgroundColor: colors.backgroundGlass,
   },
