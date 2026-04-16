@@ -4,6 +4,7 @@
  */
 
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { Platform } from 'react-native';
 import { storage } from '../utils/storage';
 import { ApiError } from '../types/api';
 
@@ -21,6 +22,7 @@ const createApiClient = () => {
     timeout: 30000,
     headers: {
       'Content-Type': 'application/json',
+      'User-Agent': `CampusMind/1.0.0 (${Platform.OS === 'ios' ? 'iPhone' : 'Android'}; Mobile)`,
     },
   });
 
